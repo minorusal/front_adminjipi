@@ -37,7 +37,11 @@
         </ul>
       </ng-container>
       <ng-template #leaf>
-        <a class="menu-item" (click)="navigateTo(node.path)">
+        <a
+          class="menu-item"
+          [routerLink]="node.path"
+          (click)="menuOpen = false"
+        >
           <span>{{ node.name }}</span>
         </a>
       </ng-template>

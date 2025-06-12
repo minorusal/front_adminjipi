@@ -94,12 +94,6 @@ export class DashboardComponent implements OnInit {
     return !!this.expanded[id];
   }
 
-  navigateTo(path: string | null | undefined): void {
-    if (path) {
-      this.router.navigate([path]);
-      this.menuOpen = false;
-    }
-  }
 
   onLogout(): void {
     this.logout.emit();

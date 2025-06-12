@@ -8,9 +8,20 @@ import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SettingsComponent } from './settings/settings.component';
 import { HomeComponent } from './home/home.component';
+import { VentasComponent } from './ventas/ventas.component';
+import { ProductosComponent } from './productos/productos.component';
+import { BodegasComponent } from './bodegas/bodegas.component';
 
 @NgModule({
-  declarations: [AppComponent, DashboardComponent, SettingsComponent, HomeComponent],
+  declarations: [
+    AppComponent,
+    DashboardComponent,
+    SettingsComponent,
+    HomeComponent,
+    VentasComponent,
+    ProductosComponent,
+    BodegasComponent
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
