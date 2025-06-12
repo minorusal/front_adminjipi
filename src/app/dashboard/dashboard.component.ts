@@ -1,0 +1,20 @@
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css']
+})
+export class DashboardComponent {
+  @Input() user: { name: string; company: string } | null = null;
+  menuOpen = false;
+  submenus: Record<string, boolean> = {};
+
+  toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  toggleSubmenu(key: string): void {
+    this.submenus[key] = !this.submenus[key];
+  }
+}

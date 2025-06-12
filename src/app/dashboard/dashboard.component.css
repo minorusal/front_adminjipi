@@ -1,0 +1,64 @@
+.dashboard {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  background: #444654;
+  color: #fff;
+  padding: 0.5rem 1rem;
+}
+
+.hamburger {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  margin-right: 1rem;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+}
+
+.sidemenu {
+  width: 200px;
+  background: #343541;
+  color: #fff;
+  transition: transform 0.3s ease;
+  transform: translateX(-100%);
+}
+
+.sidemenu.open {
+  transform: translateX(0);
+}
+
+.sidemenu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+}
+
+.submenu {
+  display: none;
+  padding-left: 1rem;
+}
+
+.submenu.open {
+  display: block;
+}
+
+.content {
+  flex: 1;
+  padding: 1rem;
+}

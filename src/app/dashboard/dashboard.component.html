@@ -1,0 +1,31 @@
+<div class="dashboard">
+  <header class="topbar">
+    <button class="hamburger" (click)="toggleMenu()">&#9776;</button>
+    <div class="userinfo" *ngIf="user">
+      {{ user.name }} - {{ user.company }}
+    </div>
+  </header>
+  <div class="body">
+    <nav class="sidemenu" [class.open]="menuOpen">
+      <ul>
+        <li>
+          <div class="menu-item" (click)="toggleSubmenu('m1')">Menú 1</div>
+          <ul class="submenu" [class.open]="submenus['m1']">
+            <li>Submenú 1-1</li>
+            <li>Submenú 1-2</li>
+          </ul>
+        </li>
+        <li>
+          <div class="menu-item" (click)="toggleSubmenu('m2')">Menú 2</div>
+          <ul class="submenu" [class.open]="submenus['m2']">
+            <li>Submenú 2-1</li>
+            <li>Submenú 2-2</li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    <main class="content">
+      <h2>Bienvenido al dashboard</h2>
+    </main>
+  </div>
+</div>
