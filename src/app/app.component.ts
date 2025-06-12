@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +14,7 @@ export class AppComponent {
   isLoggedIn = false;
   user: { name: string; company: string } | null = null;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private http: HttpClient) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
@@ -28,11 +29,20 @@ export class AppComponent {
     }
 
     const { username, password } = this.loginForm.value;
-    if (username === 'admin@example.com' && password === 'admin') {
-      this.isLoggedIn = true;
-      this.user = { name: 'Admin', company: 'Empresa Ejemplo' };
-    } else {
-      this.error = 'Los datos son incorrectos';
-    }
+    this.http
+      .post<{ message: string; token: string }>(
+        'http://localhost:3000/auth/login',
+        { username, password }
+      )
+      .subscribe({
+        next: (res) => {
+          document.cookie = `token=${res.token}; path=/`;
+          this.isLoggedIn = true;
+          this.user = { name: username, company: '' };
+        },
+        error: () => {
+          this.error = 'Los datos son incorrectos';
+        }
+      });
   }
 }
