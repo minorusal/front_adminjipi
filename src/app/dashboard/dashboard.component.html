@@ -7,44 +7,9 @@
     <button class="logout" (click)="onLogout()">Cerrar sesión</button>
   </header>
   <div class="body">
-    <nav class="sidemenu" [class.open]="menuOpen">
-      <ul>
-        <ng-template [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ nodes: menuTree }"></ng-template>
-        <li class="bottom-item" routerLinkActive="active">
-          <a class="menu-item" [routerLink]="'settings'" (click)="menuOpen = false">
-            <span class="icon">&#9881;</span>
-            <span>Configuración</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-    <main class="content">
+    <app-sidebar [open]="menuOpen" (closeMenu)="menuOpen = false"></app-sidebar>
+    <main class="content" [style.marginLeft.px]="menuOpen ? 220 : 0">
       <router-outlet></router-outlet>
     </main>
   </div>
 </div>
-
-<ng-template #tree let-nodes>
-  <ng-container *ngFor="let node of nodes">
-    <li [routerLinkActive]="'active'">
-      <ng-container *ngIf="node.children && node.children.length; else leaf">
-        <div class="menu-item" (click)="toggleNode(node.id)">
-          <span>{{ node.name }}</span>
-          <span class="arrow" [class.open]="isOpen(node.id)">&#9654;</span>
-        </div>
-        <ul class="submenu" [class.open]="isOpen(node.id)">
-          <ng-template [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ nodes: node.children }"></ng-template>
-        </ul>
-      </ng-container>
-      <ng-template #leaf>
-        <a
-          class="menu-item"
-          [routerLink]="node.path"
-          (click)="menuOpen = false"
-        >
-          <span>{{ node.name }}</span>
-        </a>
-      </ng-template>
-    </li>
-  </ng-container>
-</ng-template>

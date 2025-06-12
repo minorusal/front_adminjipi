@@ -1,0 +1,87 @@
+.sidemenu {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 220px;
+  background: linear-gradient(180deg, #202123, #343541);
+  color: #fff;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease;
+  transform: translateX(-100%);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidemenu.open {
+  transform: translateX(0);
+}
+
+.sidemenu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sidemenu li {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidemenu li:last-child {
+  border-bottom: none;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.arrow {
+  transition: transform 0.3s ease;
+}
+
+.arrow.open {
+  transform: rotate(90deg);
+}
+
+.submenu {
+  display: none;
+  background: #2c2d36;
+}
+
+.submenu li {
+  padding: 0.5rem 1.5rem;
+}
+
+.submenu.open {
+  display: block;
+}
+
+.submenu .submenu {
+  background: #3c3d46;
+}
+
+.submenu .submenu li {
+  padding-left: 2.5rem;
+}
+
+.bottom-item {
+  margin-top: auto;
+}
+
+.sidemenu li.active .menu-item {
+  background: rgba(255, 255, 255, 0.2);
+}
