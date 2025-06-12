@@ -47,10 +47,17 @@
             <li>Submenú 2-2</li>
           </ul>
         </li>
+        <li class="bottom-item" (click)="selectView('settings')">
+          <div class="menu-item">
+            <span class="icon">&#9881;</span>
+            <span>Configuración</span>
+          </div>
+        </li>
       </ul>
     </nav>
     <main class="content">
-      <h2>Bienvenido al dashboard</h2>
+      <app-settings *ngIf="selectedView === 'settings'"></app-settings>
+      <h2 *ngIf="selectedView === 'home'">Bienvenido al dashboard</h2>
     </main>
   </div>
 </div>
