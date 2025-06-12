@@ -33,17 +33,27 @@ export class SettingsComponent implements OnInit {
 
   loadParentMenus(): void {
     const token = this.getCookie('token');
-    const options = token ? { headers: new HttpHeaders({ token }) } : {};
+    const options = token
+      ? { headers: new HttpHeaders({ token }), withCredentials: true }
+      : { withCredentials: true };
     this.http
-      .get<any[]>(`http://localhost:3000/menus/all?owner_id=${this.ownerId}`, options)
+      .get<any[]>(
+        `http://localhost:3000/menus/all?owner_id=${this.ownerId}`,
+        options
+      )
       .subscribe((menus) => (this.parentMenus = menus));
   }
 
   loadMenuTree(): void {
     const token = this.getCookie('token');
-    const options = token ? { headers: new HttpHeaders({ token }) } : {};
+    const options = token
+      ? { headers: new HttpHeaders({ token }), withCredentials: true }
+      : { withCredentials: true };
     this.http
-      .get<any[]>(`http://localhost:3000/menus?owner_id=${this.ownerId}`, options)
+      .get<any[]>(
+        `http://localhost:3000/menus?owner_id=${this.ownerId}`,
+        options
+      )
       .subscribe((tree) => (this.menuTree = tree));
   }
 
@@ -56,7 +66,9 @@ export class SettingsComponent implements OnInit {
       owner_id: this.ownerId
     };
     const token = this.getCookie('token');
-    const options = token ? { headers: new HttpHeaders({ token }) } : {};
+    const options = token
+      ? { headers: new HttpHeaders({ token }), withCredentials: true }
+      : { withCredentials: true };
     this.http.post('http://localhost:3000/menus', body, options).subscribe({
       next: () => {
         this.menuForm.reset();

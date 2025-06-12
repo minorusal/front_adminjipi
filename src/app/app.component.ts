@@ -69,7 +69,9 @@ export class AppComponent implements OnInit {
 
   private performLogout(): void {
     const token = this.getCookie('token');
-    const options = token ? { headers: new HttpHeaders({ token }) } : {};
+    const options = token
+      ? { headers: new HttpHeaders({ token }), withCredentials: true }
+      : { withCredentials: true };
     this.http
       .post('http://localhost:3000/auth/logout', {}, options)
       .subscribe({
@@ -97,7 +99,8 @@ export class AppComponent implements OnInit {
     this.http
       .post<LoginResponse>(
         'http://localhost:3000/auth/login',
-        { username, password }
+        { username, password },
+        { withCredentials: true }
       )
       .subscribe({
         next: (res) => {
