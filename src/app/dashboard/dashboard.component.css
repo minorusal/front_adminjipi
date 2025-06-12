@@ -104,17 +104,12 @@
   display: block;
 }
 
-.subsubmenu {
-  display: none;
+.submenu .submenu {
   background: #3c3d46;
 }
 
-.subsubmenu li {
-  padding: 0.5rem 2.5rem;
-}
-
-.subsubmenu.open {
-  display: block;
+.submenu .submenu li {
+  padding-left: 2.5rem;
 }
 
 .content {

@@ -9,44 +9,7 @@
   <div class="body">
     <nav class="sidemenu" [class.open]="menuOpen">
       <ul>
-        <li>
-          <div class="menu-item" (click)="toggleSubmenu('m1')">
-            <span>Menú 1</span>
-            <span class="arrow" [class.open]="submenus['m1']">&#9654;</span>
-          </div>
-          <ul class="submenu" [class.open]="submenus['m1']">
-            <li>
-              <div class="menu-item" (click)="toggleSubsubmenu('m1-1')">
-                <span>Submenú 1-1</span>
-                <span class="arrow" [class.open]="subsubmenus['m1-1']">&#9654;</span>
-              </div>
-              <ul class="subsubmenu" [class.open]="subsubmenus['m1-1']">
-                <li>Opción 1-1-1</li>
-                <li>Opción 1-1-2</li>
-              </ul>
-            </li>
-            <li>Submenú 1-2</li>
-          </ul>
-        </li>
-        <li>
-          <div class="menu-item" (click)="toggleSubmenu('m2')">
-            <span>Menú 2</span>
-            <span class="arrow" [class.open]="submenus['m2']">&#9654;</span>
-          </div>
-          <ul class="submenu" [class.open]="submenus['m2']">
-            <li>
-              <div class="menu-item" (click)="toggleSubsubmenu('m2-1')">
-                <span>Submenú 2-1</span>
-                <span class="arrow" [class.open]="subsubmenus['m2-1']">&#9654;</span>
-              </div>
-              <ul class="subsubmenu" [class.open]="subsubmenus['m2-1']">
-                <li>Opción 2-1-1</li>
-                <li>Opción 2-1-2</li>
-              </ul>
-            </li>
-            <li>Submenú 2-2</li>
-          </ul>
-        </li>
+        <ng-template [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ nodes: menuTree }"></ng-template>
         <li class="bottom-item" (click)="selectView('settings')" [class.active]="selectedView === 'settings'">
           <div class="menu-item">
             <span class="icon">&#9881;</span>
@@ -61,3 +24,17 @@
     </main>
   </div>
 </div>
+
+<ng-template #tree let-nodes>
+  <ng-container *ngFor="let node of nodes">
+    <li>
+      <div class="menu-item" (click)="toggleNode(node.id)">
+        <span>{{ node.name }}</span>
+        <span *ngIf="node.children && node.children.length" class="arrow" [class.open]="isOpen(node.id)">&#9654;</span>
+      </div>
+      <ul class="submenu" *ngIf="node.children && node.children.length" [class.open]="isOpen(node.id)">
+        <ng-template [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ nodes: node.children }"></ng-template>
+      </ul>
+    </li>
+  </ng-container>
+</ng-template>
