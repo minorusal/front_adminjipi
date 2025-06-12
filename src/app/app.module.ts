@@ -3,25 +3,31 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { MatTreeModule } from '@angular/material/tree';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SettingsComponent } from './settings/settings.component';
+import { HomeComponent } from './home/home.component';
+import { VentasComponent } from './ventas/ventas.component';
+import { ProductosComponent } from './productos/productos.component';
+import { BodegasComponent } from './bodegas/bodegas.component';
 
 @NgModule({
-  declarations: [AppComponent, DashboardComponent, SettingsComponent],
+  declarations: [
+    AppComponent,
+    DashboardComponent,
+    SettingsComponent,
+    HomeComponent,
+    VentasComponent,
+    ProductosComponent,
+    BodegasComponent
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
     ReactiveFormsModule,
-    HttpClientModule,
-    MatTreeModule,
-    MatIconModule,
-    MatButtonModule
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
