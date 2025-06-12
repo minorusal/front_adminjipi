@@ -1,6 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { NestedTreeControl } from '@angular/cdk/tree';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
+
+export interface MenuNode {
+  id: number;
+  name: string;
+  path?: string | null;
+  children?: MenuNode[];
+}
 
 @Component({
   selector: 'app-settings',
@@ -10,7 +19,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class SettingsComponent implements OnInit {
   menuForm: FormGroup;
   parentMenus: any[] = [];
-  menuTree: any[] = [];
+  menuTree: MenuNode[] = [];
+  treeControl = new NestedTreeControl<MenuNode>((node: MenuNode) => node.children);
+  dataSource = new MatTreeNestedDataSource<MenuNode>();
   private ownerId = 1;
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
@@ -54,8 +65,14 @@ export class SettingsComponent implements OnInit {
         `http://localhost:3000/menus?owner_id=${this.ownerId}`,
         options
       )
-      .subscribe((tree) => (this.menuTree = tree));
+      .subscribe((tree) => {
+        this.menuTree = tree as MenuNode[];
+        this.dataSource.data = this.menuTree;
+      });
   }
+
+  hasChild = (_: number, node: MenuNode) =>
+    !!node.children && node.children.length > 0;
 
   onSubmit(): void {
     const { name, url, parent } = this.menuForm.value;
