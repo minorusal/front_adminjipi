@@ -89,6 +89,19 @@
   display: block;
 }
 
+.subsubmenu {
+  display: none;
+  background: #3c3d46;
+}
+
+.subsubmenu li {
+  padding: 0.5rem 2.5rem;
+}
+
+.subsubmenu.open {
+  display: block;
+}
+
 .content {
   flex: 1;
   padding: 1rem;
