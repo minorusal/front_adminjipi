@@ -20,7 +20,7 @@ export class SettingsComponent implements OnInit {
   menuForm: FormGroup;
   parentMenus: any[] = [];
   menuTree: MenuNode[] = [];
-  treeControl = new NestedTreeControl<MenuNode>((node) => node.children);
+  treeControl = new NestedTreeControl<MenuNode>((node: MenuNode) => node.children);
   dataSource = new MatTreeNestedDataSource<MenuNode>();
   private ownerId = 1;
 

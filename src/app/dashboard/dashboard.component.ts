@@ -3,11 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 
-@Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
-})
 export interface MenuNode {
   id: number;
   name: string;
@@ -15,12 +10,18 @@ export interface MenuNode {
   children?: MenuNode[];
 }
 
+@Component({
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css']
+})
+
 export class DashboardComponent implements OnInit {
   @Input() user: { name: string; company: string } | null = null;
   @Output() logout = new EventEmitter<void>();
   menuOpen = false;
   menuTree: MenuNode[] = [];
-  treeControl = new NestedTreeControl<MenuNode>((node) => node.children);
+  treeControl = new NestedTreeControl<MenuNode>((node: MenuNode) => node.children);
   dataSource = new MatTreeNestedDataSource<MenuNode>();
   private ownerId = 1;
   selectedView = 'home';
