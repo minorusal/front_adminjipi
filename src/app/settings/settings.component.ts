@@ -66,9 +66,25 @@ export class SettingsComponent implements OnInit {
         options
       )
       .subscribe((tree) => {
-        this.menuTree = tree as MenuNode[];
+        // Ensure the data is in a nested tree format. Some responses may
+        // return a flat list, so build the hierarchy if "children" are missing.
+        const isFlat = tree.length && !tree.some((m) => Array.isArray(m.children));
+        this.menuTree = isFlat ? this.buildTree(tree) : (tree as MenuNode[]);
         this.dataSource.data = this.menuTree;
+        this.treeControl.dataNodes = this.menuTree;
+        this.treeControl.collapseAll();
       });
+  }
+
+  private buildTree(items: any[], parentId: number | null = null): MenuNode[] {
+    return items
+      .filter((m) => m.parent_id === parentId)
+      .map((m) => ({
+        id: m.id,
+        name: m.name,
+        path: m.path,
+        children: this.buildTree(items, m.id),
+      }));
   }
 
   hasChild = (_: number, node: MenuNode) =>
