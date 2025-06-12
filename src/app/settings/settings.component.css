@@ -17,12 +17,15 @@
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-.menu-tree .mat-tree-node,
-.menu-tree .mat-nested-tree-node {
+.menu-tree .mat-tree-node {
   display: flex;
   align-items: center;
   font-size: 0.85rem;
   padding: 1px 0;
+}
+
+.menu-tree .mat-nested-tree-node {
+  display: block;
 }
 
 .menu-tree .mat-tree-node:hover,
