@@ -1,1 +1,28 @@
-/* You can add global styles to this file, and also import other style files */
+/* Cambia el fondo de toda la página a negro y el color de texto a blanco */
+body {
+    background-color: black;
+    color: white;
+  }
+  
+  /* Estilo para todos los textareas */
+  textarea {
+    background-color: black;
+    color: white;
+    border: 1px solid white; /* Añade un borde blanco si lo deseas */
+    padding: 10px;
+  }
+  
+  /* Estilo para todos los botones */
+  button {
+    background-color: black;
+    color: white;
+    border: 1px solid white; /* Añade un borde blanco si lo deseas */
+    padding: 10px 15px;
+    cursor: pointer;
+  }
+  
+  /* Opcional: Estilo al pasar el mouse sobre el botón */
+  button:hover {
+    background-color: #333; /* Puedes cambiar a un tono más oscuro */
+  }
+  
