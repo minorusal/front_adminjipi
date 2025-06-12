@@ -4,3 +4,40 @@
   margin-bottom: 0.5rem;
 }
 
+/* VS Code like tree styling */
+.menu-tree {
+  background-color: #1e1e1e;
+  border: 1px solid #3c3c3c;
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-top: 1rem;
+  max-height: 400px;
+  overflow: auto;
+}
+
+.menu-tree .mat-tree-node,
+.menu-tree .mat-nested-tree-node {
+  display: flex;
+  align-items: center;
+  color: #ccc;
+  font-size: 0.85rem;
+  padding: 2px 0;
+}
+
+.menu-tree .mat-tree-node:hover,
+.menu-tree .mat-nested-tree-node:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.menu-tree button.mat-icon-button {
+  width: 24px;
+  height: 24px;
+  margin-right: 4px;
+}
+
+.tree-children {
+  margin-left: 16px;
+  border-left: 1px dashed #3c3c3c;
+  padding-left: 8px;
+}
+
