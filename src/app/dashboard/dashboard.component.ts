@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -7,6 +7,7 @@ import { Component, Input } from '@angular/core';
 })
 export class DashboardComponent {
   @Input() user: { name: string; company: string } | null = null;
+  @Output() logout = new EventEmitter<void>();
   menuOpen = false;
   submenus: Record<string, boolean> = {};
   subsubmenus: Record<string, boolean> = {};
@@ -21,5 +22,9 @@ export class DashboardComponent {
 
   toggleSubsubmenu(key: string): void {
     this.subsubmenus[key] = !this.subsubmenus[key];
+  }
+
+  onLogout(): void {
+    this.logout.emit();
   }
 }

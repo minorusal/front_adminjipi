@@ -21,6 +21,16 @@
   margin-right: 1rem;
 }
 
+.logout {
+  margin-left: auto;
+  background: #ff6b6b;
+  border: none;
+  color: #fff;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
 .body {
   flex: 1;
   display: flex;

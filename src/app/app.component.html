@@ -37,4 +37,4 @@
   <div class="error" *ngIf="error">{{ error }}</div>
 </div>
 
-<app-dashboard *ngIf="isLoggedIn" [user]="user"></app-dashboard>
+<app-dashboard *ngIf="isLoggedIn" [user]="user" (logout)="logout()"></app-dashboard>
