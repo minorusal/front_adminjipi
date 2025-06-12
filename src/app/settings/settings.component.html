@@ -33,21 +33,26 @@
     <button type="submit">Guardar</button>
   </div>
 </form>
-    <div class="menu-tree" *ngIf="menuTree && menuTree.length">
-      <h3>Estructura de menús</h3>
-      <ul>
-        <ng-container *ngTemplateOutlet="renderNodes; context: { $implicit: menuTree }"></ng-container>
-      </ul>
-    </div>
 
-    <ng-template #renderNodes let-nodes>
-      <ng-container *ngFor="let node of nodes">
-        <li>
-          {{ node.name }}
-          <ul *ngIf="node.children && node.children.length">
-            <ng-container *ngTemplateOutlet="renderNodes; context: { $implicit: node.children }"></ng-container>
-          </ul>
-        </li>
-      </ng-container>
-    </ng-template>
-</div>
+  <div class="menu-tree" *ngIf="menuTree && menuTree.length">
+    <h3>Estructura de menús</h3>
+    <ul>
+      <ng-container
+        *ngTemplateOutlet="renderNodes; context: { $implicit: menuTree }"
+      ></ng-container>
+    </ul>
+  </div>
+
+  <ng-template #renderNodes let-nodes>
+    <ng-container *ngFor="let node of nodes">
+      <li>
+        {{ node.name }}
+        <ul *ngIf="node.children && node.children.length">
+          <ng-container
+            *ngTemplateOutlet="renderNodes; context: { $implicit: node.children }"
+          ></ng-container>
+        </ul>
+      </li>
+    </ng-container>
+  </ng-template>
+  </div>
