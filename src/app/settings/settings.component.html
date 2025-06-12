@@ -1,6 +1,7 @@
 <nav class="breadcrumb">Inicio / Configuración</nav>
 <h2>Configuración</h2>
 
+<div class="form-container">
 <form [formGroup]="menuForm" (ngSubmit)="onSubmit()" class="menu-form">
   <h3>Agrega tu menú</h3>
 
@@ -23,5 +24,8 @@
     </datalist>
   </div>
 
-  <button type="submit">Guardar</button>
+  <div class="form-actions">
+    <button type="submit">Guardar</button>
+  </div>
 </form>
+</div>

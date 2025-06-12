@@ -29,3 +29,54 @@ textarea {
     background-color: #0e8a6e;
   }
 
+/* Estilos reutilizables para formularios basados en el login */
+.form-container {
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 2rem;
+  background-color: #444654;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  color: #e8e8e8;
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-container .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.form-container .form-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.form-container label {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-container input {
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #565869;
+  background-color: #343541;
+  color: #fff;
+  width: 100%;
+}
+
+.form-container button {
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.error {
+  color: #ff6b6b;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
