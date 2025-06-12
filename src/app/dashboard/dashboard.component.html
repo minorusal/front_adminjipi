@@ -9,14 +9,20 @@
     <nav class="sidemenu" [class.open]="menuOpen">
       <ul>
         <li>
-          <div class="menu-item" (click)="toggleSubmenu('m1')">Menú 1</div>
+          <div class="menu-item" (click)="toggleSubmenu('m1')">
+            <span>Menú 1</span>
+            <span class="arrow" [class.open]="submenus['m1']">&#9654;</span>
+          </div>
           <ul class="submenu" [class.open]="submenus['m1']">
             <li>Submenú 1-1</li>
             <li>Submenú 1-2</li>
           </ul>
         </li>
         <li>
-          <div class="menu-item" (click)="toggleSubmenu('m2')">Menú 2</div>
+          <div class="menu-item" (click)="toggleSubmenu('m2')">
+            <span>Menú 2</span>
+            <span class="arrow" [class.open]="submenus['m2']">&#9654;</span>
+          </div>
           <ul class="submenu" [class.open]="submenus['m2']">
             <li>Submenú 2-1</li>
             <li>Submenú 2-2</li>
