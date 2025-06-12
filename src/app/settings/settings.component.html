@@ -36,16 +36,22 @@
 
   <div class="menu-tree" *ngIf="menuTree && menuTree.length">
     <h3>Estructura de menús</h3>
-    <ng-template [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: menuTree }"></ng-template>
+    <ng-template
+      [ngTemplateOutlet]="tree"
+      [ngTemplateOutletContext]="{ nodes: menuTree }"
+    ></ng-template>
   </div>
 </div>
 
-<ng-template #tree let-nodes>
+<ng-template #tree let-nodes="nodes">
   <ul>
     <li *ngFor="let node of nodes">
       {{ node.name }}
       <ng-container *ngIf="node.children && node.children.length">
-        <ng-template [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: node.children }"></ng-template>
+        <ng-template
+          [ngTemplateOutlet]="tree"
+          [ngTemplateOutletContext]="{ nodes: node.children }"
+        ></ng-template>
       </ng-container>
     </li>
   </ul>
