@@ -49,3 +49,9 @@
   margin-top: 0.5rem;
   width: 100%;
 }
+
+.error {
+  color: #ff6b6b;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}

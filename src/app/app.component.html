@@ -1,16 +1,38 @@
 <div class="login-container">
   <h1>Iniciar sesión</h1>
-  <form>
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="username">Correo electrónico</label>
-      <input id="username" name="username" type="email" placeholder="tucorreo@ejemplo.com" />
+      <input
+        id="username"
+        name="username"
+        type="email"
+        formControlName="username"
+        placeholder="tucorreo@ejemplo.com"
+      />
+      <div class="error" *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.hasError('required')">
+        El correo es requerido
+      </div>
+      <div class="error" *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.hasError('email')">
+        Ingresa un correo válido
+      </div>
     </div>
     <div class="form-group">
       <label for="password">Contraseña</label>
-      <input id="password" name="password" type="password" placeholder="Ingresa tu contraseña" />
+      <input
+        id="password"
+        name="password"
+        type="password"
+        formControlName="password"
+        placeholder="Ingresa tu contraseña"
+      />
+      <div class="error" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')">
+        La contraseña es requerida
+      </div>
     </div>
     <div class="form-actions">
       <button type="submit">Continuar</button>
     </div>
   </form>
+  <div class="error" *ngIf="error">{{ error }}</div>
 </div>
