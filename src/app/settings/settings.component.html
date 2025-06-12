@@ -1,3 +1,27 @@
 <nav class="breadcrumb">Inicio / Configuración</nav>
 <h2>Configuración</h2>
-<p>Aquí irán las opciones de configuración.</p>
+
+<form [formGroup]="menuForm" (ngSubmit)="onSubmit()" class="menu-form">
+  <h3>Agrega tu menú</h3>
+
+  <div class="form-group">
+    <label for="name">Nombre del menú</label>
+    <input id="name" type="text" formControlName="name" />
+  </div>
+
+  <div class="form-group">
+    <label for="url">URL del menú</label>
+    <input id="url" type="text" formControlName="url" />
+  </div>
+
+  <div class="form-group">
+    <label for="parent">Menú padre</label>
+    <input id="parent" type="text" list="parentOptions" formControlName="parent" placeholder="Seleccione un menú padre" />
+    <datalist id="parentOptions">
+      <option value="Principal"></option>
+      <option value="Otro"></option>
+    </datalist>
+  </div>
+
+  <button type="submit">Guardar</button>
+</form>

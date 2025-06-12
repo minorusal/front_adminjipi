@@ -3,3 +3,22 @@
   color: #888;
   margin-bottom: 0.5rem;
 }
+
+.menu-form {
+  max-width: 400px;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.25rem;
+  box-sizing: border-box;
+}
