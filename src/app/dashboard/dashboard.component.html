@@ -14,7 +14,16 @@
             <span class="arrow" [class.open]="submenus['m1']">&#9654;</span>
           </div>
           <ul class="submenu" [class.open]="submenus['m1']">
-            <li>Submenú 1-1</li>
+            <li>
+              <div class="menu-item" (click)="toggleSubsubmenu('m1-1')">
+                <span>Submenú 1-1</span>
+                <span class="arrow" [class.open]="subsubmenus['m1-1']">&#9654;</span>
+              </div>
+              <ul class="subsubmenu" [class.open]="subsubmenus['m1-1']">
+                <li>Opción 1-1-1</li>
+                <li>Opción 1-1-2</li>
+              </ul>
+            </li>
             <li>Submenú 1-2</li>
           </ul>
         </li>
@@ -24,7 +33,16 @@
             <span class="arrow" [class.open]="submenus['m2']">&#9654;</span>
           </div>
           <ul class="submenu" [class.open]="submenus['m2']">
-            <li>Submenú 2-1</li>
+            <li>
+              <div class="menu-item" (click)="toggleSubsubmenu('m2-1')">
+                <span>Submenú 2-1</span>
+                <span class="arrow" [class.open]="subsubmenus['m2-1']">&#9654;</span>
+              </div>
+              <ul class="subsubmenu" [class.open]="subsubmenus['m2-1']">
+                <li>Opción 2-1-1</li>
+                <li>Opción 2-1-2</li>
+              </ul>
+            </li>
             <li>Submenú 2-2</li>
           </ul>
         </li>
