@@ -1,8 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { NestedTreeControl } from '@angular/cdk/tree';
-import { MatTreeNestedDataSource } from '@angular/material/tree';
 
 export interface MenuNode {
   id: number;
@@ -22,8 +20,7 @@ export class DashboardComponent implements OnInit {
   @Output() logout = new EventEmitter<void>();
   menuOpen = false;
   menuTree: MenuNode[] = [];
-  treeControl = new NestedTreeControl<MenuNode>((node: MenuNode) => node.children);
-  dataSource = new MatTreeNestedDataSource<MenuNode>();
+  expanded: Record<number, boolean> = {};
   private ownerId = 1;
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -51,14 +48,16 @@ export class DashboardComponent implements OnInit {
         `http://localhost:3000/menus?owner_id=${this.ownerId}`,
         options
       )
-      .subscribe((tree) => {
-        this.menuTree = tree as MenuNode[];
-        this.dataSource.data = this.menuTree;
-      });
+      .subscribe((tree) => (this.menuTree = tree as MenuNode[]));
   }
 
-  hasChild = (_: number, node: MenuNode) =>
-    !!node.children && node.children.length > 0;
+  toggleNode(id: number): void {
+    this.expanded[id] = !this.expanded[id];
+  }
+
+  isOpen(id: number): boolean {
+    return !!this.expanded[id];
+  }
 
   navigateTo(path: string | null | undefined): void {
     if (path) {
