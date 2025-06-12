@@ -1,7 +1,8 @@
 /* Estilos globales de la aplicación */
 body {
-  background-color: #f0f0f0;
-  color: #000;
+  background-color: #343541;
+  color: #e8e8e8;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
   
   /* Estilo para todos los textareas */
@@ -14,15 +15,17 @@ textarea {
   
   /* Estilo para todos los botones */
   button {
-    background-color: black;
-    color: white;
-    border: 1px solid white; /* Añade un borde blanco si lo deseas */
+    background-color: #10a37f;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
     padding: 10px 15px;
     cursor: pointer;
+    font-weight: 600;
   }
   
   /* Opcional: Estilo al pasar el mouse sobre el botón */
   button:hover {
-    background-color: #333; /* Puedes cambiar a un tono más oscuro */
+    background-color: #0e8a6e;
   }
 
