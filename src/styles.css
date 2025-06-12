@@ -1,16 +1,16 @@
-/* Cambia el fondo de toda la página a negro y el color de texto a blanco */
+/* Estilos globales de la aplicación */
 body {
-    background-color: black;
-    color: white;
-  }
+  background-color: #f0f0f0;
+  color: #000;
+}
   
   /* Estilo para todos los textareas */
-  textarea {
-    background-color: black;
-    color: white;
-    border: 1px solid white; /* Añade un borde blanco si lo deseas */
-    padding: 10px;
-  }
+textarea {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
   
   /* Estilo para todos los botones */
   button {
