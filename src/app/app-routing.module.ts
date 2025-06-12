@@ -4,13 +4,17 @@ import { LoginComponent } from './auth/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
 const routes: Routes = [
-  // Show the login component when the root path is visited
-  { path: '', component: LoginComponent, pathMatch: 'full' },
-
-  // Alias to access the login using '/login'
+  // Route to access the login directly
   { path: 'login', component: LoginComponent },
 
-  { path: 'dashboard', component: DashboardComponent }
+  // Route to the dashboard after successful login
+  { path: 'dashboard', component: DashboardComponent },
+
+  // Redirect the root path to the login page
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+
+  // Redirect any unknown route to the login page
+  { path: '**', redirectTo: 'login' }
 ];
 
 @NgModule({
