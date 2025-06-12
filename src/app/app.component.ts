@@ -10,6 +10,8 @@ export class AppComponent {
   title = 'app-test';
   loginForm: FormGroup;
   error = '';
+  isLoggedIn = false;
+  user: { name: string; company: string } | null = null;
 
   constructor(private fb: FormBuilder) {
     this.loginForm = this.fb.group({
@@ -27,7 +29,8 @@ export class AppComponent {
 
     const { username, password } = this.loginForm.value;
     if (username === 'admin@example.com' && password === 'admin') {
-      alert('Inicio de sesión exitoso');
+      this.isLoggedIn = true;
+      this.user = { name: 'Admin', company: 'Empresa Ejemplo' };
     } else {
       this.error = 'Los datos son incorrectos';
     }
