@@ -38,6 +38,9 @@
 .menu-tree button.mat-icon-button {
   width: 16px;
   height: 16px;
+  min-width: 16px;
+  line-height: 16px;
+  padding: 0;
   margin-right: 2px;
   color: inherit;
   flex-shrink: 0;
@@ -48,8 +51,10 @@
   color: #c5c5c5;
 }
 .menu-tree mat-icon {
+  width: 16px;
+  height: 16px;
   font-size: 14px;
-  line-height: 14px;
+  line-height: 16px;
 }
 
 .tree-children {
