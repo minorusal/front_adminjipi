@@ -17,10 +17,15 @@
 
   <div class="form-group">
     <label for="parent">Menú padre</label>
-    <input id="parent" type="text" list="parentOptions" formControlName="parent" placeholder="Seleccione un menú padre" />
+    <input
+      id="parent"
+      type="text"
+      list="parentOptions"
+      formControlName="parent"
+      placeholder="Seleccione un menú padre"
+    />
     <datalist id="parentOptions">
-      <option value="Principal"></option>
-      <option value="Otro"></option>
+      <option *ngFor="let m of parentMenus" [value]="m.id">{{ m.name }}</option>
     </datalist>
   </div>
 
@@ -28,4 +33,20 @@
     <button type="submit">Guardar</button>
   </div>
 </form>
+
+  <div class="menu-tree" *ngIf="menuTree && menuTree.length">
+    <h3>Estructura de menús</h3>
+    <ng-template [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: menuTree }"></ng-template>
+  </div>
 </div>
+
+<ng-template #tree let-nodes>
+  <ul>
+    <li *ngFor="let node of nodes">
+      {{ node.name }}
+      <ng-container *ngIf="node.children && node.children.length">
+        <ng-template [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: node.children }"></ng-template>
+      </ng-container>
+    </li>
+  </ul>
+</ng-template>
