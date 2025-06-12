@@ -4,6 +4,7 @@
     <div class="userinfo" *ngIf="user">
       {{ user.name }} - {{ user.company }}
     </div>
+    <button class="logout" (click)="onLogout()">Cerrar sesión</button>
   </header>
   <div class="body">
     <nav class="sidemenu" [class.open]="menuOpen">
