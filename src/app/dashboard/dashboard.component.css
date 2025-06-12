@@ -125,3 +125,7 @@
 .bottom-item {
   margin-top: auto;
 }
+
+.sidemenu li.active .menu-item {
+  background: rgba(255, 255, 255, 0.2);
+}
