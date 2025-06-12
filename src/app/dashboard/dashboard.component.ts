@@ -11,6 +11,7 @@ export class DashboardComponent {
   menuOpen = false;
   submenus: Record<string, boolean> = {};
   subsubmenus: Record<string, boolean> = {};
+  selectedView = 'home';
 
   toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
@@ -22,6 +23,11 @@ export class DashboardComponent {
 
   toggleSubsubmenu(key: string): void {
     this.subsubmenus[key] = !this.subsubmenus[key];
+  }
+
+  selectView(view: string): void {
+    this.selectedView = view;
+    this.menuOpen = false;
   }
 
   onLogout(): void {

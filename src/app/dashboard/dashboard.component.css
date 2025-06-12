@@ -44,6 +44,8 @@
   transition: transform 0.3s ease;
   transform: translateX(-100%);
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidemenu.open {
@@ -54,6 +56,9 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .sidemenu li {
@@ -115,4 +120,8 @@
 .content {
   flex: 1;
   padding: 1rem;
+}
+
+.bottom-item {
+  margin-top: auto;
 }
