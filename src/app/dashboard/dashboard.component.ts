@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,6 +17,11 @@ export class DashboardComponent implements OnInit {
 
   constructor(private http: HttpClient) {}
 
+  private getCookie(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+
   toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
   }
@@ -26,8 +31,10 @@ export class DashboardComponent implements OnInit {
   }
 
   loadMenuTree(): void {
+    const token = this.getCookie('token');
+    const options = token ? { headers: new HttpHeaders({ token }) } : {};
     this.http
-      .get<any[]>(`http://localhost:3000/menus?owner_id=${this.ownerId}`)
+      .get<any[]>(`http://localhost:3000/menus?owner_id=${this.ownerId}`, options)
       .subscribe((tree) => (this.menuTree = tree));
   }
 
