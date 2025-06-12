@@ -47,7 +47,7 @@
             <li>Submenú 2-2</li>
           </ul>
         </li>
-        <li class="bottom-item" (click)="selectView('settings')">
+        <li class="bottom-item" (click)="selectView('settings')" [class.active]="selectedView === 'settings'">
           <div class="menu-item">
             <span class="icon">&#9881;</span>
             <span>Configuración</span>
