@@ -48,7 +48,42 @@ export class DashboardComponent implements OnInit {
         `http://localhost:3000/menus?owner_id=${this.ownerId}`,
         options
       )
-      .subscribe((tree) => (this.menuTree = tree as MenuNode[]));
+      .subscribe({
+        next: (tree) => (this.menuTree = tree as MenuNode[]),
+        error: () => {
+          // Fallback sample menu when backend is unavailable
+          this.menuTree = [
+            { id: 1, name: 'Inicio', path: 'home' },
+            {
+              id: 2,
+              name: 'Módulos',
+              children: [
+                {
+                  id: 3,
+                  name: 'Ventas',
+                  path: 'ventas'
+                },
+                {
+                  id: 4,
+                  name: 'Inventario',
+                  children: [
+                    {
+                      id: 5,
+                      name: 'Productos',
+                      path: 'inventario/productos'
+                    },
+                    {
+                      id: 6,
+                      name: 'Bodegas',
+                      path: 'inventario/bodegas'
+                    }
+                  ]
+                }
+              ]
+            }
+          ];
+        }
+      });
   }
 
   toggleNode(id: number): void {
