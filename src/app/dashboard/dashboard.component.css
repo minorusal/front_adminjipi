@@ -32,11 +32,16 @@
 }
 
 .body {
+  position: relative;
   flex: 1;
   display: flex;
 }
 
 .sidemenu {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
   width: 220px;
   background: linear-gradient(180deg, #202123, #343541);
   color: #fff;
@@ -115,6 +120,11 @@
 .content {
   flex: 1;
   padding: 1rem;
+  transition: margin-left 0.3s ease;
+}
+
+.sidemenu.open + .content {
+  margin-left: 220px;
 }
 
 .bottom-item {
