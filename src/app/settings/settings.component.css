@@ -1,13 +1,6 @@
-
 .breadcrumb {
   font-size: 0.85rem;
   color: #888;
   margin-bottom: 0.5rem;
 }
-
-/*
- * Previously this component applied a custom "VS Code" style to the menu tree.
- * Those rules have been removed so that the tree now relies on the default
- * Angular Material appearance.
- */
 
