@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { NestedTreeControl } from '@angular/cdk/tree';
-import { MatTreeNestedDataSource } from '@angular/material/tree';
 
 export interface MenuNode {
   id: number;
@@ -21,12 +20,10 @@ export class DashboardComponent implements OnInit {
   @Output() logout = new EventEmitter<void>();
   menuOpen = false;
   menuTree: MenuNode[] = [];
-  treeControl = new NestedTreeControl<MenuNode>((node: MenuNode) => node.children);
-  dataSource = new MatTreeNestedDataSource<MenuNode>();
+  expanded: Record<number, boolean> = {};
   private ownerId = 1;
-  selectedView = 'home';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   private getCookie(name: string): string | null {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -51,18 +48,57 @@ export class DashboardComponent implements OnInit {
         `http://localhost:3000/menus?owner_id=${this.ownerId}`,
         options
       )
-      .subscribe((tree) => {
-        this.menuTree = tree as MenuNode[];
-        this.dataSource.data = this.menuTree;
+      .subscribe({
+        next: (tree) => (this.menuTree = tree as MenuNode[]),
+        error: () => {
+          // Fallback sample menu when backend is unavailable
+          this.menuTree = [
+            { id: 1, name: 'Inicio', path: 'home' },
+            {
+              id: 2,
+              name: 'Módulos',
+              children: [
+                {
+                  id: 3,
+                  name: 'Ventas',
+                  path: 'ventas'
+                },
+                {
+                  id: 4,
+                  name: 'Inventario',
+                  children: [
+                    {
+                      id: 5,
+                      name: 'Productos',
+                      path: 'inventario/productos'
+                    },
+                    {
+                      id: 6,
+                      name: 'Bodegas',
+                      path: 'inventario/bodegas'
+                    }
+                  ]
+                }
+              ]
+            }
+          ];
+        }
       });
   }
 
-  hasChild = (_: number, node: MenuNode) =>
-    !!node.children && node.children.length > 0;
+  toggleNode(id: number): void {
+    this.expanded[id] = !this.expanded[id];
+  }
 
-  selectView(view: string): void {
-    this.selectedView = view;
-    this.menuOpen = false;
+  isOpen(id: number): boolean {
+    return !!this.expanded[id];
+  }
+
+  navigateTo(path: string | null | undefined): void {
+    if (path) {
+      this.router.navigate([path]);
+      this.menuOpen = false;
+    }
   }
 
   onLogout(): void {
