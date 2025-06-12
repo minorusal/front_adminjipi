@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  username = '';
+  email = '';
   password = '';
   error = '';
 
@@ -17,7 +17,7 @@ export class LoginComponent {
   login() {
     this.error = '';
     this.http.post<any>('http://localhost:3000/auth/login', {
-      username: this.username,
+      email: this.email,
       password: this.password
     }).subscribe({
       next: (res) => {
