@@ -9,8 +9,8 @@
   background-color: #1e1e1e;
   border: 1px solid #444;
   border-radius: 4px;
-  padding: 0.5rem;
-  margin-top: 1rem;
+  padding: 0.25rem;
+  margin-top: 0.5rem;
   max-height: 400px;
   overflow: auto;
   color: #d4d4d4;
@@ -22,7 +22,7 @@
   display: flex;
   align-items: center;
   font-size: 0.85rem;
-  padding: 2px 0;
+  padding: 1px 0;
 }
 
 .menu-tree .mat-tree-node:hover,
@@ -31,15 +31,15 @@
 }
 
 .menu-tree button.mat-icon-button {
-  width: 18px;
-  height: 18px;
-  margin-right: 4px;
+  width: 16px;
+  height: 16px;
+  margin-right: 2px;
   color: inherit;
   flex-shrink: 0;
 }
 
 .menu-tree .node-icon {
-  margin-right: 4px;
+  margin-right: 2px;
   color: #c5c5c5;
 }
 .menu-tree mat-icon {
@@ -48,13 +48,13 @@
 }
 
 .tree-children {
-  margin-left: 20px;
+  margin-left: 16px;
   border-left: 1px dashed #555;
-  padding-left: 8px;
+  padding-left: 4px;
 }
 
 .menu-tree h3 {
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.25rem 0;
   color: #d4d4d4;
   font-weight: 600;
 }
