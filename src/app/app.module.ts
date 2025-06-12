@@ -10,9 +10,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SettingsComponent } from './settings/settings.component';
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
-  declarations: [AppComponent, DashboardComponent, SettingsComponent],
+  declarations: [AppComponent, DashboardComponent, SettingsComponent, HomeComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

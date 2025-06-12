@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
@@ -24,9 +25,8 @@ export class DashboardComponent implements OnInit {
   treeControl = new NestedTreeControl<MenuNode>((node: MenuNode) => node.children);
   dataSource = new MatTreeNestedDataSource<MenuNode>();
   private ownerId = 1;
-  selectedView = 'home';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   private getCookie(name: string): string | null {
     const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -60,9 +60,11 @@ export class DashboardComponent implements OnInit {
   hasChild = (_: number, node: MenuNode) =>
     !!node.children && node.children.length > 0;
 
-  selectView(view: string): void {
-    this.selectedView = view;
-    this.menuOpen = false;
+  navigateTo(path: string | null | undefined): void {
+    if (path) {
+      this.router.navigate([path]);
+      this.menuOpen = false;
+    }
   }
 
   onLogout(): void {
