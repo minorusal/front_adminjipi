@@ -1,17 +1,27 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { NestedTreeControl } from '@angular/cdk/tree';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
+export interface MenuNode {
+  id: number;
+  name: string;
+  path?: string | null;
+  children?: MenuNode[];
+}
+
 export class DashboardComponent implements OnInit {
   @Input() user: { name: string; company: string } | null = null;
   @Output() logout = new EventEmitter<void>();
   menuOpen = false;
-  expanded: Record<number, boolean> = {};
-  menuTree: any[] = [];
+  menuTree: MenuNode[] = [];
+  treeControl = new NestedTreeControl<MenuNode>((node) => node.children);
+  dataSource = new MatTreeNestedDataSource<MenuNode>();
   private ownerId = 1;
   selectedView = 'home';
 
@@ -40,16 +50,14 @@ export class DashboardComponent implements OnInit {
         `http://localhost:3000/menus?owner_id=${this.ownerId}`,
         options
       )
-      .subscribe((tree) => (this.menuTree = tree));
+      .subscribe((tree) => {
+        this.menuTree = tree as MenuNode[];
+        this.dataSource.data = this.menuTree;
+      });
   }
 
-  toggleNode(id: number): void {
-    this.expanded[id] = !this.expanded[id];
-  }
-
-  isOpen(id: number): boolean {
-    return !!this.expanded[id];
-  }
+  hasChild = (_: number, node: MenuNode) =>
+    !!node.children && node.children.length > 0;
 
   selectView(view: string): void {
     this.selectedView = view;
