@@ -32,9 +32,14 @@ export class DashboardComponent implements OnInit {
 
   loadMenuTree(): void {
     const token = this.getCookie('token');
-    const options = token ? { headers: new HttpHeaders({ token }) } : {};
+    const options = token
+      ? { headers: new HttpHeaders({ token }), withCredentials: true }
+      : { withCredentials: true };
     this.http
-      .get<any[]>(`http://localhost:3000/menus?owner_id=${this.ownerId}`, options)
+      .get<any[]>(
+        `http://localhost:3000/menus?owner_id=${this.ownerId}`,
+        options
+      )
       .subscribe((tree) => (this.menuTree = tree));
   }
 
