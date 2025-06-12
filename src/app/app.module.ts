@@ -1,22 +1,27 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
-import { AppComponent } from './app.component';
-import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
 
-const config: SocketIoConfig = { url: 'ws://localhost:8000', options: {} };
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { AppRoutingModule } from './app-routing.module';
+import { LoginComponent } from './auth/login.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { AppComponent } from './app.component';
+
 // const config: SocketIoConfig = { url: 'wss://devsocket.credibusiness.io', options: {} };
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    LoginComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,
-    SocketIoModule.forRoot(config),
+
+    FormsModule,
     HttpClientModule,
-    FormsModule 
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]

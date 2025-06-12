@@ -1,0 +1,32 @@
+.dashboard {
+  display: flex;
+}
+.sidebar {
+  width: 200px;
+  background: #1976d2;
+  color: white;
+  transition: transform 0.3s;
+  transform: translateX(-180px);
+  padding-top: 10px;
+}
+.sidebar.open {
+  transform: translateX(0);
+}
+.sidebar ul {
+  list-style: none;
+  padding-left: 10px;
+}
+.sidebar li {
+  margin: 5px 0;
+}
+.toggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  margin-left: 160px;
+}
+.content {
+  flex: 1;
+  padding: 20px;
+}
