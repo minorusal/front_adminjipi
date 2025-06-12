@@ -21,9 +21,9 @@
   display: flex;
   align-items: center;
   font-size: 0.85rem;
-  padding: 1px 0;
-  min-height: 20px;
-  line-height: 20px;
+  padding: 0;
+  min-height: 14px;
+  line-height: 14px;
 }
 
 .menu-tree .mat-nested-tree-node {
@@ -48,8 +48,8 @@
   color: #c5c5c5;
 }
 .menu-tree mat-icon {
-  font-size: 16px;
-  line-height: 18px;
+  font-size: 14px;
+  line-height: 14px;
 }
 
 .tree-children {
