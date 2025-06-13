@@ -12,6 +12,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  z-index: 1000;
 }
 
 .sidemenu.open {
@@ -45,6 +46,16 @@
   transition: background 0.2s ease;
 }
 
+button.menu-item {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  padding: 0.75rem 1rem;
+}
+
 .menu-item:hover {
   background: rgba(255, 255, 255, 0.1);
 }
@@ -76,6 +87,12 @@
 
 .submenu .submenu li {
   padding-left: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .sidemenu {
+    position: fixed;
+  }
 }
 
 .bottom-item {

@@ -1,6 +1,12 @@
 <div class="dashboard">
   <header class="topbar">
-    <button class="hamburger" (click)="toggleMenu()">&#9776;</button>
+    <button
+      class="hamburger"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuOpen"
+    >
+      &#9776;
+    </button>
     <div class="userinfo" *ngIf="user">
       {{ user.name }} - {{ user.company }}
     </div>
@@ -8,7 +14,7 @@
   </header>
   <div class="body">
     <app-sidebar [open]="menuOpen" (closeMenu)="menuOpen = false"></app-sidebar>
-    <main class="content" [style.marginLeft.px]="menuOpen ? 220 : 0">
+    <main class="content" [style.marginLeft.px]="menuOpen && isDesktop ? 220 : 0">
       <router-outlet></router-outlet>
     </main>
   </div>
