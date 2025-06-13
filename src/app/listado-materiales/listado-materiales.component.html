@@ -1,5 +1,14 @@
 <h2>Listado de materiales</h2>
 <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+<div class="search-container">
+  <span class="material-icons">search</span>
+  <input
+    type="text"
+    placeholder="Buscar materiales"
+    [(ngModel)]="searchText"
+    (input)="onSearchChange()"
+  />
+</div>
 <table *ngIf="materiales?.length">
   <thead>
     <tr>

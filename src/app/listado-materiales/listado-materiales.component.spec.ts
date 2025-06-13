@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ListadoMaterialesComponent } from './listado-materiales.component';
 import { MaterialService } from '../services/material.service';
 import { CookieService } from '../services/cookie.service';
@@ -14,7 +15,7 @@ describe('ListadoMaterialesComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ListadoMaterialesComponent],
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, FormsModule],
       providers: [MaterialService, CookieService],
       schemas: [NO_ERRORS_SCHEMA]
     });

@@ -14,4 +14,24 @@ th {
   background-color: #444654;
 }
 
+.search-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.search-container .material-icons {
+  margin-right: 0.5rem;
+  color: #fff;
+}
+
+.search-container input {
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #565869;
+  background-color: #343541;
+  color: #fff;
+  flex: 1;
+}
+
 

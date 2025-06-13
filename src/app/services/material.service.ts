@@ -38,7 +38,7 @@ export class MaterialService {
       : { withCredentials: true };
   }
 
-  getMaterials(page?: number, limit?: number): Observable<PaginatedMaterials> {
+  getMaterials(page?: number, limit?: number, search?: string): Observable<PaginatedMaterials> {
     let url = `${environment.apiUrl}/materials`;
     const params: string[] = [];
     if (page !== undefined) {
@@ -46,6 +46,9 @@ export class MaterialService {
     }
     if (limit !== undefined) {
       params.push(`limit=${limit}`);
+    }
+    if (search !== undefined && search !== '') {
+      params.push(`search=${encodeURIComponent(search)}`);
     }
     if (params.length) {
       url += `?${params.join('&')}`;
