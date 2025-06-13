@@ -67,7 +67,10 @@ export class SidebarComponent implements OnInit {
 
   onItemClick(node: MenuNode, event: MouseEvent): void {
     const hasChildren = !!node.children && node.children.length > 0;
-    if (hasChildren && !node.path) {
+    if (hasChildren) {
+      if (node.path) {
+        event.preventDefault();
+      }
       this.toggleNode(node.id);
       event.stopPropagation();
     }
