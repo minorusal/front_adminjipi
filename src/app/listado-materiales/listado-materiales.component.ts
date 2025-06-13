@@ -26,6 +26,7 @@ export class ListadoMaterialesComponent implements OnInit {
     price: undefined
   };
   saveError = '';
+  isSaving = false;
 
   constructor(private materialService: MaterialService) {}
 
@@ -64,17 +65,24 @@ export class ListadoMaterialesComponent implements OnInit {
   closeAddModal(): void {
     this.showAddModal = false;
     this.saveError = '';
+    this.isSaving = false;
   }
 
   saveMaterial(): void {
+    if (this.isSaving) {
+      return;
+    }
     this.saveError = '';
+    this.isSaving = true;
     this.materialService.addMaterial(this.newMaterial).subscribe({
       next: () => {
+        this.isSaving = false;
         this.resetNewMaterial();
         this.closeAddModal();
         this.loadMaterials();
       },
       error: err => {
+        this.isSaving = false;
         console.error('Failed to add material', err);
         this.saveError = 'Error al guardar el material';
       }
