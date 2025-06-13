@@ -17,6 +17,7 @@
         <div
           class="menu-item"
           (keydown)="onKeydown($event, node)"
+          (click)="onItemClick(node, $event)"
           tabindex="0"
           [attr.aria-expanded]="node.children ? isOpen(node.id) : null"
         >
@@ -31,7 +32,6 @@
             *ngIf="!node.path"
             class="name-btn"
             type="button"
-            (click)="$event.stopPropagation()"
           >
             {{ node.name }}
           </button>
