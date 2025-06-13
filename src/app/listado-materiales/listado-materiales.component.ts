@@ -30,8 +30,14 @@ export class ListadoMaterialesComponent implements OnInit {
         next: res => {
           const docs: any = (res as any).docs ?? (res as any).items ?? res;
           this.materiales = Array.isArray(docs) ? docs : [];
-          const total = (res as any).totalPages ?? 0;
-          this.totalPages = Number.isFinite(total) ? total : 0;
+          let pages: any = (res as any).totalPages;
+          if (!Number.isFinite(pages)) {
+            const totalDocs = (res as any).totalDocs;
+            if (Number.isFinite(totalDocs) && this.pageSize > 0) {
+              pages = Math.ceil(totalDocs / this.pageSize);
+            }
+          }
+          this.totalPages = Number.isFinite(pages) ? pages : 0;
         },
         error: err => {
           console.error('Failed to load materials', err);
