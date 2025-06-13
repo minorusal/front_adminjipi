@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { CookieService } from '../services/cookie.service';
 
 export interface MenuNode {
   id: number;
@@ -22,19 +22,15 @@ export class SidebarComponent implements OnInit {
   expanded: Record<number, boolean> = {};
   private ownerId = 1;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cookieService: CookieService) {}
 
   ngOnInit(): void {
     this.loadMenuTree();
   }
 
-  private getCookie(name: string): string | null {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? decodeURIComponent(match[2]) : null;
-  }
 
   loadMenuTree(): void {
-    const token = this.getCookie('token');
+    const token = this.cookieService.get('token');
     const options = token
       ? { headers: new HttpHeaders({ token }), withCredentials: true }
       : { withCredentials: true };

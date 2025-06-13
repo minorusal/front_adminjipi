@@ -1,7 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from '../environments/environment';
+import { CookieService } from './services/cookie.service';
 
 interface LoginResponse {
   message: string;
@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
   private inactivityTimeout: any;
 
   ngOnInit(): void {
-    const loginData = this.getCookie('loginData');
+    const loginData = this.cookieService.get('loginData');
     if (loginData) {
       try {
         const res: LoginResponse = JSON.parse(decodeURIComponent(loginData));
@@ -44,17 +44,13 @@ export class AppComponent implements OnInit {
     this.resetInactivityTimer();
   }
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private http: HttpClient, private cookieService: CookieService) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
   }
 
-  private getCookie(name: string): string | null {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? decodeURIComponent(match[2]) : null;
-  }
 
   private resetInactivityTimer(): void {
     if (!this.isLoggedIn) {
@@ -69,7 +65,7 @@ export class AppComponent implements OnInit {
   }
 
   private performLogout(): void {
-    const token = this.getCookie('token');
+    const token = this.cookieService.get('token');
     const options = token
       ? { headers: new HttpHeaders({ token }), withCredentials: true }
       : { withCredentials: true };
