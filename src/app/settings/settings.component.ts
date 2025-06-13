@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 
@@ -49,7 +50,7 @@ export class SettingsComponent implements OnInit {
       : { withCredentials: true };
     this.http
       .get<any[]>(
-        `http://localhost:3000/menus/all?owner_id=${this.ownerId}`,
+        `${environment.apiUrl}/menus/all?owner_id=${this.ownerId}`,
         options
       )
       .subscribe((menus) => (this.parentMenus = menus));
@@ -62,7 +63,7 @@ export class SettingsComponent implements OnInit {
       : { withCredentials: true };
     this.http
       .get<any[]>(
-        `http://localhost:3000/menus?owner_id=${this.ownerId}`,
+        `${environment.apiUrl}/menus?owner_id=${this.ownerId}`,
         options
       )
       .subscribe((tree) => {
@@ -102,7 +103,7 @@ export class SettingsComponent implements OnInit {
     const options = token
       ? { headers: new HttpHeaders({ token }), withCredentials: true }
       : { withCredentials: true };
-    this.http.post('http://localhost:3000/menus', body, options).subscribe({
+    this.http.post(`${environment.apiUrl}/menus`, body, options).subscribe({
       next: () => {
         this.menuForm.reset();
         this.loadParentMenus();
