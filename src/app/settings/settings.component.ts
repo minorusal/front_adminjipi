@@ -21,8 +21,6 @@ export class SettingsComponent implements OnInit {
   menuForm: FormGroup;
   parentMenus: any[] = [];
   menuTree: MenuNode[] = [];
-  treeControl = new NestedTreeControl<MenuNode>((node: MenuNode) => node.children);
-  dataSource = new MatTreeNestedDataSource<MenuNode>();
   private ownerId = 1;
 
   constructor(private fb: FormBuilder, private http: HttpClient, private cookieService: CookieService) {
@@ -46,7 +44,7 @@ export class SettingsComponent implements OnInit {
       : { withCredentials: true };
     this.http
       .get<any[]>(
-        `http://localhost:3000/menus/all?owner_id=${this.ownerId}`,
+        `${environment.apiUrl}/menus/all?owner_id=${this.ownerId}`,
         options
       )
       .subscribe((menus) => (this.parentMenus = menus));
@@ -59,7 +57,7 @@ export class SettingsComponent implements OnInit {
       : { withCredentials: true };
     this.http
       .get<any[]>(
-        `http://localhost:3000/menus?owner_id=${this.ownerId}`,
+        `${environment.apiUrl}/menus?owner_id=${this.ownerId}`,
         options
       )
       .subscribe((tree) => {
@@ -67,9 +65,6 @@ export class SettingsComponent implements OnInit {
         // return a flat list, so build the hierarchy if "children" are missing.
         const isFlat = tree.length && !tree.some((m) => Array.isArray(m.children));
         this.menuTree = isFlat ? this.buildTree(tree) : (tree as MenuNode[]);
-        this.dataSource.data = this.menuTree;
-        this.treeControl.dataNodes = this.menuTree;
-        this.treeControl.collapseAll();
       });
   }
 
@@ -99,7 +94,7 @@ export class SettingsComponent implements OnInit {
     const options = token
       ? { headers: new HttpHeaders({ token }), withCredentials: true }
       : { withCredentials: true };
-    this.http.post('http://localhost:3000/menus', body, options).subscribe({
+    this.http.post(`${environment.apiUrl}/menus`, body, options).subscribe({
       next: () => {
         this.menuForm.reset();
         this.loadParentMenus();

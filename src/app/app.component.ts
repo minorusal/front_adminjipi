@@ -70,7 +70,7 @@ export class AppComponent implements OnInit {
       ? { headers: new HttpHeaders({ token }), withCredentials: true }
       : { withCredentials: true };
     this.http
-      .post('http://localhost:3000/auth/logout', {}, options)
+      .post(`${environment.apiUrl}/auth/logout`, {}, options)
       .subscribe({
         complete: () => this.clearSession(),
         error: () => this.clearSession()
@@ -95,7 +95,7 @@ export class AppComponent implements OnInit {
     const { username, password } = this.loginForm.value;
     this.http
       .post<LoginResponse>(
-        'http://localhost:3000/auth/login',
+        `${environment.apiUrl}/auth/login`,
         { username, password },
         { withCredentials: true }
       )
