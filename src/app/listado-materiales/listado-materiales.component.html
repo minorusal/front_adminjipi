@@ -137,3 +137,67 @@
     </form>
   </div>
 </div>
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="add-modal" (click)="$event.stopPropagation()">
+    <span class="close-icon material-icons" (click)="closeEditModal()">close</span>
+    <h3>Editar material</h3>
+    <form (ngSubmit)="updateMaterial(editForm)" #editForm="ngForm">
+      <div class="form-group">
+        <label for="edit-name">Nombre</label>
+        <input
+          id="edit-name"
+          type="text"
+          [(ngModel)]="editMaterialData.name"
+          name="name"
+          required
+          #editNameRef="ngModel"
+        />
+        <div class="error" *ngIf="editNameRef.touched && editNameRef.hasError('required')">
+          El nombre es requerido
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="edit-desc">Descripción</label>
+        <textarea
+          id="edit-desc"
+          [(ngModel)]="editMaterialData.description"
+          name="description"
+          required
+          #editDescRef="ngModel"
+        ></textarea>
+        <div class="error" *ngIf="editDescRef.touched && editDescRef.hasError('required')">
+          La descripción es requerida
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="edit-thick">Espesor (mm)</label>
+        <input id="edit-thick" type="number" [(ngModel)]="editMaterialData.thickness_mm" name="thickness_mm" />
+      </div>
+      <div class="form-group">
+        <label for="edit-width">Ancho (m)</label>
+        <input id="edit-width" type="number" [(ngModel)]="editMaterialData.width_m" name="width_m" />
+      </div>
+      <div class="form-group">
+        <label for="edit-length">Largo (m)</label>
+        <input id="edit-length" type="number" [(ngModel)]="editMaterialData.length_m" name="length_m" />
+      </div>
+      <div class="form-group">
+        <label for="edit-price">Precio</label>
+        <input
+          id="edit-price"
+          type="number"
+          [(ngModel)]="editMaterialData.price"
+          name="price"
+          required
+          #editPriceRef="ngModel"
+        />
+        <div class="error" *ngIf="editPriceRef.touched && editPriceRef.hasError('required')">
+          El precio es requerido
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="!editForm.form.valid">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
