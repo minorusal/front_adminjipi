@@ -31,7 +31,7 @@ describe('ListadoMaterialesComponent', () => {
   it('should load materials with valid response', () => {
     (component as any).loadMaterials();
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/materials?page=1&limit=10`);
+    const req = httpMock.expectOne(`${environment.apiUrl}/materials`);
     expect(req.request.method).toBe('GET');
 
     const materials = [{ id: 1, name: 'Mat1', description: 'Desc1' }];
@@ -43,7 +43,7 @@ describe('ListadoMaterialesComponent', () => {
 
   it('should handle mismatched fields', () => {
     (component as any).loadMaterials();
-    const req = httpMock.expectOne(`${environment.apiUrl}/materials?page=1&limit=10`);
+    const req = httpMock.expectOne(`${environment.apiUrl}/materials`);
     expect(req.request.method).toBe('GET');
 
     req.flush({ items: [] });
@@ -54,7 +54,7 @@ describe('ListadoMaterialesComponent', () => {
 
   it('should keep defaults on http error', () => {
     (component as any).loadMaterials();
-    const req = httpMock.expectOne(`${environment.apiUrl}/materials?page=1&limit=10`);
+    const req = httpMock.expectOne(`${environment.apiUrl}/materials`);
     expect(req.request.method).toBe('GET');
 
     try {

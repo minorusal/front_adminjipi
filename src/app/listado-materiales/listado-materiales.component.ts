@@ -25,7 +25,7 @@ export class ListadoMaterialesComponent implements OnInit {
   private loadMaterials(): void {
     this.errorMessage = '';
     this.materialService
-      .getMaterials(this.currentPage, this.pageSize)
+      .getMaterials()
       .subscribe({
         next: res => {
           const docs: any = (res as any).docs ?? (res as any).items ?? res;
