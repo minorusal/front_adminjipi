@@ -1,6 +1,11 @@
 <nav class="breadcrumb">Inicio / Listado de materiales</nav>
 <h2>Listado de materiales</h2>
 <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+<div class="button-bar">
+  <button type="button" class="add-material-btn" title="Agregar Material">
+    <span class="material-icons" aria-hidden="true">add</span>
+  </button>
+</div>
 <div class="search-container">
   <span class="material-icons">search</span>
   <input
@@ -9,11 +14,6 @@
     [(ngModel)]="searchText"
   (input)="onSearchChange()"
   />
-</div>
-<div class="button-bar">
-  <button type="button" class="add-material-btn" title="Agregar Material">
-    <span class="material-icons" aria-hidden="true">add</span>
-  </button>
 </div>
 <table *ngIf="materiales?.length">
   <thead>
