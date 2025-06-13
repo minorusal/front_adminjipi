@@ -15,6 +15,7 @@ export class ListadoMaterialesComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
   totalPages = 0;
+  searchText = '';
 
   constructor(private materialService: MaterialService) {}
 
@@ -25,7 +26,7 @@ export class ListadoMaterialesComponent implements OnInit {
   private loadMaterials(): void {
     this.errorMessage = '';
     this.materialService
-      .getMaterials(this.currentPage, this.pageSize)
+      .getMaterials(this.currentPage, this.pageSize, this.searchText)
       .subscribe({
         next: res => {
           const docs: any = (res as any).docs ?? (res as any).items ?? res;
@@ -58,6 +59,11 @@ export class ListadoMaterialesComponent implements OnInit {
 
   onFilterChange(): void {
     // Filtering is done client-side
+  }
+
+  onSearchChange(): void {
+    this.currentPage = 1;
+    this.loadMaterials();
   }
 
   get pages(): number[] {
