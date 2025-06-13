@@ -38,7 +38,6 @@ describe('ListadoMaterialesComponent', () => {
     req.flush({ docs: materials, totalPages: 5 });
 
     expect(component.materiales).toEqual(materials);
-    expect(component.totalPages).toBe(5);
   });
 
   it('should handle mismatched fields', () => {
@@ -49,7 +48,6 @@ describe('ListadoMaterialesComponent', () => {
     req.flush({ items: [] });
 
     expect(component.materiales).toEqual([]);
-    expect(component.totalPages).toBe(1);
   });
 
   it('should keep defaults on http error', () => {
@@ -62,6 +60,5 @@ describe('ListadoMaterialesComponent', () => {
     } catch {}
 
     expect(component.materiales).toEqual([]);
-    expect(component.totalPages).toBe(1);
   });
 });

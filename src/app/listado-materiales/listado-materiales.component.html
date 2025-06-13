@@ -24,10 +24,3 @@
     </tr>
   </tbody>
 </table>
-<div class="pagination" *ngIf="totalPages > 1">
-  <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Anterior</button>
-  <button *ngFor="let page of pages" (click)="goToPage(page)" [disabled]="currentPage === page">
-    {{ page }}
-  </button>
-  <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Siguiente</button>
-</div>
