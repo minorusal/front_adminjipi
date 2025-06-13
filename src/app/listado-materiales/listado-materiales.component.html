@@ -7,8 +7,13 @@
     type="text"
     placeholder="Buscar materiales"
     [(ngModel)]="searchText"
-    (input)="onSearchChange()"
+  (input)="onSearchChange()"
   />
+</div>
+<div class="button-bar">
+  <button type="button" class="add-material-btn">
+    <span class="material-icons" aria-hidden="true">add</span>
+  </button>
 </div>
 <table *ngIf="materiales?.length">
   <thead>
