@@ -1,3 +1,27 @@
 <h2>Listado de materiales</h2>
 <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
 <pre>{{ responseJson | json }}</pre>
+<table *ngIf="responseJson?.docs?.length">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Descripción</th>
+      <th>Espesor (mm)</th>
+      <th>Ancho (m)</th>
+      <th>Largo (m)</th>
+      <th>Precio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of responseJson.docs">
+      <td>{{ item.id }}</td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.description }}</td>
+      <td>{{ item.thickness_mm }}</td>
+      <td>{{ item.width_m }}</td>
+      <td>{{ item.length_m }}</td>
+      <td>{{ item.price }}</td>
+    </tr>
+  </tbody>
+</table>
