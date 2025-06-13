@@ -62,7 +62,7 @@
   <div class="add-modal" (click)="$event.stopPropagation()">
     <span class="close-icon material-icons" (click)="closeAddModal()">close</span>
     <h3>Agregar material</h3>
-    <form (ngSubmit)="saveMaterial()" #materialForm="ngForm">
+    <form (ngSubmit)="saveMaterial(materialForm)" #materialForm="ngForm">
       <div class="form-group">
         <label for="mat-name">Nombre</label>
         <input id="mat-name" type="text" [(ngModel)]="newMaterial.name" name="name" required />
