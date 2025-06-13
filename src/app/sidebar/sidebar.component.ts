@@ -26,6 +26,14 @@ export class SidebarComponent implements OnInit {
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
   ngOnInit(): void {
+    const stored = localStorage.getItem('menuExpanded');
+    if (stored) {
+      try {
+        this.expanded = JSON.parse(stored);
+      } catch (_) {
+        this.expanded = {};
+      }
+    }
     this.loadMenuTree();
   }
 
@@ -65,6 +73,7 @@ export class SidebarComponent implements OnInit {
 
   toggleNode(id: number): void {
     this.expanded[id] = !this.expanded[id];
+    localStorage.setItem('menuExpanded', JSON.stringify(this.expanded));
   }
 
   isOpen(id: number): boolean {
