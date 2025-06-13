@@ -10,6 +10,7 @@
   background: #444654;
   color: #fff;
   padding: 0.5rem 1rem;
+  transition: margin-left 0.3s ease;
 }
 
 .hamburger {

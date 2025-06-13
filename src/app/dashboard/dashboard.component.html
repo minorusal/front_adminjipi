@@ -1,5 +1,5 @@
 <div class="dashboard">
-  <header class="topbar">
+  <header class="topbar" [style.marginLeft.px]="menuOpen && isDesktop ? 220 : 0">
     <button
       class="hamburger"
       (click)="toggleMenu()"
