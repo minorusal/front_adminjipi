@@ -22,7 +22,8 @@ export class ListadoMaterialesComponent implements OnInit {
   private loadMaterials(): void {
     this.errorMessage = '';
     this.materialService
-      .getMaterials()
+      // Request a large limit so we fetch all materials in one call
+      .getMaterials(undefined, 1000)
       .subscribe({
         next: res => {
           const docs: any = (res as any).docs ?? (res as any).items ?? res;
