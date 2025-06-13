@@ -4,7 +4,7 @@
       *ngTemplateOutlet="renderNodes; context: { $implicit: menuTree }"
     ></ng-container>
     <li class="bottom-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
-      <a class="menu-item" [routerLink]="'settings'" (click)="onSelect()">
+      <a class="menu-item" [routerLink]="'settings'">
         <span class="icon">&#9881;</span>
         <span>Configuración</span>
       </a>
@@ -16,7 +16,6 @@
       <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
         <div
           class="menu-item"
-          (click)="node.children && toggleNode(node.id)"
           (keydown)="onKeydown($event, node)"
           tabindex="0"
           [attr.aria-expanded]="node.children ? isOpen(node.id) : null"
@@ -25,7 +24,7 @@
             *ngIf="node.path"
             class="name-btn"
             [routerLink]="node.path"
-            (click)="onSelect()"
+            
             >{{ node.name }}</a
           >
           <button
