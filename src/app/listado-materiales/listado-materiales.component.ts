@@ -67,11 +67,6 @@ export class ListadoMaterialesComponent implements OnInit {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
-  changePageSize(size: number): void {
-    this.pageSize = size;
-    this.currentPage = 1;
-    this.loadMaterials();
-  }
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
