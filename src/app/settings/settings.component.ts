@@ -16,6 +16,7 @@ export class SettingsComponent implements OnInit {
   menuForm: FormGroup;
   parentMenus: any[] = [];
   menuTree: MenuNode[] = [];
+  expanded: Record<number, boolean> = {};
   private ownerId!: number;
 
   constructor(
@@ -63,7 +64,29 @@ export class SettingsComponent implements OnInit {
   loadMenuTree(): void {
     this.menuService
       .getMenuTree(this.ownerId)
-      .subscribe((tree) => (this.menuTree = tree));
+      .subscribe((tree) => {
+        this.menuTree = tree;
+        this.initExpanded(tree);
+      });
+  }
+
+  private initExpanded(nodes: MenuNode[]): void {
+    nodes.forEach(node => {
+      if (node.children && node.children.length) {
+        if (this.expanded[node.id] === undefined) {
+          this.expanded[node.id] = true;
+        }
+        this.initExpanded(node.children);
+      }
+    });
+  }
+
+  toggleNode(id: number): void {
+    this.expanded[id] = !this.expanded[id];
+  }
+
+  isOpen(id: number): boolean {
+    return !!this.expanded[id];
   }
 
   hasChild = (_: number, node: MenuNode) =>
