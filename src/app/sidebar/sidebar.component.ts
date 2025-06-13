@@ -25,12 +25,18 @@ export class SidebarComponent implements OnInit {
     if (loginData) {
       try {
         const data = JSON.parse(loginData);
-        this.ownerId = parseInt(data.ownerCompany.id, 10);
+        const parsedId = parseInt(data.ownerCompany.id, 10);
+        if (!isNaN(parsedId)) {
+          this.ownerId = parsedId;
+        }
       } catch (_) {
         // ignore parse errors
       }
     }
 
+    const hasValidOwner =
+      typeof this.ownerId === 'number' && !isNaN(this.ownerId);
+    
     const stored = localStorage.getItem('menuExpanded');
     if (stored) {
       try {
@@ -39,7 +45,12 @@ export class SidebarComponent implements OnInit {
         this.expanded = {};
       }
     }
-    this.loadMenuTree();
+
+    if (hasValidOwner) {
+      this.loadMenuTree();
+    } else {
+      console.warn('SidebarComponent: ownerId could not be determined');
+    }
   }
 
 
