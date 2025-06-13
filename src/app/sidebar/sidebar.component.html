@@ -47,7 +47,7 @@
         </div>
         <ul
           class="submenu"
-          *ngIf="node.children && node.children.length && isOpen(node.id)"
+          *ngIf="node.children && node.children.length"
           [class.open]="isOpen(node.id)"
         >
           <ng-container

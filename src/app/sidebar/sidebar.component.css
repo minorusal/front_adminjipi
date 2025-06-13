@@ -81,8 +81,10 @@
 }
 
 .submenu {
-  display: none;
   background: #2c2d36;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
 }
 
 .submenu li {
@@ -90,7 +92,7 @@
 }
 
 .submenu.open {
-  display: block;
+  max-height: 500px;
 }
 
 .submenu .submenu {
