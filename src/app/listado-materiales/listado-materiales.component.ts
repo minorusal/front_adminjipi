@@ -33,8 +33,8 @@ export class ListadoMaterialesComponent implements OnInit {
   get filteredItems(): Material[] {
     return this.materiales.filter(m =>
       (this.filterId === '' || m.id.toString().includes(this.filterId)) &&
-      (this.filterNombre === '' || m.nombre.toLowerCase().includes(this.filterNombre.toLowerCase())) &&
-      (this.filterDescripcion === '' || m.descripcion.toLowerCase().includes(this.filterDescripcion.toLowerCase()))
+      (this.filterNombre === '' || m.name.toLowerCase().includes(this.filterNombre.toLowerCase())) &&
+      (this.filterDescripcion === '' || m.description.toLowerCase().includes(this.filterDescripcion.toLowerCase()))
     );
   }
 
