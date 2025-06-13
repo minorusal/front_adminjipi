@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../environments/environment';
-import { NestedTreeControl } from '@angular/cdk/tree';
-import { MatTreeNestedDataSource } from '@angular/material/tree';
 
 export interface MenuNode {
   id: number;
@@ -21,8 +18,6 @@ export class SettingsComponent implements OnInit {
   menuForm: FormGroup;
   parentMenus: any[] = [];
   menuTree: MenuNode[] = [];
-  treeControl = new NestedTreeControl<MenuNode>((node: MenuNode) => node.children);
-  dataSource = new MatTreeNestedDataSource<MenuNode>();
   private ownerId = 1;
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
@@ -71,9 +66,6 @@ export class SettingsComponent implements OnInit {
         // return a flat list, so build the hierarchy if "children" are missing.
         const isFlat = tree.length && !tree.some((m) => Array.isArray(m.children));
         this.menuTree = isFlat ? this.buildTree(tree) : (tree as MenuNode[]);
-        this.dataSource.data = this.menuTree;
-        this.treeControl.dataNodes = this.menuTree;
-        this.treeControl.collapseAll();
       });
   }
 
