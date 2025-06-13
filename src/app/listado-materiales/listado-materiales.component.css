@@ -101,10 +101,10 @@ th {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1100;
 }
 
-.modal {
+.add-modal {
   background-color: #444654;
   padding: 1.5rem;
   border-radius: 8px;
@@ -114,26 +114,26 @@ th {
   color: #e8e8e8;
 }
 
-.modal .close-icon {
+.add-modal .close-icon {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
   cursor: pointer;
 }
 
-.modal form {
+.add-modal form {
   display: flex;
   flex-direction: column;
 }
 
-.modal .form-group {
+.add-modal .form-group {
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
 }
 
-.modal input,
-.modal textarea {
+.add-modal input,
+.add-modal textarea {
   padding: 0.75rem;
   border-radius: 4px;
   border: 1px solid #565869;
@@ -142,7 +142,7 @@ th {
   width: 100%;
 }
 
-.modal .form-actions {
+.add-modal .form-actions {
   display: flex;
   justify-content: center;
 }
