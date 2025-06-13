@@ -29,8 +29,9 @@ export class ListadoMaterialesComponent implements OnInit {
       .getMaterials(this.currentPage, this.pageSize)
       .subscribe({
         next: res => {
-          this.materiales = res.docs;
-          this.totalPages = res.totalPages;
+          const docs: any = (res as any).docs ?? (res as any).items ?? res;
+          this.materiales = Array.isArray(docs) ? docs : [];
+          this.totalPages = (res as any).totalPages ?? 1;
           this.responseJson = res;
         },
         error: err => {

@@ -48,8 +48,8 @@ describe('ListadoMaterialesComponent', () => {
 
     req.flush({ items: [] });
 
-    expect(component.materiales).toBeUndefined();
-    expect(component.totalPages).toBeUndefined();
+    expect(component.materiales).toEqual([]);
+    expect(component.totalPages).toBe(1);
   });
 
   it('should keep defaults on http error', () => {
