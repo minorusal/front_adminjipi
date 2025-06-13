@@ -14,6 +14,7 @@ export class ListadoMaterialesComponent implements OnInit {
   filterId = '';
   filterNombre = '';
   filterDescripcion = '';
+  errorMessage = '';
 
   constructor(private materialService: MaterialService) {}
 
@@ -22,11 +23,18 @@ export class ListadoMaterialesComponent implements OnInit {
   }
 
   private loadMaterials(): void {
+    this.errorMessage = '';
     this.materialService
       .getMaterials(this.currentPage, this.pageSize)
-      .subscribe(res => {
-        this.materiales = res.docs;
-        this.totalPages = res.totalPages;
+      .subscribe({
+        next: res => {
+          this.materiales = res.docs;
+          this.totalPages = res.totalPages;
+        },
+        error: err => {
+          console.error('Failed to load materials', err);
+          this.errorMessage = 'Error al cargar los materiales';
+        }
       });
   }
 
