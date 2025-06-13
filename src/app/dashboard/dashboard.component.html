@@ -10,7 +10,10 @@
     <div class="userinfo" *ngIf="user">
       {{ user.name }} - {{ user.company }}
     </div>
-    <button class="logout" (click)="onLogout()">Cerrar sesión</button>
+    <button class="logout" (click)="onLogout()">
+      <span class="material-icons" aria-hidden="true">logout</span>
+      Cerrar sesión
+    </button>
   </header>
   <div class="body">
     <app-sidebar [open]="menuOpen"></app-sidebar>
