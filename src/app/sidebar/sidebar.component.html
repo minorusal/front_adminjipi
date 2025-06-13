@@ -1,9 +1,6 @@
 <nav class="sidemenu" [class.open]="open">
   <ul>
-  <ng-template
-    [ngTemplateOutlet]="tree"
-    [ngTemplateOutletContext]="{ nodes: menuTree }"
-  ></ng-template>
+    <pre>{{ menuTree | json }}</pre>
     <li class="bottom-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
       <a class="menu-item" [routerLink]="'settings'" (click)="onSelect()">
         <span class="icon">&#9881;</span>
@@ -12,45 +9,3 @@
     </li>
   </ul>
 </nav>
-
-<ng-template #tree let-nodes>
-  <ng-container *ngFor="let node of nodes">
-    <li [routerLinkActive]="'active'" [routerLinkActiveOptions]="{ exact: false }">
-      <div class="menu-item">
-        <ng-container *ngIf="node.path; else nameOnly">
-          <a
-            [routerLink]="node.path"
-            (click)="onSelect()"
-            (keydown)="onKeydown($event, node)"
-          >
-            {{ node.name }}
-          </a>
-        </ng-container>
-        <ng-template #nameOnly>
-          <button
-            type="button"
-            class="name-btn"
-            (click)="toggleNode(node.id)"
-            (keydown)="onKeydown($event, node)"
-            [attr.aria-expanded]="isOpen(node.id)"
-          >
-            {{ node.name }}
-          </button>
-        </ng-template>
-        <button
-          *ngIf="node.children && node.children.length"
-          class="arrow-btn"
-          type="button"
-          (click)="toggleNode(node.id); $event.stopPropagation()"
-          (keydown)="onKeydown($event, node)"
-          [attr.aria-expanded]="isOpen(node.id)"
-        >
-          <span class="arrow" [class.open]="isOpen(node.id)">&#9654;</span>
-        </button>
-      </div>
-      <ul *ngIf="node.children && node.children.length" class="submenu" [class.open]="isOpen(node.id)">
-        <ng-template [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ nodes: node.children }"></ng-template>
-      </ul>
-    </li>
-  </ng-container>
-</ng-template>
