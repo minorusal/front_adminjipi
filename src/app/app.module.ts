@@ -11,6 +11,7 @@ import { HomeComponent } from './home/home.component';
 import { VentasComponent } from './ventas/ventas.component';
 import { ProductosComponent } from './productos/productos.component';
 import { BodegasComponent } from './bodegas/bodegas.component';
+import { SidebarComponent } from './sidebar/sidebar.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { BodegasComponent } from './bodegas/bodegas.component';
     HomeComponent,
     VentasComponent,
     ProductosComponent,
-    BodegasComponent
+    BodegasComponent,
+    SidebarComponent
   ],
   imports: [
     BrowserModule,
