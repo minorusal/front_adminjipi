@@ -18,6 +18,15 @@ export class ListadoMaterialesComponent implements OnInit {
   totalPages = 0;
   searchText = '';
   showAddModal = false;
+  showEditModal = false;
+  editMaterialData: NewMaterial = {
+    name: '',
+    description: '',
+    thickness_mm: undefined,
+    width_m: undefined,
+    length_m: undefined,
+    price: undefined
+  };
   newMaterial: NewMaterial = {
     name: '',
     description: '',
@@ -68,6 +77,27 @@ export class ListadoMaterialesComponent implements OnInit {
     this.saveError = '';
     this.isSaving = false;
     this.resetNewMaterial();
+  }
+
+  openEditModal(material: Material): void {
+    this.editMaterialData = {
+      name: material.name,
+      description: material.description,
+      thickness_mm: material.thickness_mm,
+      width_m: material.width_m,
+      length_m: material.length_m,
+      price: material.price
+    };
+    this.showEditModal = true;
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+  }
+
+  updateMaterial(form: NgForm): void {
+    // Placeholder for update logic
+    console.log('Update material', this.editMaterialData);
   }
 
   saveMaterial(form: NgForm): void {
@@ -138,7 +168,6 @@ export class ListadoMaterialesComponent implements OnInit {
   }
 
   editMaterial(material: Material): void {
-    // Placeholder for edit logic
-    console.log('Edit material', material);
+    this.openEditModal(material);
   }
 }
