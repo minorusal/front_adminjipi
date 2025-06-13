@@ -19,6 +19,7 @@ export class ListadoMaterialesComponent implements OnInit {
   searchText = '';
   showAddModal = false;
   showEditModal = false;
+  editingMaterialId: number | null = null;
   editMaterialData: NewMaterial = {
     name: '',
     description: '',
@@ -36,7 +37,9 @@ export class ListadoMaterialesComponent implements OnInit {
     price: undefined
   };
   saveError = '';
+  updateError = '';
   isSaving = false;
+  isUpdating = false;
 
   constructor(private materialService: MaterialService) {}
 
@@ -80,6 +83,7 @@ export class ListadoMaterialesComponent implements OnInit {
   }
 
   openEditModal(material: Material): void {
+    this.editingMaterialId = material.id;
     this.editMaterialData = {
       name: material.name,
       description: material.description,
@@ -88,16 +92,45 @@ export class ListadoMaterialesComponent implements OnInit {
       length_m: material.length_m,
       price: material.price
     };
+    this.updateError = '';
+    this.isUpdating = false;
     this.showEditModal = true;
   }
 
   closeEditModal(): void {
     this.showEditModal = false;
+    this.editingMaterialId = null;
+    this.updateError = '';
+    this.isUpdating = false;
   }
 
   updateMaterial(form: NgForm): void {
-    // Placeholder for update logic
-    console.log('Update material', this.editMaterialData);
+    if (this.isUpdating) {
+      return;
+    }
+    if (form.invalid) {
+      form.form.markAllAsTouched();
+      return;
+    }
+    if (this.editingMaterialId === null) {
+      return;
+    }
+    this.updateError = '';
+    this.isUpdating = true;
+    this.materialService
+      .updateMaterial(this.editingMaterialId, this.editMaterialData)
+      .subscribe({
+        next: () => {
+          this.isUpdating = false;
+          this.closeEditModal();
+          this.loadMaterials();
+        },
+        error: err => {
+          this.isUpdating = false;
+          console.error('Failed to update material', err);
+          this.updateError = 'Error al actualizar el material';
+        }
+      });
   }
 
   saveMaterial(form: NgForm): void {

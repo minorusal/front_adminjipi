@@ -62,4 +62,29 @@ describe('ListadoMaterialesComponent', () => {
 
     expect(component.materiales).toEqual([]);
   });
+
+  it('should send PUT request when updating material', () => {
+    component.editMaterialData = {
+      name: 'Mat1',
+      description: 'Desc',
+      thickness_mm: 1,
+      width_m: 2,
+      length_m: 3,
+      price: 10
+    };
+    (component as any).editingMaterialId = 5;
+    const fakeForm: any = { invalid: false, form: { markAllAsTouched: () => {} } };
+    component.updateMaterial(fakeForm as any);
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/materials/5`);
+    expect(req.request.method).toBe('PUT');
+    req.flush({});
+  });
+
+  it('should not send request if update form is invalid', () => {
+    const fakeForm: any = { invalid: true, form: { markAllAsTouched: () => {} } };
+    component.updateMaterial(fakeForm as any);
+    const reqs = httpMock.match(() => true);
+    expect(reqs.length).toBe(0);
+  });
 });
