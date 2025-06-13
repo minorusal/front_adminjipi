@@ -44,9 +44,12 @@ export class SidebarComponent implements OnInit {
       ? { headers: new HttpHeaders({ token }), withCredentials: true }
       : { withCredentials: true };
     this.http
-      .get<MenuNode[]>(`${environment.apiUrl}/menus?owner_id=${this.ownerId}`, options)
+      .get<any[]>(`${environment.apiUrl}/menus?owner_id=${this.ownerId}`, options)
       .subscribe({
-        next: (tree) => (this.menuTree = tree),
+        next: (tree) => {
+          const isFlat = tree.length && !tree.some((m) => Array.isArray(m.children));
+          this.menuTree = isFlat ? this.buildTree(tree) : (tree as MenuNode[]);
+        },
         error: () => {
           // fallback menu when backend unavailable
           this.menuTree = [
@@ -69,6 +72,17 @@ export class SidebarComponent implements OnInit {
           ];
         }
       });
+  }
+
+  private buildTree(items: any[], parentId: number | null = null): MenuNode[] {
+    return items
+      .filter((m) => m.parent_id === parentId)
+      .map((m) => ({
+        id: m.id,
+        name: m.name,
+        path: m.path,
+        children: this.buildTree(items, m.id)
+      }));
   }
 
   toggleNode(id: number): void {
