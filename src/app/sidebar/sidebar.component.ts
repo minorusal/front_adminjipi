@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 export interface MenuNode {
   id: number;
@@ -38,7 +39,7 @@ export class SidebarComponent implements OnInit {
       ? { headers: new HttpHeaders({ token }), withCredentials: true }
       : { withCredentials: true };
     this.http
-      .get<MenuNode[]>(`http://localhost:3000/menus?owner_id=${this.ownerId}`, options)
+      .get<MenuNode[]>(`${environment.apiUrl}/menus?owner_id=${this.ownerId}`, options)
       .subscribe({
         next: (tree) => (this.menuTree = tree),
         error: () => {
