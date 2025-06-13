@@ -31,6 +31,9 @@ export class SidebarComponent implements OnInit {
       }
     }
 
+    const hasValidOwner =
+      typeof this.ownerId === 'number' && !isNaN(this.ownerId);
+    
     const stored = localStorage.getItem('menuExpanded');
     if (stored) {
       try {
@@ -39,7 +42,12 @@ export class SidebarComponent implements OnInit {
         this.expanded = {};
       }
     }
-    this.loadMenuTree();
+
+    if (hasValidOwner) {
+      this.loadMenuTree();
+    } else {
+      console.warn('SidebarComponent: ownerId could not be determined');
+    }
   }
 
 
