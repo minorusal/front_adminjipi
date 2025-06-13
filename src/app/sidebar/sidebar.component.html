@@ -16,6 +16,7 @@
       <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
         <div
           class="menu-item"
+          (click)="node.children && toggleNode(node.id)"
           (keydown)="onKeydown($event, node)"
           tabindex="0"
           [attr.aria-expanded]="node.children ? isOpen(node.id) : null"
@@ -31,7 +32,7 @@
             *ngIf="!node.path"
             class="name-btn"
             type="button"
-            (click)="node.children ? toggleNode(node.id) : onSelect()"
+            (click)="$event.stopPropagation()"
           >
             {{ node.name }}
           </button>
@@ -39,7 +40,7 @@
             *ngIf="node.children && node.children.length"
             class="arrow-btn"
             type="button"
-            (click)="toggleNode(node.id)"
+            (click)="toggleNode(node.id); $event.stopPropagation()"
             [attr.aria-expanded]="isOpen(node.id)"
           >
             <span class="arrow" [class.open]="isOpen(node.id)">&#9656;</span>
