@@ -25,6 +25,8 @@ export interface PaginatedMaterials {
   totalPages: number;
 }
 
+export type NewMaterial = Omit<Material, 'id' | 'created_at' | 'updated_at' | 'owner_id'>;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -54,5 +56,13 @@ export class MaterialService {
       url += `?${params.join('&')}`;
     }
     return this.http.get<PaginatedMaterials>(url, this.httpOptions());
+  }
+
+  addMaterial(material: NewMaterial): Observable<Material> {
+    return this.http.post<Material>(
+      `${environment.apiUrl}/materials`,
+      material,
+      this.httpOptions()
+    );
   }
 }
