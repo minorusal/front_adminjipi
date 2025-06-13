@@ -38,10 +38,18 @@ export class MaterialService {
       : { withCredentials: true };
   }
 
-  getMaterials(page: number, limit: number): Observable<PaginatedMaterials> {
-    return this.http.get<PaginatedMaterials>(
-      `${environment.apiUrl}/materials?page=${page}&limit=${limit}`,
-      this.httpOptions()
-    );
+  getMaterials(page?: number, limit?: number): Observable<PaginatedMaterials> {
+    let url = `${environment.apiUrl}/materials`;
+    const params: string[] = [];
+    if (page !== undefined) {
+      params.push(`page=${page}`);
+    }
+    if (limit !== undefined) {
+      params.push(`limit=${limit}`);
+    }
+    if (params.length) {
+      url += `?${params.join('&')}`;
+    }
+    return this.http.get<PaginatedMaterials>(url, this.httpOptions());
   }
 }
