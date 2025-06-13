@@ -37,14 +37,24 @@ export class SettingsComponent implements OnInit {
     if (loginData) {
       try {
         const data = JSON.parse(loginData);
-        this.ownerId = parseInt(data.ownerCompany.id, 10);
+        const parsedId = parseInt(data.ownerCompany.id, 10);
+        if (!isNaN(parsedId)) {
+          this.ownerId = parsedId;
+        }
       } catch (_) {
         // ignore parse errors
       }
     }
 
-    this.loadParentMenus();
-    this.loadMenuTree();
+    const hasValidOwner =
+      typeof this.ownerId === 'number' && !isNaN(this.ownerId);
+
+    if (hasValidOwner) {
+      this.loadParentMenus();
+      this.loadMenuTree();
+    } else {
+      console.warn('SettingsComponent: ownerId could not be determined');
+    }
   }
 
   loadParentMenus(): void {
@@ -77,8 +87,12 @@ export class SettingsComponent implements OnInit {
     this.http.post(`${environment.apiUrl}/menus`, body, options).subscribe({
       next: () => {
         this.menuForm.reset();
-        this.loadParentMenus();
-        this.loadMenuTree();
+        if (typeof this.ownerId === 'number' && !isNaN(this.ownerId)) {
+          this.loadParentMenus();
+          this.loadMenuTree();
+        } else {
+          console.warn('SettingsComponent: ownerId could not be determined');
+        }
       }
     });
   }
