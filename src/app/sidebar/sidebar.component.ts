@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MenuService, MenuNode } from '../services/menu.service';
+import { CookieService } from '../services/cookie.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -14,7 +15,10 @@ export class SidebarComponent implements OnInit {
   expanded: Record<number, boolean> = {};
   private ownerId!: number;
 
-  constructor(private menuService: MenuService) {}
+  constructor(
+    private menuService: MenuService,
+    private cookieService: CookieService
+  ) {}
 
   ngOnInit(): void {
     const loginData = this.cookieService.get('loginData');

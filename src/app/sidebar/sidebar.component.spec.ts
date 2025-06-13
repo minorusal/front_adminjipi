@@ -17,7 +17,7 @@ describe('SidebarComponent', () => {
     TestBed.configureTestingModule({
       declarations: [SidebarComponent],
       imports: [RouterTestingModule],
-      providers: [{ provide: MenuService, useValue: menuServiceSpy }],
+      providers: [CookieService, { provide: MenuService, useValue: menuServiceSpy }],
       schemas: [NO_ERRORS_SCHEMA]
     });
 
