@@ -65,11 +65,30 @@
     <form (ngSubmit)="saveMaterial(materialForm)" #materialForm="ngForm">
       <div class="form-group">
         <label for="mat-name">Nombre</label>
-        <input id="mat-name" type="text" [(ngModel)]="newMaterial.name" name="name" required />
+        <input
+          id="mat-name"
+          type="text"
+          [(ngModel)]="newMaterial.name"
+          name="name"
+          required
+          #nameRef="ngModel"
+        />
+        <div class="error" *ngIf="nameRef.touched && nameRef.hasError('required')">
+          El nombre es requerido
+        </div>
       </div>
       <div class="form-group">
         <label for="mat-desc">Descripción</label>
-        <textarea id="mat-desc" [(ngModel)]="newMaterial.description" name="description" required></textarea>
+        <textarea
+          id="mat-desc"
+          [(ngModel)]="newMaterial.description"
+          name="description"
+          required
+          #descRef="ngModel"
+        ></textarea>
+        <div class="error" *ngIf="descRef.touched && descRef.hasError('required')">
+          La descripción es requerida
+        </div>
       </div>
       <div class="form-group">
         <label for="mat-thick">Espesor (mm)</label>
@@ -85,7 +104,17 @@
       </div>
       <div class="form-group">
         <label for="mat-price">Precio</label>
-        <input id="mat-price" type="number" [(ngModel)]="newMaterial.price" name="price" required />
+        <input
+          id="mat-price"
+          type="number"
+          [(ngModel)]="newMaterial.price"
+          name="price"
+          required
+          #priceRef="ngModel"
+        />
+        <div class="error" *ngIf="priceRef.touched && priceRef.hasError('required')">
+          El precio es requerido
+        </div>
       </div>
       <div class="error" *ngIf="saveError">{{ saveError }}</div>
       <div class="form-actions">
