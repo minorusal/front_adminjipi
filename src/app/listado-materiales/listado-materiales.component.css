@@ -142,6 +142,11 @@ th {
   width: 100%;
 }
 
+.add-modal input.ng-invalid.ng-touched,
+.add-modal textarea.ng-invalid.ng-touched {
+  border-color: #ff6b6b;
+}
+
 .add-modal .form-actions {
   display: flex;
   justify-content: center;
