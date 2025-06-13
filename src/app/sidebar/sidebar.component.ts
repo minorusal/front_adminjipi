@@ -65,6 +65,14 @@ export class SidebarComponent implements OnInit {
     return !!this.expanded[id];
   }
 
+  onItemClick(node: MenuNode, event: MouseEvent): void {
+    const hasChildren = !!node.children && node.children.length > 0;
+    if (hasChildren && !node.path) {
+      this.toggleNode(node.id);
+      event.stopPropagation();
+    }
+  }
+
   onKeydown(event: KeyboardEvent, node: MenuNode): void {
     const hasChildren = !!node.children && node.children.length > 0;
     if (event.key === 'Enter' || event.key === ' ') {
