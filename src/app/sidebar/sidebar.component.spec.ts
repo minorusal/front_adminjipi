@@ -5,6 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { CookieService } from '../services/cookie.service';
 
 import { SidebarComponent } from './sidebar.component';
+import { CookieService } from '../services/cookie.service';
 
 describe('SidebarComponent', () => {
   let component: SidebarComponent;
@@ -29,7 +30,13 @@ describe('SidebarComponent', () => {
   });
 
   it('should load fallback menu tree on http error', () => {
-    spyOn(TestBed.inject(CookieService), 'get').and.returnValue(null);
+    const cookieService = TestBed.inject(CookieService);
+    spyOn(cookieService, 'get').and.callFake((name: string) => {
+      if (name === 'loginData') {
+        return JSON.stringify({ ownerCompany: { id: 1 } });
+      }
+      return null;
+    });
 
     fixture.detectChanges();
 
