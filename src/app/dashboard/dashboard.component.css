@@ -24,12 +24,15 @@
 
 .logout {
   margin-left: auto;
-  background: #ff6b6b;
+  background: #e57373;
   border: none;
   color: #fff;
   padding: 0.25rem 0.75rem;
   cursor: pointer;
   border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .body {
