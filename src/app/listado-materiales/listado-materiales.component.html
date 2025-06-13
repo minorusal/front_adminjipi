@@ -69,8 +69,8 @@
   </ul>
 </nav>
 
-<div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
-  <div class="add-modal" (click)="$event.stopPropagation()">
+<div class="modal-overlay" *ngIf="showAddModal" (mousedown)="closeAddModal()">
+  <div class="add-modal" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()">
     <span class="close-icon material-icons" (click)="closeAddModal()">close</span>
     <h3>Agregar material</h3>
     <form (ngSubmit)="saveMaterial(materialForm)" #materialForm="ngForm">
@@ -137,8 +137,8 @@
     </form>
   </div>
 </div>
-<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
-  <div class="add-modal" (click)="$event.stopPropagation()">
+<div class="modal-overlay" *ngIf="showEditModal" (mousedown)="closeEditModal()">
+  <div class="add-modal" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()">
     <span class="close-icon material-icons" (click)="closeEditModal()">close</span>
     <h3>Editar material</h3>
     <form (ngSubmit)="updateMaterial(editForm)" #editForm="ngForm">
