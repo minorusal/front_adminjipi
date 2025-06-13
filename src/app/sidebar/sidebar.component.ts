@@ -83,4 +83,22 @@ export class SidebarComponent implements OnInit {
   onSelect(): void {
     this.closeMenu.emit();
   }
+
+  onKeydown(event: KeyboardEvent, node: MenuNode): void {
+    const hasChildren = !!node.children && node.children.length > 0;
+    if (event.key === 'Enter' || event.key === ' ') {
+      if (!node.path) {
+        event.preventDefault();
+        if (hasChildren) {
+          this.toggleNode(node.id);
+        }
+      }
+    } else if (event.key === 'ArrowRight' && hasChildren && !this.isOpen(node.id)) {
+      event.preventDefault();
+      this.toggleNode(node.id);
+    } else if (event.key === 'ArrowLeft' && hasChildren && this.isOpen(node.id)) {
+      event.preventDefault();
+      this.toggleNode(node.id);
+    }
+  }
 }
