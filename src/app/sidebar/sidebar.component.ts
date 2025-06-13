@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MenuService, MenuNode } from '../services/menu.service';
 import { CookieService } from '../services/cookie.service';
 
@@ -9,7 +9,6 @@ import { CookieService } from '../services/cookie.service';
 })
 export class SidebarComponent implements OnInit {
   @Input() open = false;
-  @Output() closeMenu = new EventEmitter<void>();
 
   menuTree: MenuNode[] = [];
   expanded: Record<number, boolean> = {};
@@ -64,10 +63,6 @@ export class SidebarComponent implements OnInit {
 
   isOpen(id: number): boolean {
     return !!this.expanded[id];
-  }
-
-  onSelect(): void {
-    this.closeMenu.emit();
   }
 
   onKeydown(event: KeyboardEvent, node: MenuNode): void {

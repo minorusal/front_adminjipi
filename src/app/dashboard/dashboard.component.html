@@ -13,7 +13,7 @@
     <button class="logout" (click)="onLogout()">Cerrar sesión</button>
   </header>
   <div class="body">
-    <app-sidebar [open]="menuOpen" (closeMenu)="menuOpen = false"></app-sidebar>
+    <app-sidebar [open]="menuOpen"></app-sidebar>
     <main class="content" [style.marginLeft.px]="menuOpen && isDesktop ? 220 : 0">
       <router-outlet></router-outlet>
     </main>
