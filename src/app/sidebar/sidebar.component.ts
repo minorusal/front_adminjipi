@@ -12,11 +12,21 @@ export class SidebarComponent implements OnInit {
 
   menuTree: MenuNode[] = [];
   expanded: Record<number, boolean> = {};
-  private ownerId = 1;
+  private ownerId!: number;
 
   constructor(private menuService: MenuService) {}
 
   ngOnInit(): void {
+    const loginData = this.cookieService.get('loginData');
+    if (loginData) {
+      try {
+        const data = JSON.parse(loginData);
+        this.ownerId = data.ownerCompany.id;
+      } catch (_) {
+        // ignore parse errors
+      }
+    }
+
     const stored = localStorage.getItem('menuExpanded');
     if (stored) {
       try {

@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { MenuService } from '../services/menu.service';
 
 import { SidebarComponent } from './sidebar.component';
+import { CookieService } from '../services/cookie.service';
 
 describe('SidebarComponent', () => {
   let component: SidebarComponent;
@@ -23,7 +24,6 @@ describe('SidebarComponent', () => {
     fixture = TestBed.createComponent(SidebarComponent);
     component = fixture.componentInstance;
   });
-
   it('should load menu tree from service', () => {
     const menu = [
       { id: 1, name: 'Inicio', path: 'home' },

@@ -16,7 +16,7 @@ export class SettingsComponent implements OnInit {
   menuForm: FormGroup;
   parentMenus: any[] = [];
   menuTree: MenuNode[] = [];
-  private ownerId = 1;
+  private ownerId!: number;
 
   constructor(
     private fb: FormBuilder,
@@ -33,6 +33,16 @@ export class SettingsComponent implements OnInit {
 
 
   ngOnInit(): void {
+    const loginData = this.cookieService.get('loginData');
+    if (loginData) {
+      try {
+        const data = JSON.parse(loginData);
+        this.ownerId = data.ownerCompany.id;
+      } catch (_) {
+        // ignore parse errors
+      }
+    }
+
     this.loadParentMenus();
     this.loadMenuTree();
   }
