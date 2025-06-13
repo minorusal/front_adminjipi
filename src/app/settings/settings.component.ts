@@ -2,16 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CookieService } from '../services/cookie.service';
+import { MenuService, MenuNode } from '../services/menu.service';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { environment } from '../../environments/environment';
-
-export interface MenuNode {
-  id: number;
-  name: string;
-  path?: string | null;
-  children?: MenuNode[];
-}
 
 @Component({
   selector: 'app-settings',
@@ -24,7 +18,12 @@ export class SettingsComponent implements OnInit {
   menuTree: MenuNode[] = [];
   private ownerId = 1;
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private cookieService: CookieService) {
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private cookieService: CookieService,
+    private menuService: MenuService
+  ) {
     this.menuForm = this.fb.group({
       name: [''],
       url: [''],
@@ -39,45 +38,15 @@ export class SettingsComponent implements OnInit {
   }
 
   loadParentMenus(): void {
-    const token = this.cookieService.get('token');
-    const options = token
-      ? { headers: new HttpHeaders({ token }), withCredentials: true }
-      : { withCredentials: true };
-    this.http
-      .get<any[]>(
-        `${environment.apiUrl}/menus/all?owner_id=${this.ownerId}`,
-        options
-      )
+    this.menuService
+      .getParentMenus(this.ownerId)
       .subscribe((menus) => (this.parentMenus = menus));
   }
 
   loadMenuTree(): void {
-    const token = this.cookieService.get('token');
-    const options = token
-      ? { headers: new HttpHeaders({ token }), withCredentials: true }
-      : { withCredentials: true };
-    this.http
-      .get<any[]>(
-        `${environment.apiUrl}/menus?owner_id=${this.ownerId}`,
-        options
-      )
-      .subscribe((tree) => {
-        // Ensure the data is in a nested tree format. Some responses may
-        // return a flat list, so build the hierarchy if "children" are missing.
-        const isFlat = tree.length && !tree.some((m) => Array.isArray(m.children));
-        this.menuTree = isFlat ? this.buildTree(tree) : (tree as MenuNode[]);
-      });
-  }
-
-  private buildTree(items: any[], parentId: number | null = null): MenuNode[] {
-    return items
-      .filter((m) => m.parent_id === parentId)
-      .map((m) => ({
-        id: m.id,
-        name: m.name,
-        path: m.path,
-        children: this.buildTree(items, m.id),
-      }));
+    this.menuService
+      .getMenuTree(this.ownerId)
+      .subscribe((tree) => (this.menuTree = tree));
   }
 
   hasChild = (_: number, node: MenuNode) =>

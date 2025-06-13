@@ -1,14 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { CookieService } from '../services/cookie.service';
-import { environment } from '../../environments/environment';
-
-export interface MenuNode {
-  id: number;
-  name: string;
-  path?: string | null;
-  children?: MenuNode[];
-}
+import { MenuService, MenuNode } from '../services/menu.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -23,7 +14,7 @@ export class SidebarComponent implements OnInit {
   expanded: Record<number, boolean> = {};
   private ownerId = 1;
 
-  constructor(private http: HttpClient, private cookieService: CookieService) {}
+  constructor(private menuService: MenuService) {}
 
   ngOnInit(): void {
     const stored = localStorage.getItem('menuExpanded');
@@ -39,50 +30,9 @@ export class SidebarComponent implements OnInit {
 
 
   loadMenuTree(): void {
-    const token = this.cookieService.get('token');
-    const options = token
-      ? { headers: new HttpHeaders({ token }), withCredentials: true }
-      : { withCredentials: true };
-    this.http
-      .get<any[]>(`${environment.apiUrl}/menus?owner_id=${this.ownerId}`, options)
-      .subscribe({
-        next: (tree) => {
-          const isFlat = tree.length && !tree.some((m) => Array.isArray(m.children));
-          this.menuTree = isFlat ? this.buildTree(tree) : (tree as MenuNode[]);
-        },
-        error: () => {
-          // fallback menu when backend unavailable
-          this.menuTree = [
-            { id: 1, name: 'Inicio', path: 'home' },
-            {
-              id: 2,
-              name: 'Módulos',
-              children: [
-                { id: 3, name: 'Ventas', path: 'ventas' },
-                {
-                  id: 4,
-                  name: 'Inventario',
-                  children: [
-                    { id: 5, name: 'Productos', path: 'inventario/productos' },
-                    { id: 6, name: 'Bodegas', path: 'inventario/bodegas' }
-                  ]
-                }
-              ]
-            }
-          ];
-        }
-      });
-  }
-
-  private buildTree(items: any[], parentId: number | null = null): MenuNode[] {
-    return items
-      .filter((m) => m.parent_id === parentId)
-      .map((m) => ({
-        id: m.id,
-        name: m.name,
-        path: m.path,
-        children: this.buildTree(items, m.id)
-      }));
+    this.menuService
+      .getMenuTree(this.ownerId)
+      .subscribe((tree) => (this.menuTree = tree));
   }
 
   toggleNode(id: number): void {
