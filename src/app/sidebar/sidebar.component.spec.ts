@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { CookieService } from '../services/cookie.service';
 
 import { SidebarComponent } from './sidebar.component';
 
@@ -14,6 +15,7 @@ describe('SidebarComponent', () => {
     TestBed.configureTestingModule({
       declarations: [SidebarComponent],
       imports: [HttpClientTestingModule, RouterTestingModule],
+      providers: [CookieService],
       schemas: [NO_ERRORS_SCHEMA]
     });
 
@@ -27,7 +29,7 @@ describe('SidebarComponent', () => {
   });
 
   it('should load fallback menu tree on http error', () => {
-    spyOn<any>(component, 'getCookie').and.returnValue(null);
+    spyOn(TestBed.inject(CookieService), 'get').and.returnValue(null);
 
     fixture.detectChanges();
 
