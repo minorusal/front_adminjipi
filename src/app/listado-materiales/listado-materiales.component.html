@@ -33,7 +33,7 @@
 </div>
 <div class="page-size">
   <label for="pageSize">Filas por página:</label>
-  <select id="pageSize" [value]="pageSize" (change)="changePageSize(+($event.target as HTMLSelectElement).value)">
+  <select id="pageSize" [value]="pageSize" (change)="changePageSize(+($any($event.target).value))">
     <option *ngFor="let size of [5,10,20,50]" [value]="size">{{ size }}</option>
   </select>
 </div>
