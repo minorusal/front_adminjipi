@@ -8,6 +8,13 @@ export interface Material {
   id: number;
   name: string;
   description: string;
+  thickness_mm?: number;
+  width_m?: number;
+  length_m?: number;
+  price?: number;
+  created_at?: string;
+  updated_at?: string;
+  owner_id?: number;
 }
 
 export interface PaginatedMaterials {

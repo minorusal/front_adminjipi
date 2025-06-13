@@ -12,11 +12,19 @@
       <th>ID</th>
       <th>Nombre</th>
       <th>Descripción</th>
+      <th>Espesor (mm)</th>
+      <th>Ancho (m)</th>
+      <th>Largo (m)</th>
+      <th>Precio</th>
     </tr>
     <tr>
       <th><input class="filter-input" type="text" [(ngModel)]="filterId" (ngModelChange)="onFilterChange()" placeholder="Filtrar" /></th>
       <th><input class="filter-input" type="text" [(ngModel)]="filterNombre" (ngModelChange)="onFilterChange()" placeholder="Filtrar" /></th>
       <th><input class="filter-input" type="text" [(ngModel)]="filterDescripcion" (ngModelChange)="onFilterChange()" placeholder="Filtrar" /></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -24,6 +32,10 @@
       <td>{{ material.id }}</td>
       <td>{{ material.name }}</td>
       <td>{{ material.description }}</td>
+      <td>{{ material.thickness_mm }}</td>
+      <td>{{ material.width_m }}</td>
+      <td>{{ material.length_m }}</td>
+      <td>{{ material.price }}</td>
     </tr>
   </tbody>
 </table>
