@@ -6,8 +6,8 @@ import { environment } from '../../environments/environment';
 
 export interface Material {
   id: number;
-  nombre: string;
-  descripcion: string;
+  name: string;
+  description: string;
 }
 
 export interface PaginatedMaterials {
