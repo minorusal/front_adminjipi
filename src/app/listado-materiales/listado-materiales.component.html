@@ -195,8 +195,12 @@
           El precio es requerido
         </div>
       </div>
+      <div class="error" *ngIf="updateError">{{ updateError }}</div>
       <div class="form-actions">
-        <button type="submit" [disabled]="!editForm.form.valid">Guardar</button>
+        <button type="submit" [disabled]="isUpdating || !editForm.form.valid">Guardar</button>
+        <div class="loader-overlay" *ngIf="isUpdating">
+          <div class="spinner"></div>
+        </div>
       </div>
     </form>
   </div>

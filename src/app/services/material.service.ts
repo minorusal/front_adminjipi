@@ -65,4 +65,12 @@ export class MaterialService {
       this.httpOptions()
     );
   }
+
+  updateMaterial(id: number, material: NewMaterial): Observable<Material> {
+    return this.http.put<Material>(
+      `${environment.apiUrl}/materials/${id}`,
+      material,
+      this.httpOptions()
+    );
+  }
 }
