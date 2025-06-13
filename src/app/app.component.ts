@@ -1,6 +1,6 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { CookieService } from './services/cookie.service';
 import { environment } from '../environments/environment';
 
@@ -108,8 +108,10 @@ export class AppComponent implements OnInit {
           this.user = { name: res.user.username, company: res.ownerCompany.name };
           this.resetInactivityTimer();
         },
-        error: () => {
-          this.error = 'Los datos son incorrectos';
+        error: (err: HttpErrorResponse) => {
+          this.error = err.status === 0
+            ? 'Ocurrió un error, contacte al administrador'
+            : 'Los datos son incorrectos';
         }
       });
   }
