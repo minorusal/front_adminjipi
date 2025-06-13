@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { CookieService } from '../services/cookie.service';
+import { of } from 'rxjs';
+import { MenuService } from '../services/menu.service';
 
 import { SidebarComponent } from './sidebar.component';
 import { CookieService } from '../services/cookie.service';
@@ -10,40 +10,22 @@ import { CookieService } from '../services/cookie.service';
 describe('SidebarComponent', () => {
   let component: SidebarComponent;
   let fixture: ComponentFixture<SidebarComponent>;
-  let httpMock: HttpTestingController;
+  let menuServiceSpy: jasmine.SpyObj<MenuService>;
 
   beforeEach(() => {
+    menuServiceSpy = jasmine.createSpyObj('MenuService', ['getMenuTree']);
     TestBed.configureTestingModule({
       declarations: [SidebarComponent],
-      imports: [HttpClientTestingModule, RouterTestingModule],
-      providers: [CookieService],
+      imports: [RouterTestingModule],
+      providers: [{ provide: MenuService, useValue: menuServiceSpy }],
       schemas: [NO_ERRORS_SCHEMA]
     });
 
     fixture = TestBed.createComponent(SidebarComponent);
     component = fixture.componentInstance;
-    httpMock = TestBed.inject(HttpTestingController);
   });
-
-  afterEach(() => {
-    httpMock.verify();
-  });
-
-  it('should load fallback menu tree on http error', () => {
-    const cookieService = TestBed.inject(CookieService);
-    spyOn(cookieService, 'get').and.callFake((name: string) => {
-      if (name === 'loginData') {
-        return JSON.stringify({ ownerCompany: { id: 1 } });
-      }
-      return null;
-    });
-
-    fixture.detectChanges();
-
-    const req = httpMock.expectOne('http://localhost:3000/menus?owner_id=1');
-    req.error(new ErrorEvent('Network error'));
-
-    expect(component.menuTree).toEqual([
+  it('should load menu tree from service', () => {
+    const menu = [
       { id: 1, name: 'Inicio', path: 'home' },
       {
         id: 2,
@@ -60,7 +42,12 @@ describe('SidebarComponent', () => {
           }
         ]
       }
-    ]);
+    ];
+    menuServiceSpy.getMenuTree.and.returnValue(of(menu));
+
+    fixture.detectChanges();
+
+    expect(component.menuTree).toEqual(menu);
   });
 
   it('should toggle node open state', () => {
