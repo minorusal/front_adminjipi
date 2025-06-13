@@ -8,6 +8,7 @@ import { MaterialService, Material } from '../services/material.service';
 })
 export class ListadoMaterialesComponent implements OnInit {
   materiales: Material[] = [];
+  responseJson: any;
   pageSize = 10;
   currentPage = 1;
   totalPages = 1;
@@ -30,6 +31,7 @@ export class ListadoMaterialesComponent implements OnInit {
         next: res => {
           this.materiales = res.docs;
           this.totalPages = res.totalPages;
+          this.responseJson = res;
         },
         error: err => {
           console.error('Failed to load materials', err);
