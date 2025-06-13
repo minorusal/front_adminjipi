@@ -24,7 +24,7 @@ export class SidebarComponent implements OnInit {
     const loginData = this.cookieService.get('loginData');
     if (loginData) {
       try {
-        const data = JSON.parse(loginData);
+        const data = JSON.parse(decodeURIComponent(loginData));
         this.ownerId = data.ownerCompany.id;
       } catch (_) {
         // ignore parse errors
