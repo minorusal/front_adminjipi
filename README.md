@@ -2,6 +2,32 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.11.
 
+## Backend API prerequisites
+
+The application expects a backend server exposing the following endpoints:
+
+- `POST /auth/login` – validates credentials and returns a JWT token.
+- `POST /auth/logout` – clears the user session using the provided token.
+- `GET /menus` – returns the menu tree for a company. The `owner_id` query
+  parameter selects the company, e.g. `/menus?owner_id=1`.
+
+All endpoints are assumed to live under the base URL configured via the
+Angular environment files (see next section).
+
+## Configuring the API base URL
+
+Create the file `src/environments/environment.ts` with:
+```ts
+export const environment = {
+  apiBaseUrl: "http://localhost:3000"
+};
+```
+
+For production builds you can add `src/environments/environment.prod.ts` with an
+ appropriate value and update `angular.json` to replace the file during `--prod`
+ builds. Import `environment` from `src/environments/environment` in your servic
+es to prefix all backend requests with `environment.apiBaseUrl`.
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
@@ -17,6 +43,11 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 ## Running unit tests
 
 Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+
+## Useful commands
+
+- `npm start` - serves the application using Angular CLI (`ng serve`).
+- `npm test`  - runs unit tests with Karma.
 
 ## Running end-to-end tests
 
