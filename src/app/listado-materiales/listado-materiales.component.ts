@@ -15,6 +15,9 @@ export class ListadoMaterialesComponent {
   materiales: Material[] = [];
   pageSize = 10;
   currentPage = 1;
+  filterId = '';
+  filterNombre = '';
+  filterDescripcion = '';
 
   constructor() {
     this.materiales = Array.from({ length: 100 }).map((_, i) => ({
@@ -25,12 +28,20 @@ export class ListadoMaterialesComponent {
   }
 
   get totalPages(): number {
-    return Math.ceil(this.materiales.length / this.pageSize);
+    return Math.ceil(this.filteredItems.length / this.pageSize);
   }
 
   get paginatedItems(): Material[] {
     const start = (this.currentPage - 1) * this.pageSize;
-    return this.materiales.slice(start, start + this.pageSize);
+    return this.filteredItems.slice(start, start + this.pageSize);
+  }
+
+  get filteredItems(): Material[] {
+    return this.materiales.filter(m =>
+      (this.filterId === '' || m.id.toString().includes(this.filterId)) &&
+      (this.filterNombre === '' || m.nombre.toLowerCase().includes(this.filterNombre.toLowerCase())) &&
+      (this.filterDescripcion === '' || m.descripcion.toLowerCase().includes(this.filterDescripcion.toLowerCase()))
+    );
   }
 
   changePageSize(size: number): void {
@@ -42,5 +53,9 @@ export class ListadoMaterialesComponent {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
     }
+  }
+
+  onFilterChange(): void {
+    this.currentPage = 1;
   }
 }

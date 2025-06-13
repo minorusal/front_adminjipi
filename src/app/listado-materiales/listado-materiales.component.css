@@ -13,6 +13,11 @@
   padding: 0.5rem;
 }
 
+.filter-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .paginator {
   margin-top: 1rem;
 }

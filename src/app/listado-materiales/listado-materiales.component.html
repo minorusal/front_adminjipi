@@ -12,6 +12,11 @@
       <th>Nombre</th>
       <th>Descripción</th>
     </tr>
+    <tr>
+      <th><input class="filter-input" type="text" [(ngModel)]="filterId" (ngModelChange)="onFilterChange()" placeholder="Filtrar" /></th>
+      <th><input class="filter-input" type="text" [(ngModel)]="filterNombre" (ngModelChange)="onFilterChange()" placeholder="Filtrar" /></th>
+      <th><input class="filter-input" type="text" [(ngModel)]="filterDescripcion" (ngModelChange)="onFilterChange()" placeholder="Filtrar" /></th>
+    </tr>
   </thead>
   <tbody>
     <tr *ngFor="let material of paginatedItems">
