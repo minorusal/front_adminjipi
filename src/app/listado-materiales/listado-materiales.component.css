@@ -1,0 +1,22 @@
+.controls {
+  margin-bottom: 1rem;
+}
+
+.materials-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.materials-table th,
+.materials-table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+}
+
+.paginator {
+  margin-top: 1rem;
+}
+
+.paginator button.active {
+  font-weight: bold;
+}
