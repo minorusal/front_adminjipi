@@ -49,6 +49,10 @@ export class ListadoMaterialesComponent implements OnInit {
     );
   }
 
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
   changePageSize(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;

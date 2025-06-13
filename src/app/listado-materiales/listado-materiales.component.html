@@ -25,3 +25,16 @@
     </tr>
   </tbody>
 </table>
+<div class="pagination" *ngIf="totalPages > 1">
+  <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Anterior</button>
+  <button *ngFor="let page of pages" (click)="goToPage(page)" [disabled]="currentPage === page">
+    {{ page }}
+  </button>
+  <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Siguiente</button>
+</div>
+<div class="page-size">
+  <label for="pageSize">Filas por página:</label>
+  <select id="pageSize" [value]="pageSize" (change)="changePageSize(+($event.target as HTMLSelectElement).value)">
+    <option *ngFor="let size of [5,10,20,50]" [value]="size">{{ size }}</option>
+  </select>
+</div>
