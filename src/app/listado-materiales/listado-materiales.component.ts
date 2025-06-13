@@ -12,6 +12,9 @@ export class ListadoMaterialesComponent implements OnInit {
   filterNombre = '';
   filterDescripcion = '';
   errorMessage = '';
+  currentPage = 1;
+  pageSize = 10;
+  totalPages = 0;
 
   constructor(private materialService: MaterialService) {}
 
@@ -22,12 +25,13 @@ export class ListadoMaterialesComponent implements OnInit {
   private loadMaterials(): void {
     this.errorMessage = '';
     this.materialService
-      // Request a large limit so we fetch all materials in one call
-      .getMaterials(undefined, 1000)
+      .getMaterials(this.currentPage, this.pageSize)
       .subscribe({
         next: res => {
           const docs: any = (res as any).docs ?? (res as any).items ?? res;
           this.materiales = Array.isArray(docs) ? docs : [];
+          const total = (res as any).totalPages ?? 0;
+          this.totalPages = Number.isFinite(total) ? total : 0;
         },
         error: err => {
           console.error('Failed to load materials', err);
@@ -48,5 +52,17 @@ export class ListadoMaterialesComponent implements OnInit {
 
   onFilterChange(): void {
     // Filtering is done client-side
+  }
+
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages || page === this.currentPage) {
+      return;
+    }
+    this.currentPage = page;
+    this.loadMaterials();
   }
 }
