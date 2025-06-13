@@ -136,4 +136,9 @@ export class ListadoMaterialesComponent implements OnInit {
     this.currentPage = page;
     this.loadMaterials();
   }
+
+  editMaterial(material: Material): void {
+    // Placeholder for edit logic
+    console.log('Edit material', material);
+  }
 }
