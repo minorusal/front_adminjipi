@@ -2,7 +2,12 @@
 <h2>Listado de materiales</h2>
 <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
 <div class="button-bar">
-  <button type="button" class="add-material-btn" title="Agregar Material">
+  <button
+    type="button"
+    class="add-material-btn"
+    title="Agregar Material"
+    (click)="openAddModal()"
+  >
     <span class="material-icons" aria-hidden="true">add</span>
   </button>
 </div>
@@ -52,3 +57,40 @@
     </li>
   </ul>
 </nav>
+
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <span class="close-icon material-icons" (click)="closeAddModal()">close</span>
+    <h3>Agregar material</h3>
+    <form (ngSubmit)="saveMaterial()">
+      <div class="form-group">
+        <label for="mat-name">Nombre</label>
+        <input id="mat-name" type="text" [(ngModel)]="newMaterial.name" name="name" required />
+      </div>
+      <div class="form-group">
+        <label for="mat-desc">Descripción</label>
+        <textarea id="mat-desc" [(ngModel)]="newMaterial.description" name="description"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="mat-thick">Espesor (mm)</label>
+        <input id="mat-thick" type="number" [(ngModel)]="newMaterial.thickness_mm" name="thickness_mm" />
+      </div>
+      <div class="form-group">
+        <label for="mat-width">Ancho (m)</label>
+        <input id="mat-width" type="number" [(ngModel)]="newMaterial.width_m" name="width_m" />
+      </div>
+      <div class="form-group">
+        <label for="mat-length">Largo (m)</label>
+        <input id="mat-length" type="number" [(ngModel)]="newMaterial.length_m" name="length_m" />
+      </div>
+      <div class="form-group">
+        <label for="mat-price">Precio</label>
+        <input id="mat-price" type="number" [(ngModel)]="newMaterial.price" name="price" />
+      </div>
+      <div class="error" *ngIf="saveError">{{ saveError }}</div>
+      <div class="form-actions">
+        <button type="submit">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>

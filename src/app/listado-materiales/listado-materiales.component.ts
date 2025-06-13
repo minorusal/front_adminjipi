@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MaterialService, Material } from '../services/material.service';
+import { MaterialService, Material, NewMaterial } from '../services/material.service';
 
 @Component({
   selector: 'app-listado-materiales',
@@ -16,6 +16,16 @@ export class ListadoMaterialesComponent implements OnInit {
   pageSize = 10;
   totalPages = 0;
   searchText = '';
+  showAddModal = false;
+  newMaterial: NewMaterial = {
+    name: '',
+    description: '',
+    thickness_mm: undefined,
+    width_m: undefined,
+    length_m: undefined,
+    price: undefined
+  };
+  saveError = '';
 
   constructor(private materialService: MaterialService) {}
 
@@ -45,6 +55,41 @@ export class ListadoMaterialesComponent implements OnInit {
           this.errorMessage = 'Error al cargar los materiales';
         }
       });
+  }
+
+  openAddModal(): void {
+    this.showAddModal = true;
+  }
+
+  closeAddModal(): void {
+    this.showAddModal = false;
+    this.saveError = '';
+  }
+
+  saveMaterial(): void {
+    this.saveError = '';
+    this.materialService.addMaterial(this.newMaterial).subscribe({
+      next: () => {
+        this.resetNewMaterial();
+        this.closeAddModal();
+        this.loadMaterials();
+      },
+      error: err => {
+        console.error('Failed to add material', err);
+        this.saveError = 'Error al guardar el material';
+      }
+    });
+  }
+
+  private resetNewMaterial(): void {
+    this.newMaterial = {
+      name: '',
+      description: '',
+      thickness_mm: undefined,
+      width_m: undefined,
+      length_m: undefined,
+      price: undefined
+    };
   }
 
   get filteredItems(): Material[] {
