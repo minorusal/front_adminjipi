@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { MaterialService, Material, NewMaterial } from '../services/material.service';
 
 @Component({
@@ -66,10 +67,15 @@ export class ListadoMaterialesComponent implements OnInit {
     this.showAddModal = false;
     this.saveError = '';
     this.isSaving = false;
+    this.resetNewMaterial();
   }
 
-  saveMaterial(): void {
+  saveMaterial(form: NgForm): void {
     if (this.isSaving) {
+      return;
+    }
+    if (form.invalid) {
+      form.form.markAllAsTouched();
       return;
     }
     this.saveError = '';
