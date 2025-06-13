@@ -25,10 +25,7 @@ export class SidebarComponent implements OnInit {
     if (loginData) {
       try {
         const data = JSON.parse(loginData);
-        const parsedId = parseInt(data.ownerCompany.id, 10);
-        if (!isNaN(parsedId)) {
-          this.ownerId = parsedId;
-        }
+        this.ownerId = parseInt(data.ownerCompany.id, 10);
       } catch (_) {
         // ignore parse errors
       }
