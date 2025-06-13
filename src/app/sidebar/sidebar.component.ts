@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CookieService } from '../services/cookie.service';
+import { environment } from '../../environments/environment';
 
 export interface MenuNode {
   id: number;
