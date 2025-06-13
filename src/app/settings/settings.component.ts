@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { CookieService } from '../services/cookie.service';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 
@@ -24,7 +25,7 @@ export class SettingsComponent implements OnInit {
   dataSource = new MatTreeNestedDataSource<MenuNode>();
   private ownerId = 1;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private http: HttpClient, private cookieService: CookieService) {
     this.menuForm = this.fb.group({
       name: [''],
       url: [''],
@@ -32,10 +33,6 @@ export class SettingsComponent implements OnInit {
     });
   }
 
-  private getCookie(name: string): string | null {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? decodeURIComponent(match[2]) : null;
-  }
 
   ngOnInit(): void {
     this.loadParentMenus();
@@ -43,7 +40,7 @@ export class SettingsComponent implements OnInit {
   }
 
   loadParentMenus(): void {
-    const token = this.getCookie('token');
+    const token = this.cookieService.get('token');
     const options = token
       ? { headers: new HttpHeaders({ token }), withCredentials: true }
       : { withCredentials: true };
@@ -56,7 +53,7 @@ export class SettingsComponent implements OnInit {
   }
 
   loadMenuTree(): void {
-    const token = this.getCookie('token');
+    const token = this.cookieService.get('token');
     const options = token
       ? { headers: new HttpHeaders({ token }), withCredentials: true }
       : { withCredentials: true };
@@ -98,7 +95,7 @@ export class SettingsComponent implements OnInit {
       parent_id: parent || null,
       owner_id: this.ownerId
     };
-    const token = this.getCookie('token');
+    const token = this.cookieService.get('token');
     const options = token
       ? { headers: new HttpHeaders({ token }), withCredentials: true }
       : { withCredentials: true };

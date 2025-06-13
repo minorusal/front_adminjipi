@@ -12,6 +12,7 @@ import { VentasComponent } from './ventas/ventas.component';
 import { ProductosComponent } from './productos/productos.component';
 import { BodegasComponent } from './bodegas/bodegas.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
+import { CookieService } from './services/cookie.service';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,7 @@ import { SidebarComponent } from './sidebar/sidebar.component';
     ReactiveFormsModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [CookieService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
