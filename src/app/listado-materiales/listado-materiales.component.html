@@ -59,7 +59,7 @@
 </nav>
 
 <div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
-  <div class="modal" (click)="$event.stopPropagation()">
+  <div class="add-modal" (click)="$event.stopPropagation()">
     <span class="close-icon material-icons" (click)="closeAddModal()">close</span>
     <h3>Agregar material</h3>
     <form (ngSubmit)="saveMaterial()">
