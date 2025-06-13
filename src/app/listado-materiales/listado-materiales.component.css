@@ -91,6 +91,25 @@ th {
   font-size: 1.2rem;
 }
 
+.edit-btn {
+  background-color: #10a37f;
+  border: none;
+  color: #fff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-btn:hover {
+  background-color: #0e8a6e;
+}
+
+.edit-btn .material-icons {
+  font-size: 1.2rem;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
