@@ -1,4 +1,5 @@
 <h2>Listado de materiales</h2>
+<div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
 <div class="controls">
   <label for="pageSize">Elementos por página:</label>
   <select id="pageSize" [(ngModel)]="pageSize" (ngModelChange)="changePageSize($event)">
