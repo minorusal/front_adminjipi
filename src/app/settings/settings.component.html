@@ -36,7 +36,7 @@
 
   <div class="menu-tree" *ngIf="menuTree && menuTree.length">
     <h3>Estructura de menús</h3>
-    <ul>
+    <ul class="tree-root">
       <ng-container
         *ngTemplateOutlet="renderNodes; context: { $implicit: menuTree }"
       ></ng-container>
@@ -46,8 +46,22 @@
   <ng-template #renderNodes let-nodes>
     <ng-container *ngFor="let node of nodes">
       <li>
-        {{ node.name }}
-        <ul *ngIf="node.children && node.children.length">
+        <div class="node">
+          <button
+            *ngIf="node.children && node.children.length"
+            class="toggle-btn"
+            type="button"
+            (click)="toggleNode(node.id)"
+            [attr.aria-expanded]="isOpen(node.id)"
+          >
+            <span class="arrow" [class.open]="isOpen(node.id)">&#9656;</span>
+          </button>
+          <span>{{ node.name }}</span>
+        </div>
+        <ul
+          class="children"
+          *ngIf="node.children && node.children.length && isOpen(node.id)"
+        >
           <ng-container
             *ngTemplateOutlet="renderNodes; context: { $implicit: node.children }"
           ></ng-container>
