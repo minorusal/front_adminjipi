@@ -1,39 +1,33 @@
-import { Component } from '@angular/core';
-
-interface Material {
-  id: number;
-  nombre: string;
-  descripcion: string;
-}
+import { Component, OnInit } from '@angular/core';
+import { MaterialService, Material } from '../services/material.service';
 
 @Component({
   selector: 'app-listado-materiales',
   templateUrl: './listado-materiales.component.html',
   styleUrls: ['./listado-materiales.component.css']
 })
-export class ListadoMaterialesComponent {
+export class ListadoMaterialesComponent implements OnInit {
   materiales: Material[] = [];
   pageSize = 10;
   currentPage = 1;
+  totalPages = 1;
   filterId = '';
   filterNombre = '';
   filterDescripcion = '';
 
-  constructor() {
-    this.materiales = Array.from({ length: 100 }).map((_, i) => ({
-      id: i + 1,
-      nombre: `Material ${i + 1}`,
-      descripcion: `Descripción del material ${i + 1}`
-    }));
+  constructor(private materialService: MaterialService) {}
+
+  ngOnInit(): void {
+    this.loadMaterials();
   }
 
-  get totalPages(): number {
-    return Math.ceil(this.filteredItems.length / this.pageSize);
-  }
-
-  get paginatedItems(): Material[] {
-    const start = (this.currentPage - 1) * this.pageSize;
-    return this.filteredItems.slice(start, start + this.pageSize);
+  private loadMaterials(): void {
+    this.materialService
+      .getMaterials(this.currentPage, this.pageSize)
+      .subscribe(res => {
+        this.materiales = res.docs;
+        this.totalPages = res.totalPages;
+      });
   }
 
   get filteredItems(): Material[] {
@@ -47,15 +41,17 @@ export class ListadoMaterialesComponent {
   changePageSize(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
+    this.loadMaterials();
   }
 
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
+      this.loadMaterials();
     }
   }
 
   onFilterChange(): void {
-    this.currentPage = 1;
+    // Filtering is done client-side on the current page only
   }
 }
