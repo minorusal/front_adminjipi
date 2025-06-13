@@ -46,14 +46,26 @@
   transition: background 0.2s ease;
 }
 
-button.menu-item {
+
+.name-btn {
   background: none;
   border: none;
-  width: 100%;
-  text-align: left;
   color: inherit;
   font: inherit;
-  padding: 0.75rem 1rem;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  flex: 1;
+  text-align: left;
+}
+
+.arrow-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  padding: 0 0.25rem;
+  cursor: pointer;
 }
 
 .menu-item:hover {
