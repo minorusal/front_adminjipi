@@ -18,7 +18,7 @@
             {{ item[h] }}
           </button>
         </ng-container>
-        <ng-template #defaultCell>{{ item[h] }}</ng-template>
+        <ng-template #defaultCell>{{ displayValue(item[h]) }}</ng-template>
       </td>
     </tr>
   </tbody>

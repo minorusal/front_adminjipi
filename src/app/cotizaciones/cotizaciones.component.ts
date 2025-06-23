@@ -74,4 +74,30 @@ export class CotizacionesComponent implements OnInit {
       ? Object.keys(this.remisiones[0]).filter(h => !h.startsWith('_'))
       : [];
   }
+
+  displayValue(value: any): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    if (typeof value === 'object') {
+      const preferredKeys = [
+        'name',
+        'nombre',
+        'razon_social',
+        'description',
+        'label'
+      ];
+      for (const key of preferredKeys) {
+        if (value && key in value && typeof value[key] === 'string') {
+          return value[key];
+        }
+      }
+      try {
+        return JSON.stringify(value);
+      } catch (_) {
+        return '' + value;
+      }
+    }
+    return '' + value;
+  }
 }
