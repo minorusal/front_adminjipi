@@ -4,9 +4,6 @@ import { Observable } from 'rxjs';
 import { CookieService } from './cookie.service';
 import { environment } from '../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
 export interface PaginatedRemissions {
   docs: any[];
   totalDocs: number;
@@ -15,6 +12,9 @@ export interface PaginatedRemissions {
   totalPages: number;
 }
 
+@Injectable({
+  providedIn: 'root'
+})
 export class RemissionService {
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
