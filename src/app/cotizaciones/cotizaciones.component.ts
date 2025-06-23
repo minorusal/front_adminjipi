@@ -45,6 +45,11 @@ export class CotizacionesComponent implements OnInit {
                   clone._pdfUrl = clone.pdf_path;
                   delete clone.pdf_path;
                 }
+                if (clone.client && typeof clone.client === 'object') {
+                  clone['Contacto'] = clone.client.contact_name;
+                  clone['Cliente'] = clone.client.company_name;
+                  delete clone.client;
+                }
                 return clone;
               })
             : [];
