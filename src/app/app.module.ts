@@ -13,6 +13,7 @@ import { ProductosComponent } from './productos/productos.component';
 import { BodegasComponent } from './bodegas/bodegas.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { ListadoMaterialesComponent } from './listado-materiales/listado-materiales.component';
+import { CotizacionesComponent } from './cotizaciones/cotizaciones.component';
 import { CookieService } from './services/cookie.service';
 
 @NgModule({
@@ -25,7 +26,8 @@ import { CookieService } from './services/cookie.service';
     ProductosComponent,
     BodegasComponent,
     SidebarComponent,
-    ListadoMaterialesComponent
+    ListadoMaterialesComponent,
+    CotizacionesComponent
   ],
   imports: [
     BrowserModule,

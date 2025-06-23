@@ -1,0 +1,15 @@
+<nav class="breadcrumb">Inicio / Cotizaciones</nav>
+<h2>Cotizaciones</h2>
+<div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+<table *ngIf="remisiones?.length">
+  <thead>
+    <tr>
+      <th *ngFor="let h of headers">{{ h }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of remisiones">
+      <td *ngFor="let h of headers">{{ item[h] }}</td>
+    </tr>
+  </tbody>
+</table>
