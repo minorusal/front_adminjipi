@@ -82,6 +82,8 @@ export class CotizacionesComponent implements OnInit {
       const normalized = url.startsWith('/') ? url : `/${url}`;
       finalUrl = `${environment.apiUrl}${normalized}`;
     }
+    const viewerParams = 'zoom=page-width&pagemode=none';
+    finalUrl += finalUrl.includes('#') ? `&${viewerParams}` : `#${viewerParams}`;
     this.selectedPdf = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
     this.showPdfModal = true;
   }
