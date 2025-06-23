@@ -30,7 +30,18 @@ export class CotizacionesComponent implements OnInit {
     if (ownerId !== null && !isNaN(ownerId)) {
       this.remissionService.getByOwner(ownerId).subscribe({
         next: res => {
-          this.remisiones = Array.isArray(res) ? res : [];
+          this.remisiones = Array.isArray(res)
+            ? res.map(item => {
+                const clone: any = { ...item };
+                delete clone.data;
+                if (typeof clone.pdf_path === 'string') {
+                  const parts = clone.pdf_path.split('/');
+                  clone.file = parts[parts.length - 1];
+                  delete clone.pdf_path;
+                }
+                return clone;
+              })
+            : [];
         },
         error: err => {
           console.error('Failed to load remissions', err);
