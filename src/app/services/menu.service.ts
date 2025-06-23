@@ -23,6 +23,7 @@ export class MenuService {
       name: 'Módulos',
       children: [
         { id: 3, name: 'Ventas', path: 'ventas' },
+        { id: 8, name: 'Cotizaciones', path: 'cotizaciones' },
         {
           id: 4,
           name: 'Inventario',
