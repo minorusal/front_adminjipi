@@ -40,10 +40,16 @@ export class CotizacionesComponent implements OnInit {
                 const clone: any = { ...item };
                 delete clone.data;
                 if (typeof clone.pdf_path === 'string') {
-                  // Handle both Unix and Windows style paths
+                  // Handle both Unix and Windows style paths and convert the
+                  // server file path into a URL that can be requested from the
+                  // API. The backend returns an absolute path such as
+                  // "C:\\...\\remissions\\project_1.pdf". Extract the file name
+                  // and build a relative URL under the /remissions endpoint so
+                  // that openPdf() generates a proper API URL.
                   const parts = clone.pdf_path.split(/[\\/]/);
-                  clone.file = parts[parts.length - 1];
-                  clone._pdfUrl = clone.pdf_path;
+                  const fileName = parts[parts.length - 1];
+                  clone.file = fileName;
+                  clone._pdfUrl = `remissions/${fileName}`;
                   delete clone.pdf_path;
                 }
                 return clone;
