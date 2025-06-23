@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RemissionService } from '../services/remission.service';
 import { CookieService } from '../services/cookie.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-cotizaciones',
@@ -60,7 +61,12 @@ export class CotizacionesComponent implements OnInit {
   }
 
   openPdf(url: string): void {
-    this.selectedPdf = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    let finalUrl = url;
+    if (!/^https?:\/\//i.test(url)) {
+      const normalized = url.startsWith('/') ? url : `/${url}`;
+      finalUrl = `${environment.apiUrl}${normalized}`;
+    }
+    this.selectedPdf = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
     this.showPdfModal = true;
   }
 
