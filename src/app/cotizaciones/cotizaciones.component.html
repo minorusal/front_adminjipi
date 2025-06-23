@@ -4,7 +4,7 @@
 <table *ngIf="remisiones?.length">
   <thead>
     <tr>
-      <th *ngFor="let h of headers">{{ h }}</th>
+      <th *ngFor="let h of headers">{{ headerLabel(h) }}</th>
     </tr>
   </thead>
   <tbody>
@@ -18,7 +18,7 @@
             {{ item[h] }}
           </button>
         </ng-container>
-        <ng-template #defaultCell>{{ displayValue(item[h]) }}</ng-template>
+        <ng-template #defaultCell>{{ displayValue(item[h], h) }}</ng-template>
       </td>
     </tr>
   </tbody>

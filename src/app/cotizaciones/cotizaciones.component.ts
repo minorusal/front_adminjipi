@@ -100,7 +100,11 @@ export class CotizacionesComponent implements OnInit {
       h => !h.startsWith('_')
     );
     const others = keys.filter(
-      k => k !== 'Contacto' && k !== 'Cliente' && k !== 'file'
+      k =>
+        k !== 'Contacto' &&
+        k !== 'Cliente' &&
+        k !== 'file' &&
+        k !== 'created_at'
     );
     const filePos = keys.indexOf('file');
     const idx = filePos === -1 ? others.length : Math.min(filePos, others.length);
@@ -109,13 +113,25 @@ export class CotizacionesComponent implements OnInit {
       'Contacto',
       'Cliente',
       ...others.slice(idx),
-      'file'
+      'file',
+      'created_at'
     ];
   }
 
-  displayValue(value: any): string {
+  headerLabel(header: string): string {
+    return header === 'created_at' ? 'Fecha de emisión' : header;
+  }
+  displayValue(value: any, header?: string): string {
     if (value === null || value === undefined) {
       return '';
+    }
+    if (header === 'created_at') {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleString('es-MX', {
+          timeZone: 'America/Mexico_City'
+        });
+      }
     }
     if (typeof value === 'object') {
       const preferredKeys = [
