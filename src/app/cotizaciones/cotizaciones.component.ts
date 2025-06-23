@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RemissionService } from '../services/remission.service';
 import { CookieService } from '../services/cookie.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-cotizaciones',
@@ -10,10 +11,13 @@ import { CookieService } from '../services/cookie.service';
 export class CotizacionesComponent implements OnInit {
   remisiones: any[] = [];
   errorMessage = '';
+  showPdfModal = false;
+  selectedPdf: SafeResourceUrl | null = null;
 
   constructor(
     private remissionService: RemissionService,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -38,6 +42,7 @@ export class CotizacionesComponent implements OnInit {
                   // Handle both Unix and Windows style paths
                   const parts = clone.pdf_path.split(/[\\/]/);
                   clone.file = parts[parts.length - 1];
+                  clone._pdfUrl = clone.pdf_path;
                   delete clone.pdf_path;
                 }
                 return clone;
@@ -54,7 +59,19 @@ export class CotizacionesComponent implements OnInit {
     }
   }
 
+  openPdf(url: string): void {
+    this.selectedPdf = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    this.showPdfModal = true;
+  }
+
+  closePdfModal(): void {
+    this.showPdfModal = false;
+    this.selectedPdf = null;
+  }
+
   get headers(): string[] {
-    return this.remisiones.length ? Object.keys(this.remisiones[0]) : [];
+    return this.remisiones.length
+      ? Object.keys(this.remisiones[0]).filter(h => !h.startsWith('_'))
+      : [];
   }
 }
