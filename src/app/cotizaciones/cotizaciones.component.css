@@ -60,9 +60,9 @@ th {
   background-color: #444654;
   padding: 1rem;
   border-radius: 8px;
-  width: 95%;
-  max-width: 1200px;
-  height: 90vh;
+  width: 100%;
+  max-width: none;
+  height: 100vh;
   position: relative;
   color: #e8e8e8;
   display: flex;
