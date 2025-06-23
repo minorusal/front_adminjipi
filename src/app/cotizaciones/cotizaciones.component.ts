@@ -46,6 +46,7 @@ export class CotizacionesComponent implements OnInit {
                 let pdfPath: string | undefined;
                 if (typeof clone.pdf_path === 'string') {
                   pdfPath = clone.pdf_path;
+
                   delete clone.pdf_path;
                 }
 
