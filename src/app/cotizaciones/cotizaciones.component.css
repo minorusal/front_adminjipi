@@ -24,3 +24,10 @@ tbody tr:not(:last-child) td {
 th {
   background-color: #444654;
 }
+
+.pdf-icon {
+  margin-right: 0.25rem;
+  vertical-align: middle;
+  color: #e53e3e;
+  font-size: 1.2rem;
+}
