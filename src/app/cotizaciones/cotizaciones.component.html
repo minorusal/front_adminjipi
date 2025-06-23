@@ -31,6 +31,11 @@
     (click)="$event.stopPropagation()"
   >
     <span class="close-icon material-icons" (click)="closePdfModal()">close</span>
-    <iframe [src]="selectedPdf" frameborder="0"></iframe>
+    <object [data]="selectedPdf" type="application/pdf">
+      <p>
+        No se pudo visualizar el PDF.
+        <a [href]="selectedPdf" target="_blank">Descargar</a>
+      </p>
+    </object>
   </div>
 </div>

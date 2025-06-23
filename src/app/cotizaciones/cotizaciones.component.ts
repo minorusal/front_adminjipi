@@ -49,7 +49,9 @@ export class CotizacionesComponent implements OnInit {
                   const parts = clone.pdf_path.split(/[\\/]/);
                   const fileName = parts[parts.length - 1];
                   clone.file = fileName;
-                  clone._pdfUrl = `remissions/${fileName}`;
+                  // Build the absolute URL to the PDF so the modal viewer can
+                  // request it directly from the API server.
+                  clone._pdfUrl = `${environment.apiUrl}/remissions/${fileName}`;
                   delete clone.pdf_path;
                 }
                 if (clone.client && typeof clone.client === 'object') {
