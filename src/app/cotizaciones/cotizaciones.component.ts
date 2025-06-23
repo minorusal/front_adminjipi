@@ -35,7 +35,8 @@ export class CotizacionesComponent implements OnInit {
                 const clone: any = { ...item };
                 delete clone.data;
                 if (typeof clone.pdf_path === 'string') {
-                  const parts = clone.pdf_path.split('/');
+                  // Handle both Unix and Windows style paths
+                  const parts = clone.pdf_path.split(/[\\/]/);
                   clone.file = parts[parts.length - 1];
                   delete clone.pdf_path;
                 }

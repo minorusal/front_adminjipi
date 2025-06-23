@@ -9,7 +9,15 @@
   </thead>
   <tbody>
     <tr *ngFor="let item of remisiones">
-      <td *ngFor="let h of headers">{{ item[h] }}</td>
+      <td *ngFor="let h of headers">
+        <ng-container *ngIf="h === 'file'; else defaultCell">
+          <span class="material-icons pdf-icon" aria-hidden="true"
+            >picture_as_pdf</span
+          >
+          {{ item[h] }}
+        </ng-container>
+        <ng-template #defaultCell>{{ item[h] }}</ng-template>
+      </td>
     </tr>
   </tbody>
 </table>
