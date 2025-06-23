@@ -82,7 +82,8 @@ export class CotizacionesComponent implements OnInit {
       const normalized = url.startsWith('/') ? url : `/${url}`;
       finalUrl = `${environment.apiUrl}${normalized}`;
     }
-    const viewerParams = 'zoom=page-width&pagemode=none';
+    // Open the PDF at 100% zoom instead of fitting the page width
+    const viewerParams = 'zoom=100&pagemode=none';
     finalUrl += finalUrl.includes('#') ? `&${viewerParams}` : `#${viewerParams}`;
     this.selectedPdf = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
     this.showPdfModal = true;
