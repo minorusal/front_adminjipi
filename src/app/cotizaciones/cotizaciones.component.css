@@ -82,3 +82,48 @@ th {
   cursor: pointer;
   z-index: 10;
 }
+
+.search-container {
+  display: flex;
+  align-items: center;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.search-container .material-icons {
+  margin-right: 0.5rem;
+  color: #fff;
+}
+
+.search-container input {
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid #565869;
+  background-color: #343541;
+  color: #fff;
+  flex: 1;
+}
+
+/* Pagination styles aligned with the platform colors */
+.pagination .page-link {
+  background-color: #444654;
+  color: #e8e8e8;
+  border: 1px solid #565869;
+}
+
+.pagination .page-link:hover {
+  background-color: #0e8a6e;
+  color: #fff;
+}
+
+.page-item.active .page-link {
+  background-color: #10a37f;
+  border-color: #10a37f;
+  color: #fff;
+}
+
+.page-item.disabled .page-link {
+  background-color: #343541;
+  color: #777;
+  border-color: #565869;
+}

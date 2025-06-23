@@ -14,6 +14,11 @@ export class CotizacionesComponent implements OnInit {
   errorMessage = '';
   showPdfModal = false;
   selectedPdf: SafeResourceUrl | null = null;
+  ownerId: number | null = null;
+  currentPage = 1;
+  pageSize = 10;
+  totalPages = 0;
+  searchText = '';
 
   constructor(
     private remissionService: RemissionService,
@@ -22,58 +27,95 @@ export class CotizacionesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    let ownerId: number | null = null;
     const loginData = this.cookieService.get('loginData');
     if (loginData) {
       try {
         const data = JSON.parse(loginData);
-        ownerId = parseInt(data.ownerCompany.id, 10);
+        this.ownerId = parseInt(data.ownerCompany.id, 10);
       } catch (_) {
-        ownerId = null;
+        this.ownerId = null;
       }
     }
-    if (ownerId !== null && !isNaN(ownerId)) {
-      this.remissionService.getByOwner(ownerId).subscribe({
+    if (this.ownerId !== null && !isNaN(this.ownerId)) {
+      this.loadRemisiones();
+    } else {
+      this.errorMessage = 'No se pudo determinar la empresa';
+    }
+  }
+
+  private loadRemisiones(): void {
+    if (this.ownerId === null) {
+      this.errorMessage = 'No se pudo determinar la empresa';
+      return;
+    }
+    this.errorMessage = '';
+    this.remissionService
+      .getByOwner(this.ownerId, this.currentPage, this.pageSize, this.searchText)
+      .subscribe({
         next: res => {
-          this.remisiones = Array.isArray(res)
-            ? res.map(item => {
-                const clone: any = { ...item };
-                delete clone.data;
-                delete clone.project_id;
-                delete clone.recipient_type;
-                delete clone.owner_id;
-
-                let pdfPath: string | undefined;
-                if (typeof clone.pdf_path === 'string') {
-                  pdfPath = clone.pdf_path;
-
-                  delete clone.pdf_path;
-                }
-
-                if (clone.client && typeof clone.client === 'object') {
-                  clone['Contacto'] = clone.client.contact_name;
-                  clone['Cliente'] = clone.client.company_name;
-                  delete clone.client;
-                }
-
-                if (pdfPath) {
-                  const parts = pdfPath.split(/[\\/]/);
-                  clone.file = parts[parts.length - 1];
-                  clone._pdfUrl = pdfPath;
-                }
-
-                return clone;
-              })
+          const docs: any[] = Array.isArray((res as any).docs)
+            ? (res as any).docs
+            : Array.isArray(res)
+            ? (res as any)
             : [];
+          this.remisiones = docs.map(item => {
+            const clone: any = { ...item };
+            delete clone.data;
+            delete clone.project_id;
+            delete clone.recipient_type;
+            delete clone.owner_id;
+
+            let pdfPath: string | undefined;
+            if (typeof clone.pdf_path === 'string') {
+              pdfPath = clone.pdf_path;
+              delete clone.pdf_path;
+            }
+
+            if (clone.client && typeof clone.client === 'object') {
+              clone['Contacto'] = clone.client.contact_name;
+              clone['Cliente'] = clone.client.company_name;
+              delete clone.client;
+            }
+
+            if (pdfPath) {
+              const parts = pdfPath.split(/[\\/]/);
+              clone.file = parts[parts.length - 1];
+              clone._pdfUrl = pdfPath;
+            }
+
+            return clone;
+          });
+          let pages: any = (res as any).totalPages;
+          if (!Number.isFinite(pages)) {
+            const totalDocs = (res as any).totalDocs;
+            if (Number.isFinite(totalDocs) && this.pageSize > 0) {
+              pages = Math.ceil(totalDocs / this.pageSize);
+            }
+          }
+          this.totalPages = Number.isFinite(pages) ? pages : 0;
         },
         error: err => {
           console.error('Failed to load remissions', err);
           this.errorMessage = 'Error al cargar las cotizaciones';
         }
       });
-    } else {
-      this.errorMessage = 'No se pudo determinar la empresa';
+  }
+
+  onSearchChange(): void {
+    this.currentPage = 1;
+    this.loadRemisiones();
+  }
+
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages || page === this.currentPage) {
+      return;
     }
+    this.currentPage = page;
+    this.loadRemisiones();
   }
 
   openPdf(url: string): void {
