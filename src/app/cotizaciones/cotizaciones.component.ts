@@ -39,18 +39,28 @@ export class CotizacionesComponent implements OnInit {
             ? res.map(item => {
                 const clone: any = { ...item };
                 delete clone.data;
+                delete clone.project_id;
+                delete clone.recipient_type;
+                delete clone.owner_id;
+
+                let pdfPath: string | undefined;
                 if (typeof clone.pdf_path === 'string') {
-                  // Handle both Unix and Windows style paths
-                  const parts = clone.pdf_path.split(/[\\/]/);
-                  clone.file = parts[parts.length - 1];
-                  clone._pdfUrl = clone.pdf_path;
+                  pdfPath = clone.pdf_path;
                   delete clone.pdf_path;
                 }
+
                 if (clone.client && typeof clone.client === 'object') {
                   clone['Contacto'] = clone.client.contact_name;
                   clone['Cliente'] = clone.client.company_name;
                   delete clone.client;
                 }
+
+                if (pdfPath) {
+                  const parts = pdfPath.split(/[\\/]/);
+                  clone.file = parts[parts.length - 1];
+                  clone._pdfUrl = pdfPath;
+                }
+
                 return clone;
               })
             : [];
@@ -81,9 +91,25 @@ export class CotizacionesComponent implements OnInit {
   }
 
   get headers(): string[] {
-    return this.remisiones.length
-      ? Object.keys(this.remisiones[0]).filter(h => !h.startsWith('_'))
-      : [];
+    if (!this.remisiones.length) {
+      return [];
+    }
+
+    const keys = Object.keys(this.remisiones[0]).filter(
+      h => !h.startsWith('_')
+    );
+    const others = keys.filter(
+      k => k !== 'Contacto' && k !== 'Cliente' && k !== 'file'
+    );
+    const filePos = keys.indexOf('file');
+    const idx = filePos === -1 ? others.length : Math.min(filePos, others.length);
+    return [
+      ...others.slice(0, idx),
+      'Contacto',
+      'Cliente',
+      ...others.slice(idx),
+      'file'
+    ];
   }
 
   displayValue(value: any): string {
