@@ -38,7 +38,8 @@ describe('SidebarComponent', () => {
             children: [
               { id: 5, name: 'Productos', path: 'inventario/productos' },
               { id: 6, name: 'Bodegas', path: 'inventario/bodegas' },
-              { id: 7, name: 'Materiales', path: 'materiales' }
+              { id: 7, name: 'Materiales', path: 'materiales' },
+              { id: 8, name: 'Accesorios', path: 'accesorios' }
             ]
           }
         ]
