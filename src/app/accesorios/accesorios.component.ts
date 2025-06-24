@@ -36,6 +36,8 @@ export class AccesoriosComponent {
   addMaterial(mat: Material): void {
     if (!this.selected.some(m => m.id === mat.id)) {
       this.selected.push(mat);
+      this.searchText = '';
+      this.results = [];
     }
   }
 }
