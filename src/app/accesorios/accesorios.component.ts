@@ -6,6 +6,7 @@ interface SelectedMaterial {
   material: Material;
   width?: number;
   length?: number;
+  quantity?: number;
 }
 
 @Component({
@@ -77,21 +78,25 @@ export class AccesoriosComponent implements OnInit {
 
   isAreaType(mat: Material): boolean {
     const type = this.getMaterialType(mat);
-    if (!type || !type.unit) {
-      return false;
-    }
-    const u = type.unit.toLowerCase();
-    return u.includes('m2') || u.includes('m²') || u.includes('area');
+    return type?.id === 2;
+  }
+
+  isPieceType(mat: Material): boolean {
+    const type = this.getMaterialType(mat);
+    return type?.id === 1;
   }
 
   calculateCost(sel: SelectedMaterial): number {
+    const price = sel.material.price ?? 0;
     if (this.isAreaType(sel.material)) {
       const width = sel.width ?? 0;
       const length = sel.length ?? 0;
-      const area = width * length;
-      const price = sel.material.price ?? 0;
-      return area * price;
+      return width * length * price;
     }
-    return sel.material.price ?? 0;
+    if (this.isPieceType(sel.material)) {
+      const qty = sel.quantity ?? 0;
+      return qty * price;
+    }
+    return price;
   }
 }
