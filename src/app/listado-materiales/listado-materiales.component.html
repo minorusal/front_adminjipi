@@ -102,6 +102,20 @@
         </div>
       </div>
       <div class="form-group">
+        <label for="mat-type">Tipo ID</label>
+        <input
+          id="mat-type"
+          type="number"
+          [(ngModel)]="newMaterial.material_type_id"
+          name="material_type_id"
+          required
+          #typeRef="ngModel"
+        />
+        <div class="error" *ngIf="typeRef.touched && typeRef.hasError('required')">
+          El tipo es requerido
+        </div>
+      </div>
+      <div class="form-group">
         <label for="mat-thick">Espesor (mm)</label>
         <input id="mat-thick" type="number" [(ngModel)]="newMaterial.thickness_mm" name="thickness_mm" />
       </div>
@@ -167,6 +181,20 @@
         ></textarea>
         <div class="error" *ngIf="editDescRef.touched && editDescRef.hasError('required')">
           La descripción es requerida
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="edit-type">Tipo ID</label>
+        <input
+          id="edit-type"
+          type="number"
+          [(ngModel)]="editMaterialData.material_type_id"
+          name="material_type_id"
+          required
+          #editTypeRef="ngModel"
+        />
+        <div class="error" *ngIf="editTypeRef.touched && editTypeRef.hasError('required')">
+          El tipo es requerido
         </div>
       </div>
       <div class="form-group">

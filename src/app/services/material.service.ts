@@ -8,6 +8,7 @@ export interface Material {
   id: number;
   name: string;
   description: string;
+  material_type_id?: number;
   thickness_mm?: number;
   width_m?: number;
   length_m?: number;
