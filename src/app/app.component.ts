@@ -9,6 +9,7 @@ interface LoginResponse {
   token: string;
   user: { id: number; username: string };
   ownerCompany: { id: number; name: string };
+  profit_percentage: number;
 }
 
 @Component({
