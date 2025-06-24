@@ -21,16 +21,27 @@
     <table *ngIf="selected.length">
       <thead>
         <tr>
-          <th>ID</th>
           <th>Nombre</th>
           <th>Descripción</th>
+          <th>Inversión</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let mat of selected">
-          <td>{{ mat.id }}</td>
           <td>{{ mat.name }}</td>
           <td>{{ mat.description }}</td>
+          <td>{{ mat.price }}</td>
+          <td>
+            <button
+              type="button"
+              class="delete-btn"
+              title="Quitar"
+              (click)="removeMaterial(mat)"
+            >
+              <span class="material-icons" aria-hidden="true">delete</span>
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>

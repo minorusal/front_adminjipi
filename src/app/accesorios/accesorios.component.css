@@ -19,6 +19,25 @@ th {
   background-color: #444654;
 }
 
+.delete-btn {
+  background-color: #e53e3e;
+  border: none;
+  color: #fff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  background-color: #c53030;
+}
+
+.delete-btn .material-icons {
+  font-size: 1.2rem;
+}
+
 .accesorios-container {
   display: flex;
   gap: 1rem;

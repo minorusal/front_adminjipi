@@ -40,4 +40,11 @@ export class AccesoriosComponent {
       this.results = [];
     }
   }
+
+  removeMaterial(mat: Material): void {
+    const confirmed = window.confirm('Quitar?');
+    if (confirmed) {
+      this.selected = this.selected.filter(m => m.id !== mat.id);
+    }
+  }
 }
