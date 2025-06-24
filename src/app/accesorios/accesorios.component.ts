@@ -1,18 +1,41 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MaterialService, Material } from '../services/material.service';
+import { MaterialTypeService, MaterialType } from '../services/material-type.service';
+
+interface SelectedMaterial {
+  material: Material;
+  width?: number;
+  length?: number;
+}
 
 @Component({
   selector: 'app-accesorios',
   templateUrl: './accesorios.component.html',
   styleUrls: ['./accesorios.component.css']
 })
-export class AccesoriosComponent {
+
+export class AccesoriosComponent implements OnInit {
   searchText = '';
   results: Material[] = [];
-  selected: Material[] = [];
+  selected: SelectedMaterial[] = [];
+  materialTypes: MaterialType[] = [];
   searching = false;
 
-  constructor(private materialService: MaterialService) {}
+  constructor(
+    private materialService: MaterialService,
+    private materialTypeService: MaterialTypeService
+  ) {}
+
+  ngOnInit(): void {
+    this.materialTypeService.getMaterialTypes().subscribe({
+      next: types => {
+        this.materialTypes = Array.isArray(types) ? types : [];
+      },
+      error: () => {
+        this.materialTypes = [];
+      }
+    });
+  }
 
   onSearchChange(): void {
     if (this.searchText.trim() === '') {
@@ -34,17 +57,41 @@ export class AccesoriosComponent {
   }
 
   addMaterial(mat: Material): void {
-    if (!this.selected.some(m => m.id === mat.id)) {
-      this.selected.push(mat);
+    if (!this.selected.some(m => m.material.id === mat.id)) {
+      this.selected.push({ material: mat });
       this.searchText = '';
       this.results = [];
     }
   }
 
-  removeMaterial(mat: Material): void {
+  removeMaterial(sel: SelectedMaterial): void {
     const confirmed = window.confirm('Quitar?');
     if (confirmed) {
-      this.selected = this.selected.filter(m => m.id !== mat.id);
+      this.selected = this.selected.filter(m => m.material.id !== sel.material.id);
     }
+  }
+
+  getMaterialType(mat: Material): MaterialType | undefined {
+    return this.materialTypes.find(t => t.id === mat.material_type_id);
+  }
+
+  isAreaType(mat: Material): boolean {
+    const type = this.getMaterialType(mat);
+    if (!type || !type.unit) {
+      return false;
+    }
+    const u = type.unit.toLowerCase();
+    return u.includes('m2') || u.includes('m²') || u.includes('area');
+  }
+
+  calculateCost(sel: SelectedMaterial): number {
+    if (this.isAreaType(sel.material)) {
+      const width = sel.width ?? 0;
+      const length = sel.length ?? 0;
+      const area = width * length;
+      const price = sel.material.price ?? 0;
+      return area * price;
+    }
+    return sel.material.price ?? 0;
   }
 }

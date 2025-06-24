@@ -23,21 +23,45 @@
         <tr>
           <th>Nombre</th>
           <th>Descripción</th>
+          <th>Tipo</th>
+          <th>Costo por tipo seleccionado</th>
           <th>Inversión</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let mat of selected">
-          <td>{{ mat.name }}</td>
-          <td>{{ mat.description }}</td>
-          <td>{{ mat.price }}</td>
+        <tr *ngFor="let sel of selected">
+          <td>{{ sel.material.name }}</td>
+          <td>{{ sel.material.description }}</td>
+          <td>
+            <ng-container *ngIf="isAreaType(sel.material); else typeName">
+              <input
+                type="number"
+                min="0"
+                class="dim-input"
+                [(ngModel)]="sel.length"
+                placeholder="Largo"
+              />
+              <input
+                type="number"
+                min="0"
+                class="dim-input"
+                [(ngModel)]="sel.width"
+                placeholder="Ancho"
+              />
+            </ng-container>
+            <ng-template #typeName>
+              {{ getMaterialType(sel.material)?.name }}
+            </ng-template>
+          </td>
+          <td>{{ calculateCost(sel) | number:'1.2-2' }}</td>
+          <td>{{ sel.material.price }}</td>
           <td>
             <button
               type="button"
               class="delete-btn"
               title="Quitar"
-              (click)="removeMaterial(mat)"
+              (click)="removeMaterial(sel)"
             >
               <span class="material-icons" aria-hidden="true">delete</span>
             </button>
