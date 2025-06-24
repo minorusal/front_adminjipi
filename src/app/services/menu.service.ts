@@ -16,26 +16,6 @@ export interface MenuNode {
   providedIn: 'root'
 })
 export class MenuService {
-  private readonly fallbackMenu: MenuNode[] = [
-    { id: 1, name: 'Inicio', path: 'home' },
-    {
-      id: 2,
-      name: 'Módulos',
-      children: [
-        { id: 3, name: 'Ventas', path: 'ventas' },
-        { id: 8, name: 'Cotizaciones', path: 'cotizaciones' },
-        {
-          id: 4,
-          name: 'Inventario',
-          children: [
-            { id: 5, name: 'Productos', path: 'inventario/productos' },
-            { id: 6, name: 'Bodegas', path: 'inventario/bodegas' },
-            { id: 7, name: 'Materiales', path: 'listado_materiales' }
-          ]
-        }
-      ]
-    }
-  ];
 
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
@@ -53,6 +33,10 @@ export class MenuService {
     );
   }
 
+  /**
+   * Fetches the hierarchical menu for the given company.
+   * If the request fails, an empty list is returned.
+   */
   getMenuTree(ownerId: number): Observable<MenuNode[]> {
     return this.http
       .get<any[]>(`${environment.apiUrl}/menus?owner_id=${ownerId}`, this.httpOptions())
@@ -61,7 +45,7 @@ export class MenuService {
           const isFlat = tree.length && !tree.some(m => Array.isArray(m.children));
           return isFlat ? this.buildTree(tree) : (tree as MenuNode[]);
         }),
-        catchError(() => of(this.fallbackMenu))
+        catchError(() => of([]))
       );
   }
 
