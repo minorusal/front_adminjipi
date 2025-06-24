@@ -14,7 +14,7 @@ const routes: Routes = [
   { path: 'ventas', component: VentasComponent },
   { path: 'inventario/productos', component: ProductosComponent },
   { path: 'inventario/bodegas', component: BodegasComponent },
-  { path: 'listado_materiales', component: ListadoMaterialesComponent },
+  { path: 'materiales', component: ListadoMaterialesComponent },
   { path: 'cotizaciones', component: CotizacionesComponent },
   { path: 'settings', component: SettingsComponent }
 ];
