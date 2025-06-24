@@ -21,6 +21,8 @@ export class AccesoriosComponent implements OnInit {
   selected: SelectedMaterial[] = [];
   materialTypes: MaterialType[] = [];
   searching = false;
+  showRemoveModal = false;
+  materialToRemove: SelectedMaterial | null = null;
 
   constructor(
     private materialService: MaterialService,
@@ -65,11 +67,23 @@ export class AccesoriosComponent implements OnInit {
     }
   }
 
-  removeMaterial(sel: SelectedMaterial): void {
-    const confirmed = window.confirm('Quitar?');
-    if (confirmed) {
-      this.selected = this.selected.filter(m => m.material.id !== sel.material.id);
+  openRemoveModal(sel: SelectedMaterial): void {
+    this.materialToRemove = sel;
+    this.showRemoveModal = true;
+  }
+
+  closeRemoveModal(): void {
+    this.showRemoveModal = false;
+    this.materialToRemove = null;
+  }
+
+  confirmRemove(): void {
+    if (this.materialToRemove) {
+      this.selected = this.selected.filter(
+        m => m.material.id !== this.materialToRemove!.material.id
+      );
     }
+    this.closeRemoveModal();
   }
 
   getMaterialType(mat: Material): MaterialType | undefined {
