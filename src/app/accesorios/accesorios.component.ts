@@ -37,10 +37,19 @@ export class AccesoriosComponent implements OnInit {
     if (loginData) {
       try {
         const data = JSON.parse(loginData);
-        const profit =
-          typeof data.profit_percentage === 'number'
-            ? data.profit_percentage
-            : parseFloat(data.profit_percentage);
+        let profit = 0;
+        if (typeof data.profit_percentage === 'number') {
+          profit = data.profit_percentage;
+        } else if (data.profit_percentage !== undefined) {
+          profit = parseFloat(data.profit_percentage);
+        } else if (
+          data.ownerCompany &&
+          typeof data.ownerCompany.profit_percentage === 'number'
+        ) {
+          profit = data.ownerCompany.profit_percentage;
+        } else if (data.ownerCompany?.profit_percentage !== undefined) {
+          profit = parseFloat(data.ownerCompany.profit_percentage);
+        }
         if (!Number.isNaN(profit)) {
           this.profitPercentage = profit;
         }
