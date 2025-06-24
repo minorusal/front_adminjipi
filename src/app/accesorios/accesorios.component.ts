@@ -91,7 +91,14 @@ export class AccesoriosComponent implements OnInit {
     if (this.isAreaType(sel.material)) {
       const width = sel.width ?? 0;
       const length = sel.length ?? 0;
-      return width * length * price;
+      const baseWidth = sel.material.width_m ?? 0;
+      const baseLength = sel.material.length_m ?? 0;
+      const baseArea = baseWidth * baseLength;
+      const area = width * length;
+      if (baseArea > 0) {
+        return (area / baseArea) * price;
+      }
+      return area * price;
     }
     if (this.isPieceType(sel.material)) {
       const qty = sel.quantity ?? 0;
