@@ -4,6 +4,11 @@
       *ngTemplateOutlet="renderNodes; context: { $implicit: menuTree }"
     ></ng-container>
     <li class="bottom-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+      <a class="menu-item" [routerLink]="'accesorios'">
+        <span>Accesorios</span>
+      </a>
+    </li>
+    <li class="bottom-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
       <a class="menu-item" [routerLink]="'settings'">
         <span class="icon">&#9881;</span>
         <span>Configuración</span>
