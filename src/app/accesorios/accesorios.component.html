@@ -1,2 +1,38 @@
 <nav class="breadcrumb">Inicio / Accesorios</nav>
 <h2>Accesorios</h2>
+<div class="accesorios-container">
+  <div class="search-section">
+    <div class="search-container">
+      <span class="material-icons">search</span>
+      <input
+        type="text"
+        placeholder="Buscar materiales"
+        [(ngModel)]="searchText"
+        (input)="onSearchChange()"
+      />
+    </div>
+    <ul class="results" *ngIf="results.length">
+      <li *ngFor="let mat of results" (click)="addMaterial(mat)">
+        {{ mat.name }}
+      </li>
+    </ul>
+  </div>
+  <div class="table-section">
+    <table *ngIf="selected.length">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let mat of selected">
+          <td>{{ mat.id }}</td>
+          <td>{{ mat.name }}</td>
+          <td>{{ mat.description }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
