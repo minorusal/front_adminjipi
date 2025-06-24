@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { MaterialService, Material, NewMaterial } from '../services/material.service';
+import { MaterialTypeService, MaterialType } from '../services/material-type.service';
 
 @Component({
   selector: 'app-listado-materiales',
@@ -19,6 +20,7 @@ export class ListadoMaterialesComponent implements OnInit {
   searchText = '';
   showAddModal = false;
   showEditModal = false;
+  materialTypes: MaterialType[] = [];
   editingMaterialId: number | null = null;
   editMaterialData: NewMaterial = {
     name: '',
@@ -43,10 +45,14 @@ export class ListadoMaterialesComponent implements OnInit {
   isSaving = false;
   isUpdating = false;
 
-  constructor(private materialService: MaterialService) {}
+  constructor(
+    private materialService: MaterialService,
+    private materialTypeService: MaterialTypeService
+  ) {}
 
   ngOnInit(): void {
     this.loadMaterials();
+    this.loadMaterialTypes();
   }
 
   private loadMaterials(): void {
@@ -71,6 +77,22 @@ export class ListadoMaterialesComponent implements OnInit {
           this.errorMessage = 'Error al cargar los materiales';
         }
       });
+  }
+
+  private loadMaterialTypes(): void {
+    this.materialTypeService.getMaterialTypes().subscribe({
+      next: types => {
+        this.materialTypes = Array.isArray(types) ? types : [];
+      },
+      error: err => {
+        console.error('Failed to load material types', err);
+      }
+    });
+  }
+
+  parseNumber(value: string): number | undefined {
+    const n = parseInt(value, 10);
+    return isNaN(n) ? undefined : n;
   }
 
   openAddModal(): void {

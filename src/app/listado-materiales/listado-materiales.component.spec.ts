@@ -4,6 +4,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ListadoMaterialesComponent } from './listado-materiales.component';
 import { MaterialService } from '../services/material.service';
+import { MaterialTypeService } from '../services/material-type.service';
 import { CookieService } from '../services/cookie.service';
 import { environment } from '../../environments/environment';
 
@@ -16,7 +17,7 @@ describe('ListadoMaterialesComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ListadoMaterialesComponent],
       imports: [HttpClientTestingModule, FormsModule],
-      providers: [MaterialService, CookieService],
+      providers: [MaterialService, MaterialTypeService, CookieService],
       schemas: [NO_ERRORS_SCHEMA]
     });
 

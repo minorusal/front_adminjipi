@@ -102,15 +102,20 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="mat-type">Tipo ID</label>
+        <label for="mat-type">Tipo</label>
         <input
           id="mat-type"
-          type="number"
-          [(ngModel)]="newMaterial.material_type_id"
+          type="text"
+          list="materialTypeOptions"
+          [ngModel]="newMaterial.material_type_id"
+          (ngModelChange)="newMaterial.material_type_id = parseNumber($event)"
           name="material_type_id"
           required
           #typeRef="ngModel"
         />
+        <datalist id="materialTypeOptions">
+          <option *ngFor="let t of materialTypes" [value]="t.id">{{ t.name }}</option>
+        </datalist>
         <div class="error" *ngIf="typeRef.touched && typeRef.hasError('required')">
           El tipo es requerido
         </div>
@@ -184,15 +189,20 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="edit-type">Tipo ID</label>
+        <label for="edit-type">Tipo</label>
         <input
           id="edit-type"
-          type="number"
-          [(ngModel)]="editMaterialData.material_type_id"
+          type="text"
+          list="editMaterialTypeOptions"
+          [ngModel]="editMaterialData.material_type_id"
+          (ngModelChange)="editMaterialData.material_type_id = parseNumber($event)"
           name="material_type_id"
           required
           #editTypeRef="ngModel"
         />
+        <datalist id="editMaterialTypeOptions">
+          <option *ngFor="let t of materialTypes" [value]="t.id">{{ t.name }}</option>
+        </datalist>
         <div class="error" *ngIf="editTypeRef.touched && editTypeRef.hasError('required')">
           El tipo es requerido
         </div>
