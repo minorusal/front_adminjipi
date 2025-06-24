@@ -16,6 +16,23 @@
         {{ mat.name }}
       </li>
     </ul>
+
+    <table class="summary-table">
+      <tbody>
+        <tr>
+          <th>Total materiales</th>
+          <td>{{ totalCost | number:'1.2-2' }}</td>
+        </tr>
+        <tr>
+          <th>Porcentaje de ganancia</th>
+          <td>{{ profitPercentage | number:'1.2-2' }}%</td>
+        </tr>
+        <tr>
+          <th>Total + ganancia</th>
+          <td>{{ totalWithProfit | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   <div class="table-section">
     <table *ngIf="selected.length">

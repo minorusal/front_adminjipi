@@ -4,19 +4,26 @@ import { FormsModule } from '@angular/forms';
 
 import { AccesoriosComponent } from './accesorios.component';
 import { MaterialService } from '../services/material.service';
+import { MaterialTypeService } from '../services/material-type.service';
 import { CookieService } from '../services/cookie.service';
 
 describe('AccesoriosComponent', () => {
   let component: AccesoriosComponent;
   let fixture: ComponentFixture<AccesoriosComponent>;
   let materialServiceSpy: jasmine.SpyObj<MaterialService>;
+  let materialTypeServiceSpy: jasmine.SpyObj<MaterialTypeService>;
 
   beforeEach(() => {
     materialServiceSpy = jasmine.createSpyObj('MaterialService', ['getMaterials']);
+    materialTypeServiceSpy = jasmine.createSpyObj('MaterialTypeService', ['getMaterialTypes']);
     TestBed.configureTestingModule({
       declarations: [AccesoriosComponent],
       imports: [FormsModule],
-      providers: [CookieService, { provide: MaterialService, useValue: materialServiceSpy }],
+      providers: [
+        CookieService,
+        { provide: MaterialService, useValue: materialServiceSpy },
+        { provide: MaterialTypeService, useValue: materialTypeServiceSpy }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     });
 
