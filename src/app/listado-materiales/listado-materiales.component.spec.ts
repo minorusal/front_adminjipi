@@ -67,6 +67,7 @@ describe('ListadoMaterialesComponent', () => {
     component.editMaterialData = {
       name: 'Mat1',
       description: 'Desc',
+      material_type_id: 1,
       thickness_mm: 1,
       width_m: 2,
       length_m: 3,

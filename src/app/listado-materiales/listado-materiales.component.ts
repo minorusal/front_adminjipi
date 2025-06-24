@@ -23,6 +23,7 @@ export class ListadoMaterialesComponent implements OnInit {
   editMaterialData: NewMaterial = {
     name: '',
     description: '',
+    material_type_id: undefined,
     thickness_mm: undefined,
     width_m: undefined,
     length_m: undefined,
@@ -31,6 +32,7 @@ export class ListadoMaterialesComponent implements OnInit {
   newMaterial: NewMaterial = {
     name: '',
     description: '',
+    material_type_id: undefined,
     thickness_mm: undefined,
     width_m: undefined,
     length_m: undefined,
@@ -87,6 +89,7 @@ export class ListadoMaterialesComponent implements OnInit {
     this.editMaterialData = {
       name: material.name,
       description: material.description,
+      material_type_id: material.material_type_id,
       thickness_mm: material.thickness_mm,
       width_m: material.width_m,
       length_m: material.length_m,
@@ -162,6 +165,7 @@ export class ListadoMaterialesComponent implements OnInit {
     this.newMaterial = {
       name: '',
       description: '',
+      material_type_id: undefined,
       thickness_mm: undefined,
       width_m: undefined,
       length_m: undefined,
