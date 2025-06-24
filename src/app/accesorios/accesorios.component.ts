@@ -37,8 +37,12 @@ export class AccesoriosComponent implements OnInit {
     if (loginData) {
       try {
         const data = JSON.parse(loginData);
-        if (typeof data.profit_percentage === 'number') {
-          this.profitPercentage = data.profit_percentage;
+        const profit =
+          typeof data.profit_percentage === 'number'
+            ? data.profit_percentage
+            : parseFloat(data.profit_percentage);
+        if (!Number.isNaN(profit)) {
+          this.profitPercentage = profit;
         }
       } catch (_) {
         // ignore parse errors
