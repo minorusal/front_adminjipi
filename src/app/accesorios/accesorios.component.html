@@ -89,7 +89,7 @@
               type="button"
               class="delete-btn"
               title="Quitar"
-              (click)="removeMaterial(sel)"
+              (click)="openRemoveModal(sel)"
             >
               <span class="material-icons" aria-hidden="true">delete</span>
             </button>
@@ -97,5 +97,16 @@
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showRemoveModal" (mousedown)="closeRemoveModal()">
+  <div class="confirm-modal" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()">
+    <span class="close-icon material-icons" (click)="closeRemoveModal()">close</span>
+    <p>¿Quitar material?</p>
+    <div class="modal-actions">
+      <button type="button" (click)="confirmRemove()">Quitar</button>
+      <button type="button" class="cancel-btn" (click)="closeRemoveModal()">Cancelar</button>
+    </div>
   </div>
 </div>
