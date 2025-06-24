@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MaterialService, Material } from '../services/material.service';
 import { MaterialTypeService, MaterialType } from '../services/material-type.service';
+import { CookieService } from '../services/cookie.service';
 
 interface SelectedMaterial {
   material: Material;
@@ -21,13 +22,26 @@ export class AccesoriosComponent implements OnInit {
   selected: SelectedMaterial[] = [];
   materialTypes: MaterialType[] = [];
   searching = false;
+  profitPercentage = 0;
 
   constructor(
     private materialService: MaterialService,
-    private materialTypeService: MaterialTypeService
+    private materialTypeService: MaterialTypeService,
+    private cookieService: CookieService
   ) {}
 
   ngOnInit(): void {
+    const loginData = this.cookieService.get('loginData');
+    if (loginData) {
+      try {
+        const data = JSON.parse(loginData);
+        if (typeof data.profit_percentage === 'number') {
+          this.profitPercentage = data.profit_percentage;
+        }
+      } catch (_) {
+        // ignore parse errors
+      }
+    }
     this.materialTypeService.getMaterialTypes().subscribe({
       next: types => {
         this.materialTypes = Array.isArray(types) ? types : [];
@@ -105,5 +119,13 @@ export class AccesoriosComponent implements OnInit {
       return qty * price;
     }
     return price;
+  }
+
+  get totalCost(): number {
+    return this.selected.reduce((sum, sel) => sum + this.calculateCost(sel), 0);
+  }
+
+  get totalWithProfit(): number {
+    return this.totalCost * (1 + this.profitPercentage / 100);
   }
 }
