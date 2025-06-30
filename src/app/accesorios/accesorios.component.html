@@ -30,15 +30,17 @@
   </div>
   <div class="accesorios-container">
   <div class="search-section">
-    <div class="search-container">
-      <span class="material-icons">search</span>
-      <input
-        type="text"
-        placeholder="Buscar materiales"
-        [(ngModel)]="searchText"
-        (input)="onSearchChange()"
-      />
-    </div>
+      <div class="search-container">
+        <span class="material-icons">search</span>
+        <input
+          type="text"
+          placeholder="Buscar materiales"
+          [(ngModel)]="searchText"
+          name="search"
+          [ngModelOptions]="{ standalone: true }"
+          (input)="onSearchChange()"
+        />
+      </div>
     <ul class="results" *ngIf="results.length">
       <li *ngFor="let mat of results" (click)="addMaterial(mat)">
         {{ mat.name }}
