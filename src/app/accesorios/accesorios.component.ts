@@ -2,6 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { MaterialService, Material } from '../services/material.service';
 import { MaterialTypeService, MaterialType } from '../services/material-type.service';
 import { CookieService } from '../services/cookie.service';
+import {
+  AccessoryService,
+  AccessoryMaterial,
+  Accessory
+} from '../services/accessory.service';
 
 interface SelectedMaterial {
   material: Material;
@@ -25,11 +30,16 @@ export class AccesoriosComponent implements OnInit {
   showRemoveModal = false;
   materialToRemove: SelectedMaterial | null = null;
   profitPercentage = 0;
+  accessoryName = '';
+  accessoryDescription = '';
+  saveError = '';
+  isSaving = false;
 
   constructor(
     private materialService: MaterialService,
     private materialTypeService: MaterialTypeService,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private accessoryService: AccessoryService
   ) {}
 
   ngOnInit(): void {
@@ -154,5 +164,68 @@ export class AccesoriosComponent implements OnInit {
 
   get totalWithProfit(): number {
     return this.totalCost * (1 + this.profitPercentage / 100);
+  }
+
+  submitAccessory(form: any): void {
+    if (this.isSaving) {
+      return;
+    }
+    this.saveError = '';
+    if (!form.valid) {
+      form.form.markAllAsTouched();
+      return;
+    }
+    if (this.selected.length === 0) {
+      this.saveError = 'Debes seleccionar al menos un material';
+      return;
+    }
+
+    const loginData = this.cookieService.get('loginData');
+    let ownerId: number | null = null;
+    if (loginData) {
+      try {
+        const data = JSON.parse(loginData);
+        ownerId = parseInt(data.ownerCompany.id, 10);
+      } catch {
+        ownerId = null;
+      }
+    }
+    if (ownerId === null || isNaN(ownerId)) {
+      this.saveError = 'No se pudo determinar la empresa';
+      return;
+    }
+
+    this.isSaving = true;
+    this.accessoryService
+      .addAccessory(this.accessoryName, this.accessoryDescription, ownerId)
+      .subscribe({
+        next: (acc: Accessory) => {
+          const materials: AccessoryMaterial[] = this.selected.map(sel => ({
+            accessory_id: acc.id,
+            material_id: sel.material.id,
+            width: sel.width,
+            length: sel.length,
+            quantity: sel.quantity
+          }));
+          this.accessoryService
+            .addAccessoryMaterials(acc.id, materials)
+            .subscribe({
+              next: () => {
+                this.isSaving = false;
+                this.accessoryName = '';
+                this.accessoryDescription = '';
+                this.selected = [];
+              },
+              error: () => {
+                this.isSaving = false;
+                this.saveError = 'Error al guardar materiales';
+              }
+            });
+        },
+        error: () => {
+          this.isSaving = false;
+          this.saveError = 'Error al guardar el accesorio';
+        }
+      });
   }
 }
