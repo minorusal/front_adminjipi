@@ -365,4 +365,8 @@ export class AccesoriosComponent implements OnInit {
         }
       });
   }
+
+  editAccessory(acc: Accessory): void {
+    // TODO: implement accessory editing
+  }
 }
