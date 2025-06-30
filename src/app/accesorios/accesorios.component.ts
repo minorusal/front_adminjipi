@@ -176,6 +176,18 @@ export class AccesoriosComponent implements OnInit {
       });
   }
 
+  get filteredAccessories(): Accessory[] {
+    const term = this.listSearchText.trim().toLowerCase();
+    if (!term) {
+      return this.accessories;
+    }
+    return this.accessories.filter(acc =>
+      acc.id.toString().includes(term) ||
+      acc.name?.toLowerCase().includes(term) ||
+      acc.description?.toLowerCase().includes(term)
+    );
+  }
+
   onListSearchChange(): void {
     this.currentPage = 1;
     this.loadAccessories();
