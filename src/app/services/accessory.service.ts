@@ -56,7 +56,7 @@ export class AccessoryService {
   ): Observable<any> {
     const body = { accessory_id: accessoryId, materials };
     return this.http.post<any>(
-      `${environment.apiUrl}/accessories-materials`,
+      `${environment.apiUrl}/accessory-materials`,
       body,
       this.httpOptions()
     );
