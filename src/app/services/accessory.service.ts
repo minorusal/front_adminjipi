@@ -28,6 +28,14 @@ export interface AccessoryMaterial {
   profit_percentage?: number;
 }
 
+export interface PaginatedAccessories {
+  docs: Accessory[];
+  totalDocs: number;
+  limit: number;
+  page: number;
+  totalPages: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -66,10 +74,22 @@ export class AccessoryService {
     );
   }
 
-  getAccessories(ownerId: number): Observable<Accessory[]> {
-    return this.http.get<Accessory[]>(
-      `${environment.apiUrl}/accessories?owner_id=${ownerId}`,
-      this.httpOptions()
-    );
+  getAccessories(
+    ownerId: number,
+    page?: number,
+    limit?: number
+  ): Observable<PaginatedAccessories> {
+    let url = `${environment.apiUrl}/accessories?owner_id=${ownerId}`;
+    const params: string[] = [];
+    if (page !== undefined) {
+      params.push(`page=${page}`);
+    }
+    if (limit !== undefined) {
+      params.push(`limit=${limit}`);
+    }
+    if (params.length) {
+      url += `&${params.join('&')}`;
+    }
+    return this.http.get<PaginatedAccessories>(url, this.httpOptions());
   }
 }
