@@ -242,13 +242,19 @@ export class AccesoriosComponent implements OnInit {
       .addAccessory(name, description, ownerId)
       .subscribe({
         next: (acc: Accessory) => {
-          const materials: AccessoryMaterial[] = this.selected.map(sel => ({
-            accessory_id: acc.id,
-            material_id: sel.material.id,
-            width: sel.width,
-            length: sel.length,
-            quantity: sel.quantity
-          }));
+          const materials: AccessoryMaterial[] = this.selected.map(sel => {
+            const cost = this.calculateCost(sel);
+            return {
+              accessory_id: acc.id,
+              material_id: sel.material.id,
+              width: sel.width,
+              length: sel.length,
+              quantity: sel.quantity,
+              cost,
+              price: cost * (1 + this.profitPercentage / 100),
+              profit_percentage: this.profitPercentage
+            };
+          });
           this.accessoryService
             .addAccessoryMaterials(acc.id, materials)
             .subscribe({

@@ -19,6 +19,9 @@ export interface AccessoryMaterial {
   width?: number;
   length?: number;
   quantity?: number;
+  cost?: number;
+  price?: number;
+  profit_percentage?: number;
 }
 
 @Injectable({
