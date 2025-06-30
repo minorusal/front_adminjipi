@@ -90,4 +90,17 @@ describe('AccesoriosComponent', () => {
 
     expect(cost).toBeCloseTo(600, 2);
   });
+
+  it('should filter accessories by search text', () => {
+    component.accessories = [
+      { id: 1, name: 'Alpha', description: 'Primero' } as any,
+      { id: 2, name: 'Beta', description: 'Segundo' } as any
+    ];
+    component.listSearchText = 'seg';
+
+    const filtered = component.filteredAccessories;
+
+    expect(filtered.length).toBe(1);
+    expect(filtered[0].id).toBe(2);
+  });
 });
