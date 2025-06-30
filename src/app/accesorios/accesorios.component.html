@@ -9,9 +9,16 @@
       [(ngModel)]="accessoryName"
       name="name"
       required
+      pattern=".*\S.*"
       #nameRef="ngModel"
     />
-    <div class="error" *ngIf="nameRef.touched && nameRef.invalid">
+    <div
+      class="error"
+      *ngIf="
+        nameRef.touched &&
+        (nameRef.hasError('required') || nameRef.hasError('pattern'))
+      "
+    >
       El nombre es requerido
     </div>
   </div>
@@ -22,9 +29,16 @@
       [(ngModel)]="accessoryDescription"
       name="description"
       required
+      pattern=".*\S.*"
       #descRef="ngModel"
     ></textarea>
-    <div class="error" *ngIf="descRef.touched && descRef.invalid">
+    <div
+      class="error"
+      *ngIf="
+        descRef.touched &&
+        (descRef.hasError('required') || descRef.hasError('pattern'))
+      "
+    >
       La descripción es requerida
     </div>
   </div>
@@ -134,7 +148,12 @@
   </div>
   <div class="error" *ngIf="saveError">{{ saveError }}</div>
   <div class="form-actions">
-    <button type="submit" [disabled]="isSaving || !accForm.form.valid">Confirmar</button>
+    <button
+      type="submit"
+      [disabled]="isSaving || !accForm.form.valid || selected.length === 0"
+    >
+      Confirmar
+    </button>
     <div class="loader-overlay" *ngIf="isSaving">
       <div class="spinner"></div>
     </div>
