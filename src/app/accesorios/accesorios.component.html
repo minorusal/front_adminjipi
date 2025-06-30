@@ -103,6 +103,7 @@
                 [(ngModel)]="sel.length"
                 [ngModelOptions]="{ standalone: true }"
                 placeholder="Largo"
+                (input)="onMaterialInput(sel)"
               />
               <input
                 type="number"
@@ -111,6 +112,7 @@
                 [(ngModel)]="sel.width"
                 [ngModelOptions]="{ standalone: true }"
                 placeholder="Ancho"
+                (input)="onMaterialInput(sel)"
               />
             </ng-container>
             <ng-template #otherType>
@@ -118,16 +120,24 @@
                 <input
                   type="number"
                   min="0"
-                  class="dim-input"
-                  [(ngModel)]="sel.quantity"
-                  [ngModelOptions]="{ standalone: true }"
-                  placeholder="Piezas"
-                />
+                class="dim-input"
+                [(ngModel)]="sel.quantity"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="Piezas"
+                (input)="onMaterialInput(sel)"
+              />
               </ng-container>
               <ng-template #typeName>
                 {{ getMaterialType(sel.material)?.name }}
               </ng-template>
             </ng-template>
+            <div class="error" *ngIf="formSubmitted && sel._invalid">
+              Completa {{
+                isAreaType(sel.material)
+                  ? 'largo y ancho'
+                  : 'la cantidad'
+              }}
+            </div>
           </td>
           <td>{{ calculateCost(sel) | number:'1.2-2' }}</td>
           <td>{{ sel.material.price }}</td>
