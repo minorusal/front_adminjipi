@@ -13,6 +13,7 @@ interface SelectedMaterial {
   width?: number;
   length?: number;
   quantity?: number;
+  _invalid?: boolean;
 }
 
 @Component({
@@ -34,6 +35,7 @@ export class AccesoriosComponent implements OnInit {
   accessoryDescription = '';
   saveError = '';
   isSaving = false;
+  formSubmitted = false;
 
   constructor(
     private materialService: MaterialService,
@@ -137,6 +139,27 @@ export class AccesoriosComponent implements OnInit {
     return type?.id === 1;
   }
 
+  isMaterialInfoValid(sel: SelectedMaterial): boolean {
+    if (this.isAreaType(sel.material)) {
+      return (
+        !!sel.width &&
+        sel.width > 0 &&
+        !!sel.length &&
+        sel.length > 0
+      );
+    }
+    if (this.isPieceType(sel.material)) {
+      return !!sel.quantity && sel.quantity > 0;
+    }
+    return true;
+  }
+
+  onMaterialInput(sel: SelectedMaterial): void {
+    if (sel._invalid && this.isMaterialInfoValid(sel)) {
+      sel._invalid = false;
+    }
+  }
+
   calculateCost(sel: SelectedMaterial): number {
     const price = sel.material.price ?? 0;
     if (this.isAreaType(sel.material)) {
@@ -170,6 +193,7 @@ export class AccesoriosComponent implements OnInit {
     if (this.isSaving) {
       return;
     }
+    this.formSubmitted = true;
     this.saveError = '';
     if (!form.valid) {
       form.form.markAllAsTouched();
@@ -178,6 +202,21 @@ export class AccesoriosComponent implements OnInit {
     // Prevent saving without selecting any material
     if (this.selected.length === 0) {
       this.saveError = 'Debes seleccionar al menos un material';
+      return;
+    }
+
+    // Validate dynamic inputs
+    let hasInvalid = false;
+    for (const sel of this.selected) {
+      if (!this.isMaterialInfoValid(sel)) {
+        sel._invalid = true;
+        hasInvalid = true;
+      } else {
+        sel._invalid = false;
+      }
+    }
+    if (hasInvalid) {
+      this.saveError = 'Completa las cantidades o medidas de los materiales seleccionados';
       return;
     }
 
