@@ -144,9 +144,10 @@ export class AccesoriosComponent implements OnInit {
       this.accessories = [];
       return;
     }
-    this.accessoryService.getAccessories(this.ownerId).subscribe({
-      next: accs => {
-        this.accessories = Array.isArray(accs) ? accs : [];
+    this.accessoryService.getAccessories(this.ownerId, 1, 10).subscribe({
+      next: res => {
+        const docs: any = (res as any).docs ?? (res as any).items ?? res;
+        this.accessories = Array.isArray(docs) ? docs : [];
       },
       error: () => {
         this.accessories = [];
