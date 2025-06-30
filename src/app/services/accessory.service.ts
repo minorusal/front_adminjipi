@@ -77,7 +77,8 @@ export class AccessoryService {
   getAccessories(
     ownerId: number,
     page?: number,
-    limit?: number
+    limit?: number,
+    search?: string
   ): Observable<PaginatedAccessories> {
     let url = `${environment.apiUrl}/accessories?owner_id=${ownerId}`;
     const params: string[] = [];
@@ -86,6 +87,9 @@ export class AccessoryService {
     }
     if (limit !== undefined) {
       params.push(`limit=${limit}`);
+    }
+    if (search !== undefined && search !== '') {
+      params.push(`search=${encodeURIComponent(search)}`);
     }
     if (params.length) {
       url += `&${params.join('&')}`;
