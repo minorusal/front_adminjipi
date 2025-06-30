@@ -8,6 +8,10 @@ export interface Accessory {
   id: number;
   name: string;
   description: string;
+  /** Total cost of materials without profit */
+  cost?: number;
+  /** Final price including profit percentage */
+  price?: number;
   owner_id?: number;
   created_at?: string;
   updated_at?: string;
