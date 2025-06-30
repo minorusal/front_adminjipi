@@ -61,4 +61,11 @@ export class AccessoryService {
       this.httpOptions()
     );
   }
+
+  getAccessories(ownerId: number): Observable<Accessory[]> {
+    return this.http.get<Accessory[]>(
+      `${environment.apiUrl}/accessories?owner_id=${ownerId}`,
+      this.httpOptions()
+    );
+  }
 }

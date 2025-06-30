@@ -38,6 +38,30 @@ th {
   font-size: 1.2rem;
 }
 
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #565869;
+  margin-bottom: 1rem;
+}
+
+.tabs button {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  color: #e8e8e8;
+  border-bottom: 2px solid transparent;
+}
+
+.tabs button.active {
+  border-color: #10a37f;
+  color: #10a37f;
+}
+
+.tab-pane {
+  margin-top: 1rem;
+}
+
 .accesorios-container {
   display: flex;
   gap: 1rem;
