@@ -175,19 +175,7 @@ export class AccesoriosComponent implements OnInit {
       form.form.markAllAsTouched();
       return;
     }
-    // Ensure name and description are not just whitespace
-    if (this.accessoryName.trim() === '') {
-      const control = form.form.controls['name'];
-      control?.setErrors({ required: true });
-      control?.markAsTouched();
-      return;
-    }
-    if (this.accessoryDescription.trim() === '') {
-      const control = form.form.controls['description'];
-      control?.setErrors({ required: true });
-      control?.markAsTouched();
-      return;
-    }
+    // Prevent saving without selecting any material
     if (this.selected.length === 0) {
       this.saveError = 'Debes seleccionar al menos un material';
       return;
@@ -208,9 +196,11 @@ export class AccesoriosComponent implements OnInit {
       return;
     }
 
+    const name = this.accessoryName.trim();
+    const description = this.accessoryDescription.trim();
     this.isSaving = true;
     this.accessoryService
-      .addAccessory(this.accessoryName, this.accessoryDescription, ownerId)
+      .addAccessory(name, description, ownerId)
       .subscribe({
         next: (acc: Accessory) => {
           const materials: AccessoryMaterial[] = this.selected.map(sel => ({
