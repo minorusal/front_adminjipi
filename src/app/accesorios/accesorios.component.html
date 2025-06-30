@@ -217,6 +217,7 @@
         <th>Nombre</th>
         <th>Descripción</th>
         <th>Costo total</th>
+        <th>% Precio</th>
         <th>Precio total</th>
       </tr>
     </thead>
@@ -226,6 +227,7 @@
         <td>{{ acc.name }}</td>
         <td>{{ acc.description }}</td>
         <td>{{ acc.cost }}</td>
+        <td>{{ calculatePricePercentage(acc) | number:'1.2-2' }}%</td>
         <td>{{ acc.price }}</td>
       </tr>
     </tbody>
