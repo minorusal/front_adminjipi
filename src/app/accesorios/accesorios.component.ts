@@ -36,6 +36,9 @@ export class AccesoriosComponent implements OnInit {
   saveError = '';
   isSaving = false;
   formSubmitted = false;
+  accessories: Accessory[] = [];
+  ownerId: number | null = null;
+  activeTab: 'create' | 'list' = 'create';
 
   constructor(
     private materialService: MaterialService,
@@ -49,6 +52,7 @@ export class AccesoriosComponent implements OnInit {
     if (loginData) {
       try {
         const data = JSON.parse(loginData);
+        this.ownerId = parseInt(data.ownerCompany?.id, 10);
         let profit = 0;
         if (typeof data.profit_percentage === 'number') {
           profit = data.profit_percentage;
@@ -77,6 +81,9 @@ export class AccesoriosComponent implements OnInit {
         this.materialTypes = [];
       }
     });
+    if (this.ownerId !== null && !isNaN(this.ownerId)) {
+      this.loadAccessories();
+    }
   }
 
   onSearchChange(): void {
@@ -123,6 +130,28 @@ export class AccesoriosComponent implements OnInit {
       );
     }
     this.closeRemoveModal();
+  }
+
+  setTab(tab: 'create' | 'list'): void {
+    this.activeTab = tab;
+    if (tab === 'list' && this.ownerId !== null && !isNaN(this.ownerId)) {
+      this.loadAccessories();
+    }
+  }
+
+  loadAccessories(): void {
+    if (this.ownerId === null || isNaN(this.ownerId)) {
+      this.accessories = [];
+      return;
+    }
+    this.accessoryService.getAccessories(this.ownerId).subscribe({
+      next: accs => {
+        this.accessories = Array.isArray(accs) ? accs : [];
+      },
+      error: () => {
+        this.accessories = [];
+      }
+    });
   }
 
   getMaterialType(mat: Material): MaterialType | undefined {

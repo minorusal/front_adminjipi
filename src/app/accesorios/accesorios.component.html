@@ -1,5 +1,23 @@
 <nav class="breadcrumb">Inicio / Accesorios</nav>
 <h2>Accesorios</h2>
+<div class="tabs">
+  <button
+    type="button"
+    [class.active]="activeTab === 'create'"
+    (click)="setTab('create')"
+  >
+    Crear accesorio
+  </button>
+  <button
+    type="button"
+    [class.active]="activeTab === 'list'"
+    (click)="setTab('list')"
+  >
+    Listado de accesorios
+  </button>
+</div>
+
+<div *ngIf="activeTab === 'create'">
 <form #accForm="ngForm" (ngSubmit)="submitAccessory(accForm)">
   <div class="form-group">
     <label for="acc-name">Nombre</label>
@@ -179,4 +197,25 @@
       <button type="button" class="cancel-btn" (click)="closeRemoveModal()">Cancelar</button>
     </div>
   </div>
+</div>
+</div>
+
+<div *ngIf="activeTab === 'list'" class="tab-pane">
+  <table *ngIf="accessories.length">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let acc of accessories">
+        <td>{{ acc.id }}</td>
+        <td>{{ acc.name }}</td>
+        <td>{{ acc.description }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <p *ngIf="!accessories.length">No hay accesorios registrados.</p>
 </div>
