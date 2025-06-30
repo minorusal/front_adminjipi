@@ -87,6 +87,7 @@
                 min="0"
                 class="dim-input"
                 [(ngModel)]="sel.length"
+                [ngModelOptions]="{ standalone: true }"
                 placeholder="Largo"
               />
               <input
@@ -94,6 +95,7 @@
                 min="0"
                 class="dim-input"
                 [(ngModel)]="sel.width"
+                [ngModelOptions]="{ standalone: true }"
                 placeholder="Ancho"
               />
             </ng-container>
@@ -104,6 +106,7 @@
                   min="0"
                   class="dim-input"
                   [(ngModel)]="sel.quantity"
+                  [ngModelOptions]="{ standalone: true }"
                   placeholder="Piezas"
                 />
               </ng-container>
