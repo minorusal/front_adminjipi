@@ -175,6 +175,19 @@ export class AccesoriosComponent implements OnInit {
       form.form.markAllAsTouched();
       return;
     }
+    // Ensure name and description are not just whitespace
+    if (this.accessoryName.trim() === '') {
+      const control = form.form.controls['name'];
+      control?.setErrors({ required: true });
+      control?.markAsTouched();
+      return;
+    }
+    if (this.accessoryDescription.trim() === '') {
+      const control = form.form.controls['description'];
+      control?.setErrors({ required: true });
+      control?.markAsTouched();
+      return;
+    }
     if (this.selected.length === 0) {
       this.saveError = 'Debes seleccionar al menos un material';
       return;
