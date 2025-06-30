@@ -257,6 +257,15 @@ export class AccesoriosComponent implements OnInit {
     return this.totalCost * (1 + this.profitPercentage / 100);
   }
 
+  calculatePricePercentage(acc: Accessory): number {
+    if (!acc || acc.cost === undefined || acc.price === undefined) {
+      return 0;
+    }
+    const cost = Number(acc.cost);
+    const price = Number(acc.price);
+    return cost > 0 ? ((price - cost) / cost) * 100 : 0;
+  }
+
   submitAccessory(form: any): void {
     if (this.isSaving) {
       return;
