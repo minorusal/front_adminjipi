@@ -1,6 +1,34 @@
 <nav class="breadcrumb">Inicio / Accesorios</nav>
 <h2>Accesorios</h2>
-<div class="accesorios-container">
+<form #accForm="ngForm" (ngSubmit)="submitAccessory(accForm)">
+  <div class="form-group">
+    <label for="acc-name">Nombre</label>
+    <input
+      id="acc-name"
+      type="text"
+      [(ngModel)]="accessoryName"
+      name="name"
+      required
+      #nameRef="ngModel"
+    />
+    <div class="error" *ngIf="nameRef.touched && nameRef.invalid">
+      El nombre es requerido
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="acc-desc">Descripción</label>
+    <textarea
+      id="acc-desc"
+      [(ngModel)]="accessoryDescription"
+      name="description"
+      required
+      #descRef="ngModel"
+    ></textarea>
+    <div class="error" *ngIf="descRef.touched && descRef.invalid">
+      La descripción es requerida
+    </div>
+  </div>
+  <div class="accesorios-container">
   <div class="search-section">
     <div class="search-container">
       <span class="material-icons">search</span>
@@ -98,7 +126,15 @@
       </tbody>
     </table>
   </div>
-</div>
+  </div>
+  <div class="error" *ngIf="saveError">{{ saveError }}</div>
+  <div class="form-actions">
+    <button type="submit" [disabled]="isSaving || !accForm.form.valid">Confirmar</button>
+    <div class="loader-overlay" *ngIf="isSaving">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</form>
 
 <div class="modal-overlay" *ngIf="showRemoveModal" (mousedown)="closeRemoveModal()">
   <div class="confirm-modal" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()">

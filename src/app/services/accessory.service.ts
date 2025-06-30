@@ -1,0 +1,61 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { CookieService } from './cookie.service';
+
+export interface Accessory {
+  id: number;
+  name: string;
+  description: string;
+  owner_id?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AccessoryMaterial {
+  accessory_id: number;
+  material_id: number;
+  width?: number;
+  length?: number;
+  quantity?: number;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AccessoryService {
+  constructor(private http: HttpClient, private cookieService: CookieService) {}
+
+  private httpOptions() {
+    const token = this.cookieService.get('token');
+    return token
+      ? { headers: new HttpHeaders({ token }), withCredentials: true }
+      : { withCredentials: true };
+  }
+
+  addAccessory(
+    name: string,
+    description: string,
+    ownerId: number
+  ): Observable<Accessory> {
+    const body = { name, description, owner_id: ownerId };
+    return this.http.post<Accessory>(
+      `${environment.apiUrl}/accessories`,
+      body,
+      this.httpOptions()
+    );
+  }
+
+  addAccessoryMaterials(
+    accessoryId: number,
+    materials: AccessoryMaterial[]
+  ): Observable<any> {
+    const body = { accessory_id: accessoryId, materials };
+    return this.http.post<any>(
+      `${environment.apiUrl}/accessories-materials`,
+      body,
+      this.httpOptions()
+    );
+  }
+}
