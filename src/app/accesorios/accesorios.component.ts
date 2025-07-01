@@ -46,6 +46,7 @@ export class AccesoriosComponent implements OnInit {
   accessoryName = '';
   accessoryDescription = '';
   saveError = '';
+  successMessage = '';
   isSaving = false;
   formSubmitted = false;
   accessories: Accessory[] = [];
@@ -223,6 +224,7 @@ export class AccesoriosComponent implements OnInit {
     this.selectedChildren = [];
     this.formSubmitted = false;
     this.saveError = '';
+    this.successMessage = '';
   }
 
   setTab(tab: 'create' | 'edit' | 'list'): void {
@@ -573,12 +575,14 @@ export class AccesoriosComponent implements OnInit {
               let pending = newChildren.length;
               const finalizeSave = () => {
                 this.isSaving = false;
-                if (!this.isEditing) {
-                  this.accessoryName = '';
-                  this.accessoryDescription = '';
-                  this.selected = [];
-                  this.selectedChildren = [];
+                if (this.isEditing) {
+                  this.formSubmitted = false;
+                } else {
+                  this.resetForm();
                 }
+                this.saveError = '';
+                this.successMessage = 'Accesorio guardado exitosamente';
+                setTimeout(() => (this.successMessage = ''), 3000);
               };
               for (const child of newChildren) {
                 this.accessoryService
@@ -600,25 +604,27 @@ export class AccesoriosComponent implements OnInit {
             } else {
               const finalizeSave = () => {
                 this.isSaving = false;
-                if (!this.isEditing) {
-                  this.accessoryName = '';
-                  this.accessoryDescription = '';
-                  this.selected = [];
-                  this.selectedChildren = [];
+                if (this.isEditing) {
+                  this.formSubmitted = false;
+                } else {
+                  this.resetForm();
                 }
+                this.saveError = '';
+                this.successMessage = 'Accesorio guardado exitosamente';
+                setTimeout(() => (this.successMessage = ''), 3000);
               };
               finalizeSave();
             }
           },
-          error: () => {
+          error: err => {
             this.isSaving = false;
-            this.saveError = 'Error al guardar materiales';
+            this.saveError = err?.error?.message || 'Error al guardar materiales';
           }
         });
       },
-      error: () => {
+      error: err => {
         this.isSaving = false;
-        this.saveError = 'Error al guardar el accesorio';
+        this.saveError = err?.error?.message || 'Error al guardar el accesorio';
       }
     });
   }
