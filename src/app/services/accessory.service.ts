@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CookieService } from './cookie.service';
+import { Material } from './material.service';
 
 export interface Accessory {
   id: number;
@@ -20,8 +21,19 @@ export interface Accessory {
 export interface AccessoryMaterial {
   accessory_id: number;
   material_id: number;
+  /** Base material information when returned from the API */
+  material?: Material;
+  /** Material type identifier when returned from the API */
+  material_type_id?: number;
+  /**
+   * Values used when the material is measured by area.
+   * For backwards compatibility the API might also return `width`/`length`.
+   */
   width?: number;
   length?: number;
+  width_m_used?: number;
+  length_m_used?: number;
+  /** Quantity when the material is a discrete piece or other unit */
   quantity?: number;
   cost?: number;
   price?: number;
