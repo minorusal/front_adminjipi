@@ -109,4 +109,20 @@ describe('AccesoriosComponent', () => {
     expect(filtered.length).toBe(1);
     expect(filtered[0].id).toBe(2);
   });
+
+  it('should sum accessory cost and price', () => {
+    component.selectedChildren = [
+      {
+        accessory: { id: 1, name: 'A', description: '', cost: 10, price: 15 } as any,
+        quantity: 2
+      },
+      {
+        accessory: { id: 2, name: 'B', description: '', cost: 5, price: 8 } as any,
+        quantity: 1
+      }
+    ] as any;
+
+    expect(component.totalAccessoryCost).toBe(25);
+    expect(component.totalAccessoryPrice).toBe(38);
+  });
 });
