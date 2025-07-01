@@ -439,22 +439,23 @@ export class AccesoriosComponent implements OnInit {
             profit_percentage: this.profitPercentage
           };
         });
-        this.accessoryService
-          .addAccessoryMaterials(id, materials)
-          .subscribe({
-            next: () => {
-              this.isSaving = false;
-              if (!this.isEditing) {
-                this.accessoryName = '';
-                this.accessoryDescription = '';
-                this.selected = [];
-              }
-            },
-            error: () => {
-              this.isSaving = false;
-              this.saveError = 'Error al guardar materiales';
+        const materials$ = this.isEditing
+          ? this.accessoryService.updateAccessoryMaterials(id, materials)
+          : this.accessoryService.addAccessoryMaterials(id, materials);
+        materials$.subscribe({
+          next: () => {
+            this.isSaving = false;
+            if (!this.isEditing) {
+              this.accessoryName = '';
+              this.accessoryDescription = '';
+              this.selected = [];
             }
-          });
+          },
+          error: () => {
+            this.isSaving = false;
+            this.saveError = 'Error al guardar materiales';
+          }
+        });
       },
       error: () => {
         this.isSaving = false;

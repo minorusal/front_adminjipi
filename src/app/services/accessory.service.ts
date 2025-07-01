@@ -86,6 +86,18 @@ export class AccessoryService {
     );
   }
 
+  updateAccessoryMaterials(
+    accessoryId: number,
+    materials: AccessoryMaterial[]
+  ): Observable<any> {
+    const body = { accessory_id: accessoryId, materials };
+    return this.http.put<any>(
+      `${environment.apiUrl}/accessory-materials/${accessoryId}`,
+      body,
+      this.httpOptions()
+    );
+  }
+
   getAccessories(
     ownerId: number,
     page?: number,

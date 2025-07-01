@@ -21,6 +21,7 @@ describe('AccesoriosComponent', () => {
     accessoryServiceSpy = jasmine.createSpyObj('AccessoryService', [
       'addAccessory',
       'addAccessoryMaterials',
+      'updateAccessoryMaterials',
       'updateAccessory',
       'getAccessory'
     ]);
