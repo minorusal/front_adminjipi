@@ -579,6 +579,7 @@ export class AccesoriosComponent implements OnInit {
                   this.formSubmitted = false;
                 } else {
                   this.resetForm();
+                  form.resetForm();
                 }
                 this.saveError = '';
                 this.successMessage = 'Accesorio guardado exitosamente';
@@ -608,6 +609,7 @@ export class AccesoriosComponent implements OnInit {
                   this.formSubmitted = false;
                 } else {
                   this.resetForm();
+                  form.resetForm();
                 }
                 this.saveError = '';
                 this.successMessage = 'Accesorio guardado exitosamente';
