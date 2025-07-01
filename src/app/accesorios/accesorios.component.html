@@ -121,7 +121,7 @@
           <td>{{ sel.material.name }}</td>
           <td>{{ sel.material.description }}</td>
           <td>
-            <ng-container *ngIf="isAreaType(sel.material); else otherType">
+            <ng-container *ngIf="isAreaType(sel.material) || sel.width !== undefined || sel.length !== undefined; else otherType">
               <input
                 type="number"
                 min="0"
@@ -142,7 +142,7 @@
               />
             </ng-container>
             <ng-template #otherType>
-              <ng-container *ngIf="isPieceType(sel.material); else typeName">
+              <ng-container *ngIf="isPieceType(sel.material) || sel.quantity !== undefined; else typeName">
                 <input
                   type="number"
                   min="0"
