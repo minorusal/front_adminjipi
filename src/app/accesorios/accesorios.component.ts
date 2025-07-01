@@ -9,6 +9,12 @@ import {
   Accessory
 } from '../services/accessory.service';
 
+interface SelectedAccessory {
+  accessory: Accessory;
+  quantity: number;
+  component_id?: number;
+}
+
 interface SelectedMaterial {
   material: Material;
   width?: number;
@@ -27,6 +33,11 @@ export class AccesoriosComponent implements OnInit {
   searchText = '';
   results: Material[] = [];
   selected: SelectedMaterial[] = [];
+  childSearchText = '';
+  accessoryResults: Accessory[] = [];
+  selectedChildren: SelectedAccessory[] = [];
+  showRemoveChildModal = false;
+  childToRemove: SelectedAccessory | null = null;
   materialTypes: MaterialType[] = [];
   searching = false;
   showRemoveModal = false;
@@ -125,6 +136,24 @@ export class AccesoriosComponent implements OnInit {
     });
   }
 
+  onAccessorySearchChange(): void {
+    if (this.childSearchText.trim() === '' || this.ownerId === null) {
+      this.accessoryResults = [];
+      return;
+    }
+    this.accessoryService
+      .getAccessories(this.ownerId, 1, 10, this.childSearchText)
+      .subscribe({
+        next: res => {
+          const docs: any = (res as any).docs ?? (res as any).items ?? res;
+          this.accessoryResults = Array.isArray(docs) ? docs : [];
+        },
+        error: () => {
+          this.accessoryResults = [];
+        }
+      });
+  }
+
   addMaterial(mat: Material): void {
     if (!this.selected.some(m => m.material.id === mat.id)) {
       this.selected.push({ material: mat });
@@ -133,14 +162,32 @@ export class AccesoriosComponent implements OnInit {
     }
   }
 
+  addChildAccessory(acc: Accessory): void {
+    if (!this.selectedChildren.some(a => a.accessory.id === acc.id)) {
+      this.selectedChildren.push({ accessory: acc, quantity: 1 });
+      this.childSearchText = '';
+      this.accessoryResults = [];
+    }
+  }
+
   openRemoveModal(sel: SelectedMaterial): void {
     this.materialToRemove = sel;
     this.showRemoveModal = true;
   }
 
+  openRemoveChildModal(sel: SelectedAccessory): void {
+    this.childToRemove = sel;
+    this.showRemoveChildModal = true;
+  }
+
   closeRemoveModal(): void {
     this.showRemoveModal = false;
     this.materialToRemove = null;
+  }
+
+  closeRemoveChildModal(): void {
+    this.showRemoveChildModal = false;
+    this.childToRemove = null;
   }
 
   confirmRemove(): void {
@@ -152,10 +199,28 @@ export class AccesoriosComponent implements OnInit {
     this.closeRemoveModal();
   }
 
+  confirmRemoveChild(): void {
+    if (this.childToRemove) {
+      if (this.childToRemove.component_id) {
+        this.accessoryService
+          .deleteAccessoryComponent(this.childToRemove.component_id)
+          .subscribe({
+            next: () => {},
+            error: () => {}
+          });
+      }
+      this.selectedChildren = this.selectedChildren.filter(
+        c => c.accessory.id !== this.childToRemove!.accessory.id
+      );
+    }
+    this.closeRemoveChildModal();
+  }
+
   private resetForm(): void {
     this.accessoryName = '';
     this.accessoryDescription = '';
     this.selected = [];
+    this.selectedChildren = [];
     this.formSubmitted = false;
     this.saveError = '';
   }
@@ -237,6 +302,30 @@ export class AccesoriosComponent implements OnInit {
           },
           error: () => {
             this.selected = [];
+          }
+        });
+        this.accessoryService.getAccessoryComponents(id).subscribe({
+          next: comps => {
+            const items: any[] = Array.isArray((comps as any).components)
+              ? (comps as any).components
+              : Array.isArray(comps)
+              ? (comps as any)
+              : [];
+            this.selectedChildren = items.map(c => {
+              const child: Accessory = (c as any).child ?? {
+                id: c.child_accessory_id,
+                name: (c as any).child_name ?? '',
+                description: (c as any).child_description ?? ''
+              };
+              return {
+                accessory: child,
+                quantity: c.quantity ?? 1,
+                component_id: c.id
+              } as SelectedAccessory;
+            });
+          },
+          error: () => {
+            this.selectedChildren = [];
           }
         });
       },
@@ -385,6 +474,13 @@ export class AccesoriosComponent implements OnInit {
       return;
     }
 
+    for (const child of this.selectedChildren) {
+      if (!child.quantity || child.quantity <= 0) {
+        this.saveError = 'Ingresa cantidades válidas para los accesorios hijos';
+        return;
+      }
+    }
+
     // Validate dynamic inputs
     let hasInvalid = false;
     for (const sel of this.selected) {
@@ -444,11 +540,46 @@ export class AccesoriosComponent implements OnInit {
           : this.accessoryService.addAccessoryMaterials(id, materials);
         materials$.subscribe({
           next: () => {
-            this.isSaving = false;
-            if (!this.isEditing) {
-              this.accessoryName = '';
-              this.accessoryDescription = '';
-              this.selected = [];
+            const newChildren = this.selectedChildren.filter(c => !c.component_id);
+            if (newChildren.length) {
+              let pending = newChildren.length;
+              const finalizeSave = () => {
+                this.isSaving = false;
+                if (!this.isEditing) {
+                  this.accessoryName = '';
+                  this.accessoryDescription = '';
+                  this.selected = [];
+                  this.selectedChildren = [];
+                }
+              };
+              for (const child of newChildren) {
+                this.accessoryService
+                  .addAccessoryComponent(id, child.accessory.id, child.quantity)
+                  .subscribe({
+                    next: res => {
+                      child.component_id = res.id;
+                      if (--pending === 0) {
+                        finalizeSave();
+                      }
+                    },
+                    error: () => {
+                      if (--pending === 0) {
+                        finalizeSave();
+                      }
+                    }
+                  });
+              }
+            } else {
+              const finalizeSave = () => {
+                this.isSaving = false;
+                if (!this.isEditing) {
+                  this.accessoryName = '';
+                  this.accessoryDescription = '';
+                  this.selected = [];
+                  this.selectedChildren = [];
+                }
+              };
+              finalizeSave();
             }
           },
           error: () => {
