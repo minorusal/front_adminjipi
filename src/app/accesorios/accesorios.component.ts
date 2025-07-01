@@ -209,6 +209,21 @@ export class AccesoriosComponent implements OnInit {
       next: acc => {
         this.accessoryName = acc.name;
         this.accessoryDescription = acc.description;
+        this.accessoryService.getAccessoryMaterials(id).subscribe({
+          next: mats => {
+            this.selected = Array.isArray(mats)
+              ? mats.map(m => ({
+                  material: (m as any).material ?? (m as any),
+                  width: m.width,
+                  length: m.length,
+                  quantity: m.quantity
+                }))
+              : [];
+          },
+          error: () => {
+            this.selected = [];
+          }
+        });
       },
       error: () => {
         // ignore errors
