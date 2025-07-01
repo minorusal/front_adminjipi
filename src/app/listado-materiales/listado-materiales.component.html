@@ -124,11 +124,11 @@
         <label for="mat-thick">Espesor (mm)</label>
         <input id="mat-thick" type="number" [(ngModel)]="newMaterial.thickness_mm" name="thickness_mm" />
       </div>
-      <div class="form-group">
+      <div class="form-group" *ngIf="isAreaType(newMaterial.material_type_id) || newMaterial.width_m !== undefined || newMaterial.length_m !== undefined">
         <label for="mat-width">Ancho (m)</label>
         <input id="mat-width" type="number" [(ngModel)]="newMaterial.width_m" name="width_m" />
       </div>
-      <div class="form-group">
+      <div class="form-group" *ngIf="isAreaType(newMaterial.material_type_id) || newMaterial.width_m !== undefined || newMaterial.length_m !== undefined">
         <label for="mat-length">Largo (m)</label>
         <input id="mat-length" type="number" [(ngModel)]="newMaterial.length_m" name="length_m" />
       </div>
@@ -211,11 +211,11 @@
         <label for="edit-thick">Espesor (mm)</label>
         <input id="edit-thick" type="number" [(ngModel)]="editMaterialData.thickness_mm" name="thickness_mm" />
       </div>
-      <div class="form-group">
+      <div class="form-group" *ngIf="isAreaType(editMaterialData.material_type_id) || editMaterialData.width_m !== undefined || editMaterialData.length_m !== undefined">
         <label for="edit-width">Ancho (m)</label>
         <input id="edit-width" type="number" [(ngModel)]="editMaterialData.width_m" name="width_m" />
       </div>
-      <div class="form-group">
+      <div class="form-group" *ngIf="isAreaType(editMaterialData.material_type_id) || editMaterialData.width_m !== undefined || editMaterialData.length_m !== undefined">
         <label for="edit-length">Largo (m)</label>
         <input id="edit-length" type="number" [(ngModel)]="editMaterialData.length_m" name="length_m" />
       </div>
