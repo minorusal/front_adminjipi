@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MaterialService, Material } from '../services/material.service';
 import { MaterialTypeService, MaterialType } from '../services/material-type.service';
 import { CookieService } from '../services/cookie.service';
@@ -38,6 +39,8 @@ export class AccesoriosComponent implements OnInit {
   formSubmitted = false;
   accessories: Accessory[] = [];
   ownerId: number | null = null;
+  isEditing = false;
+  editingId: number | null = null;
   activeTab: 'create' | 'list' = 'create';
   listSearchText = '';
   currentPage = 1;
@@ -48,10 +51,23 @@ export class AccesoriosComponent implements OnInit {
     private materialService: MaterialService,
     private materialTypeService: MaterialTypeService,
     private cookieService: CookieService,
-    private accessoryService: AccessoryService
+    private accessoryService: AccessoryService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    const editIdParam = this.route.snapshot.paramMap.get('id');
+    if (editIdParam) {
+      const id = parseInt(editIdParam, 10);
+      if (!isNaN(id)) {
+        this.isEditing = true;
+        this.editingId = id;
+        this.activeTab = 'create';
+        this.loadAccessory(id);
+      }
+    }
+
     const loginData = this.cookieService.get('loginData');
     if (loginData) {
       try {
@@ -174,6 +190,18 @@ export class AccesoriosComponent implements OnInit {
           this.totalPages = 0;
         }
       });
+  }
+
+  private loadAccessory(id: number): void {
+    this.accessoryService.getAccessory(id).subscribe({
+      next: acc => {
+        this.accessoryName = acc.name;
+        this.accessoryDescription = acc.description;
+      },
+      error: () => {
+        // ignore errors
+      }
+    });
   }
 
   get filteredAccessories(): Accessory[] {
@@ -327,46 +355,55 @@ export class AccesoriosComponent implements OnInit {
     const name = this.accessoryName.trim();
     const description = this.accessoryDescription.trim();
     this.isSaving = true;
-    this.accessoryService
-      .addAccessory(name, description, ownerId)
-      .subscribe({
-        next: (acc: Accessory) => {
-          const materials: AccessoryMaterial[] = this.selected.map(sel => {
-            const cost = this.calculateCost(sel);
-            return {
-              accessory_id: acc.id,
-              material_id: sel.material.id,
-              width: sel.width,
-              length: sel.length,
-              quantity: sel.quantity,
-              cost,
-              price: cost * (1 + this.profitPercentage / 100),
-              profit_percentage: this.profitPercentage
-            };
-          });
-          this.accessoryService
-            .addAccessoryMaterials(acc.id, materials)
-            .subscribe({
-              next: () => {
-                this.isSaving = false;
+
+    const save$ = this.isEditing && this.editingId !== null
+      ? this.accessoryService.updateAccessory(this.editingId, name, description)
+      : this.accessoryService.addAccessory(name, description, ownerId);
+
+    save$.subscribe({
+      next: (acc: Accessory) => {
+        const id = this.isEditing && this.editingId !== null ? this.editingId : acc.id;
+        const materials: AccessoryMaterial[] = this.selected.map(sel => {
+          const cost = this.calculateCost(sel);
+          return {
+            accessory_id: id,
+            material_id: sel.material.id,
+            width: sel.width,
+            length: sel.length,
+            quantity: sel.quantity,
+            cost,
+            price: cost * (1 + this.profitPercentage / 100),
+            profit_percentage: this.profitPercentage
+          };
+        });
+        this.accessoryService
+          .addAccessoryMaterials(id, materials)
+          .subscribe({
+            next: () => {
+              this.isSaving = false;
+              if (!this.isEditing) {
                 this.accessoryName = '';
                 this.accessoryDescription = '';
                 this.selected = [];
-              },
-              error: () => {
-                this.isSaving = false;
-                this.saveError = 'Error al guardar materiales';
               }
-            });
-        },
-        error: () => {
-          this.isSaving = false;
-          this.saveError = 'Error al guardar el accesorio';
-        }
-      });
+            },
+            error: () => {
+              this.isSaving = false;
+              this.saveError = 'Error al guardar materiales';
+            }
+          });
+      },
+      error: () => {
+        this.isSaving = false;
+        this.saveError = 'Error al guardar el accesorio';
+      }
+    });
   }
 
   editAccessory(acc: Accessory): void {
-    // TODO: implement accessory editing
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/accesorios/editar', acc.id])
+    );
+    window.open(url, '_blank');
   }
 }

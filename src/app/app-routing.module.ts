@@ -17,6 +17,7 @@ const routes: Routes = [
   { path: 'inventario/bodegas', component: BodegasComponent },
   { path: 'materiales', component: ListadoMaterialesComponent },
   { path: 'cotizaciones', component: CotizacionesComponent },
+  { path: 'accesorios/editar/:id', component: AccesoriosComponent },
   { path: 'accesorios', component: AccesoriosComponent },
   { path: 'settings', component: SettingsComponent }
 ];
