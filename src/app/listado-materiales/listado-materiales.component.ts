@@ -95,6 +95,25 @@ export class ListadoMaterialesComponent implements OnInit {
     return isNaN(n) ? undefined : n;
   }
 
+  private getMaterialType(id: number | undefined): MaterialType | undefined {
+    return this.materialTypes.find(t => t.id === id);
+  }
+
+  isAreaType(id: number | undefined): boolean {
+    const type = this.getMaterialType(id);
+    const ident = (type?.unit || type?.name || '').toLowerCase();
+    return type?.id === 2 || ident.includes('m2') || ident.includes('área') || ident.includes('area');
+  }
+
+  isPieceType(id: number | undefined): boolean {
+    const type = this.getMaterialType(id);
+    if (!type) {
+      return false;
+    }
+    const ident = (type.unit || type.name || '').toLowerCase();
+    return type.id === 1 || ident.includes('pieza') || ident.includes('unidad');
+  }
+
   openAddModal(): void {
     this.showAddModal = true;
   }
