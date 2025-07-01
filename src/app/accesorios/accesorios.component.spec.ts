@@ -18,7 +18,12 @@ describe('AccesoriosComponent', () => {
   beforeEach(() => {
     materialServiceSpy = jasmine.createSpyObj('MaterialService', ['getMaterials']);
     materialTypeServiceSpy = jasmine.createSpyObj('MaterialTypeService', ['getMaterialTypes']);
-    accessoryServiceSpy = jasmine.createSpyObj('AccessoryService', ['addAccessory', 'addAccessoryMaterials']);
+    accessoryServiceSpy = jasmine.createSpyObj('AccessoryService', [
+      'addAccessory',
+      'addAccessoryMaterials',
+      'updateAccessory',
+      'getAccessory'
+    ]);
     TestBed.configureTestingModule({
       declarations: [AccesoriosComponent],
       imports: [FormsModule],

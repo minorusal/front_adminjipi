@@ -96,4 +96,24 @@ export class AccessoryService {
     }
     return this.http.get<PaginatedAccessories>(url, this.httpOptions());
   }
+
+  getAccessory(id: number): Observable<Accessory> {
+    return this.http.get<Accessory>(
+      `${environment.apiUrl}/accessories/${id}`,
+      this.httpOptions()
+    );
+  }
+
+  updateAccessory(
+    id: number,
+    name: string,
+    description: string
+  ): Observable<Accessory> {
+    const body = { name, description };
+    return this.http.put<Accessory>(
+      `${environment.apiUrl}/accessories/${id}`,
+      body,
+      this.httpOptions()
+    );
+  }
 }

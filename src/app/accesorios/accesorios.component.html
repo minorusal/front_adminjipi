@@ -6,7 +6,7 @@
     [class.active]="activeTab === 'create'"
     (click)="setTab('create')"
   >
-    Crear accesorio
+    {{ isEditing ? 'Editar accesorio' : 'Crear accesorio' }}
   </button>
   <button
     type="button"
@@ -180,7 +180,7 @@
       type="submit"
       [disabled]="isSaving"
     >
-      Confirmar
+      {{ isEditing ? 'Guardar cambios' : 'Confirmar' }}
     </button>
     <div class="loader-overlay" *ngIf="isSaving">
       <div class="spinner"></div>
