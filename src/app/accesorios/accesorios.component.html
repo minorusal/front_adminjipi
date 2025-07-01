@@ -9,19 +9,19 @@
     Crear accesorio
   </button>
   <button
+    type="button"
+    [class.active]="activeTab === 'list'"
+    (click)="setTab('list')"
+  >
+    Listado de accesorios
+  </button>
+  <button
     *ngIf="isEditing"
     type="button"
     [class.active]="activeTab === 'edit'"
     (click)="setTab('edit')"
   >
     Editar accesorio
-  </button>
-  <button
-    type="button"
-    [class.active]="activeTab === 'list'"
-    (click)="setTab('list')"
-  >
-    Listado de accesorios
   </button>
 </div>
 
