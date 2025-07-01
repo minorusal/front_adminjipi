@@ -118,7 +118,7 @@ export class AccessoryService {
   }
 
   getAccessoryMaterials(id: number): Observable<AccessoryMaterial[]> {
-    const url = `${environment.apiUrl}/accessory-materials?accessory_id=${id}`;
+    const url = `${environment.apiUrl}/accessories/${id}/materials`;
     return this.http.get<AccessoryMaterial[]>(url, this.httpOptions());
   }
 }
