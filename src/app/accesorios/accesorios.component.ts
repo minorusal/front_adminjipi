@@ -269,12 +269,20 @@ export class AccesoriosComponent implements OnInit {
 
   isAreaType(mat: Material): boolean {
     const type = this.getMaterialType(mat);
-    return type?.id === 2;
+    if (!type) {
+      return false;
+    }
+    const ident = (type.unit || type.name || '').toLowerCase();
+    return type.id === 2 || ident.includes('m2') || ident.includes('área') || ident.includes('area');
   }
 
   isPieceType(mat: Material): boolean {
     const type = this.getMaterialType(mat);
-    return type?.id === 1;
+    if (!type) {
+      return false;
+    }
+    const ident = (type.unit || type.name || '').toLowerCase();
+    return type.id === 1 || ident.includes('pieza') || ident.includes('unidad');
   }
 
   isMaterialInfoValid(sel: SelectedMaterial): boolean {
