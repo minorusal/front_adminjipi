@@ -219,6 +219,7 @@
         <th>Costo total</th>
         <th>% Precio</th>
         <th>Precio total</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -229,6 +230,16 @@
         <td>{{ acc.cost }}</td>
         <td>{{ calculatePricePercentage(acc) | number:'1.2-2' }}%</td>
         <td>{{ acc.price }}</td>
+        <td>
+          <button
+            type="button"
+            class="edit-btn"
+            title="Editar accesorio"
+            (click)="editAccessory(acc)"
+          >
+            <span class="material-icons" aria-hidden="true">edit</span>
+          </button>
+        </td>
       </tr>
     </tbody>
   </table>
