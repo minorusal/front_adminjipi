@@ -269,6 +269,11 @@ export class AccesoriosComponent implements OnInit {
 
   isAreaType(mat: Material): boolean {
     const type = this.getMaterialType(mat);
+    // Avoid classifying piece based materials as area even if they have
+    // width/length metadata by explicitly checking the piece type first
+    if (this.isPieceType(mat)) {
+      return false;
+    }
     const ident = (type?.unit || type?.name || '').toLowerCase();
     return (
       (mat.width_m !== undefined && mat.length_m !== undefined) ||
