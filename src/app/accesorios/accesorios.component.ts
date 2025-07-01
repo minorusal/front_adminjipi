@@ -449,6 +449,22 @@ export class AccesoriosComponent implements OnInit {
     return this.totalCost * (1 + this.profitPercentage / 100);
   }
 
+  get totalAccessoryCost(): number {
+    return this.selectedChildren.reduce((sum, child) => {
+      const qty = child.quantity ?? 1;
+      const cost = child.accessory?.cost ?? 0;
+      return sum + cost * qty;
+    }, 0);
+  }
+
+  get totalAccessoryPrice(): number {
+    return this.selectedChildren.reduce((sum, child) => {
+      const qty = child.quantity ?? 1;
+      const price = child.accessory?.price ?? 0;
+      return sum + price * qty;
+    }, 0);
+  }
+
   calculatePricePercentage(acc: Accessory): number {
     if (!acc || acc.cost === undefined || acc.price === undefined) {
       return 0;
