@@ -465,6 +465,18 @@ export class AccesoriosComponent implements OnInit {
     }, 0);
   }
 
+  calculateChildCost(child: SelectedAccessory): number {
+    const qty = child.quantity ?? 1;
+    const cost = child.accessory?.cost ?? 0;
+    return cost * qty;
+  }
+
+  calculateChildPrice(child: SelectedAccessory): number {
+    const qty = child.quantity ?? 1;
+    const price = child.accessory?.price ?? 0;
+    return price * qty;
+  }
+
   calculatePricePercentage(acc: Accessory): number {
     if (!acc || acc.cost === undefined || acc.price === undefined) {
       return 0;
