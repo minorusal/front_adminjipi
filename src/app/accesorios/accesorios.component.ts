@@ -216,12 +216,24 @@ export class AccesoriosComponent implements OnInit {
               : Array.isArray(mats)
               ? (mats as any)
               : [];
-            this.selected = materials.map(m => ({
-              material: (m as any).material ?? (m as any),
-              width: m.width,
-              length: m.length,
-              quantity: m.quantity
-            }));
+            this.selected = materials.map(m => {
+              const mat: Material = (m as any).material ?? {
+                id: m.material_id ?? m.id,
+                name: m.material_name ?? m.name,
+                description: m.description,
+                material_type_id: m.material_type_id,
+                thickness_mm: m.thickness_mm,
+                width_m: m.width_m,
+                length_m: m.length_m,
+                price: m.price
+              };
+              return {
+                material: mat,
+                width: m.width ?? m.width_m_used,
+                length: m.length ?? m.length_m_used,
+                quantity: m.quantity
+              } as SelectedMaterial;
+            });
           },
           error: () => {
             this.selected = [];
@@ -268,6 +280,10 @@ export class AccesoriosComponent implements OnInit {
   }
 
   isAreaType(mat: Material): boolean {
+    const typeId = mat.material_type_id;
+    if (typeId != null) {
+      return typeId === 2;
+    }
     const type = this.getMaterialType(mat);
     // Avoid classifying piece based materials as area even if they have
     // width/length metadata by explicitly checking the piece type first
@@ -282,6 +298,10 @@ export class AccesoriosComponent implements OnInit {
   }
 
   isPieceType(mat: Material): boolean {
+    const typeId = mat.material_type_id;
+    if (typeId != null) {
+      return typeId === 1;
+    }
     const type = this.getMaterialType(mat);
     if (!type) {
       return false;
