@@ -48,6 +48,14 @@ export interface PaginatedAccessories {
   totalPages: number;
 }
 
+export interface AccessoryComponent {
+  id: number;
+  parent_accessory_id: number;
+  child_accessory_id: number;
+  quantity: number;
+  child?: Accessory;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -144,5 +152,34 @@ export class AccessoryService {
   getAccessoryMaterials(id: number): Observable<AccessoryMaterial[]> {
     const url = `${environment.apiUrl}/accessories/${id}/materials`;
     return this.http.get<AccessoryMaterial[]>(url, this.httpOptions());
+  }
+
+  getAccessoryComponents(id: number): Observable<AccessoryComponent[]> {
+    const url = `${environment.apiUrl}/accessories/${id}/components`;
+    return this.http.get<AccessoryComponent[]>(url, this.httpOptions());
+  }
+
+  addAccessoryComponent(
+    parentId: number,
+    childId: number,
+    quantity: number
+  ): Observable<AccessoryComponent> {
+    const body = {
+      parent_accessory_id: parentId,
+      child_accessory_id: childId,
+      quantity
+    };
+    return this.http.post<AccessoryComponent>(
+      `${environment.apiUrl}/accessory-components`,
+      body,
+      this.httpOptions()
+    );
+  }
+
+  deleteAccessoryComponent(id: number): Observable<any> {
+    return this.http.delete<any>(
+      `${environment.apiUrl}/accessory-components/${id}`,
+      this.httpOptions()
+    );
   }
 }

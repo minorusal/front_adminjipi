@@ -87,6 +87,23 @@
       </li>
     </ul>
 
+      <div class="search-container">
+        <span class="material-icons">search</span>
+        <input
+          type="text"
+          placeholder="Buscar accesorios"
+          [(ngModel)]="childSearchText"
+          name="searchChild"
+          [ngModelOptions]="{ standalone: true }"
+          (input)="onAccessorySearchChange()"
+        />
+      </div>
+      <ul class="results" *ngIf="accessoryResults.length">
+        <li *ngFor="let a of accessoryResults" (click)="addChildAccessory(a)">
+          {{ a.name }}
+        </li>
+      </ul>
+
     <table class="summary-table">
       <tbody>
         <tr>
@@ -180,6 +197,40 @@
         </tr>
       </tbody>
     </table>
+
+    <table *ngIf="selectedChildren.length">
+      <thead>
+        <tr>
+          <th>Accesorio hijo</th>
+          <th>Cantidad</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let child of selectedChildren">
+          <td>{{ child.accessory.name }}</td>
+          <td>
+            <input
+              type="number"
+              min="1"
+              class="dim-input"
+              [(ngModel)]="child.quantity"
+              [ngModelOptions]="{ standalone: true }"
+            />
+          </td>
+          <td>
+            <button
+              type="button"
+              class="delete-btn"
+              title="Quitar"
+              (click)="openRemoveChildModal(child)"
+            >
+              <span class="material-icons" aria-hidden="true">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   </div>
   <div class="error" *ngIf="saveError">{{ saveError }}</div>
@@ -205,6 +256,16 @@
       <button type="button" class="cancel-btn" (click)="closeRemoveModal()">Cancelar</button>
     </div>
   </div>
+</div>
+<div class="modal-overlay" *ngIf="showRemoveChildModal" (mousedown)="closeRemoveChildModal()">
+  <div class="confirm-modal" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()">
+    <span class="close-icon material-icons" (click)="closeRemoveChildModal()">close</span>
+    <p>¿Quitar accesorio?</p>
+    <div class="modal-actions">
+      <button type="button" (click)="confirmRemoveChild()">Quitar</button>
+      <button type="button" class="cancel-btn" (click)="closeRemoveChildModal()">Cancelar</button>
+</div>
+</div>
 </div>
 </div>
 
