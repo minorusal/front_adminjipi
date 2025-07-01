@@ -325,6 +325,18 @@ export class AccesoriosComponent implements OnInit {
                 component_id: c.id
               } as SelectedAccessory;
             });
+
+            // Fetch full accessory details to ensure name, cost and price are available
+            for (const sel of this.selectedChildren) {
+              this.accessoryService.getAccessory(sel.accessory.id).subscribe({
+                next: acc => {
+                  sel.accessory = { ...sel.accessory, ...acc };
+                },
+                error: () => {
+                  // ignore errors and keep existing partial data
+                }
+              });
+            }
           },
           error: () => {
             this.selectedChildren = [];
