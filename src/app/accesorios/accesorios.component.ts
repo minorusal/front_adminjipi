@@ -152,10 +152,22 @@ export class AccesoriosComponent implements OnInit {
     this.closeRemoveModal();
   }
 
+  private resetForm(): void {
+    this.accessoryName = '';
+    this.accessoryDescription = '';
+    this.selected = [];
+    this.formSubmitted = false;
+    this.saveError = '';
+  }
+
   setTab(tab: 'create' | 'edit' | 'list'): void {
     this.activeTab = tab;
     if (tab === 'list' && this.ownerId !== null && !isNaN(this.ownerId)) {
       this.loadAccessories();
+    } else if (tab === 'create') {
+      this.isEditing = false;
+      this.editingId = null;
+      this.resetForm();
     }
   }
 
