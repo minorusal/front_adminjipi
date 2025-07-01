@@ -80,3 +80,9 @@ textarea {
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
+
+.success {
+  color: #4caf50;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
