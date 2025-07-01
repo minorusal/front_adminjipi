@@ -211,6 +211,8 @@
         <tr>
           <th>Accesorio hijo</th>
           <th>Cantidad</th>
+          <th>Costo</th>
+          <th>Precio</th>
           <th></th>
         </tr>
       </thead>
@@ -226,6 +228,8 @@
               [ngModelOptions]="{ standalone: true }"
             />
           </td>
+          <td>{{ calculateChildCost(child) | number:'1.2-2' }}</td>
+          <td>{{ calculateChildPrice(child) | number:'1.2-2' }}</td>
           <td>
             <button
               type="button"
