@@ -41,7 +41,7 @@ export class AccesoriosComponent implements OnInit {
   ownerId: number | null = null;
   isEditing = false;
   editingId: number | null = null;
-  activeTab: 'create' | 'list' = 'create';
+  activeTab: 'create' | 'edit' | 'list' = 'create';
   listSearchText = '';
   currentPage = 1;
   pageSize = 10;
@@ -63,7 +63,7 @@ export class AccesoriosComponent implements OnInit {
       if (!isNaN(id)) {
         this.isEditing = true;
         this.editingId = id;
-        this.activeTab = 'create';
+        this.activeTab = 'edit';
         this.loadAccessory(id);
       }
     }
@@ -152,7 +152,7 @@ export class AccesoriosComponent implements OnInit {
     this.closeRemoveModal();
   }
 
-  setTab(tab: 'create' | 'list'): void {
+  setTab(tab: 'create' | 'edit' | 'list'): void {
     this.activeTab = tab;
     if (tab === 'list' && this.ownerId !== null && !isNaN(this.ownerId)) {
       this.loadAccessories();
@@ -401,9 +401,9 @@ export class AccesoriosComponent implements OnInit {
   }
 
   editAccessory(acc: Accessory): void {
-    const url = this.router.serializeUrl(
-      this.router.createUrlTree(['/accesorios/editar', acc.id])
-    );
-    window.open(url, '_blank');
+    this.isEditing = true;
+    this.editingId = acc.id;
+    this.activeTab = 'edit';
+    this.loadAccessory(acc.id);
   }
 }
