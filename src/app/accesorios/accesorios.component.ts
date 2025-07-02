@@ -569,6 +569,14 @@ export class AccesoriosComponent implements OnInit {
     }, 0);
   }
 
+  get combinedCost(): number {
+    return this.totalCost + this.totalAccessoryCost;
+  }
+
+  get combinedPrice(): number {
+    return this.totalWithProfit;
+  }
+
   calculateChildCost(child: SelectedAccessory): number {
     const qty = toNumber(child.quantity ?? 1);
     const cost = toNumber(child.accessory?.cost);
