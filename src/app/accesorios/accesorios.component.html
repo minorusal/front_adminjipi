@@ -77,7 +77,7 @@
           placeholder="Buscar materiales"
           [(ngModel)]="searchText"
           name="search"
-          [ngModelOptions]="{ standalone: true }"
+          [ngModelOptions]="{ standalone: true, updateOn: 'input' }"
           (input)="onSearchChange()"
         />
       </div>
@@ -94,7 +94,7 @@
           placeholder="Buscar accesorios"
           [(ngModel)]="childSearchText"
           name="searchChild"
-          [ngModelOptions]="{ standalone: true }"
+          [ngModelOptions]="{ standalone: true, updateOn: 'input' }"
           (input)="onAccessorySearchChange()"
         />
       </div>
@@ -164,7 +164,7 @@
                 min="0"
                 class="dim-input"
                 [(ngModel)]="sel.length"
-                [ngModelOptions]="{ standalone: true }"
+                [ngModelOptions]="{ standalone: true, updateOn: 'input' }"
                 placeholder="Largo"
                 (input)="onMaterialInput(sel)"
               />
@@ -173,7 +173,7 @@
                 min="0"
                 class="dim-input"
                 [(ngModel)]="sel.width"
-                [ngModelOptions]="{ standalone: true }"
+                [ngModelOptions]="{ standalone: true, updateOn: 'input' }"
                 placeholder="Ancho"
                 (input)="onMaterialInput(sel)"
               />
@@ -185,7 +185,7 @@
                   min="0"
                 class="dim-input"
                 [(ngModel)]="sel.quantity"
-                [ngModelOptions]="{ standalone: true }"
+                [ngModelOptions]="{ standalone: true, updateOn: 'input' }"
                 placeholder="Piezas"
                 (input)="onMaterialInput(sel)"
               />
@@ -237,7 +237,7 @@
               min="1"
               class="dim-input"
               [(ngModel)]="child.quantity"
-              [ngModelOptions]="{ standalone: true }"
+              [ngModelOptions]="{ standalone: true, updateOn: 'input' }"
             />
           </td>
           <td>{{ calculateChildCost(child) | number:'1.2-2' }}</td>
