@@ -9,6 +9,7 @@ import { CookieService } from '../services/cookie.service';
 import {
   AccessoryService,
   AccessoryMaterial,
+  AccessoryMaterialPayload,
   Accessory,
 } from '../services/accessory.service';
 import { toNumber } from '../utils/number-parse';
@@ -668,6 +669,35 @@ export class AccesoriosComponent implements OnInit {
     const description = this.accessoryDescription.trim();
     this.isSaving = true;
 
+    const markup = toNumber(this.profitPercentage);
+    const materials: AccessoryMaterialPayload[] = this.selected.map((sel) => {
+      const cost = this.calculateCost(sel);
+      const price = cost * (1 + markup / 100);
+      const unit = this.getMaterialType(sel.material)?.unit;
+      return {
+        material_id: sel.material.id,
+        width: toNumber(sel.width),
+        length: toNumber(sel.length),
+        unit,
+        quantity: toNumber(sel.quantity),
+        cost,
+        price,
+      } as AccessoryMaterialPayload;
+    });
+    const accessoriesPayload = this.selectedChildren.map((child) => {
+      const qty = toNumber(child.quantity);
+      const unitCost = toNumber(child.accessory.cost);
+      const unitPrice = toNumber(child.accessory.price);
+      const cost = unitCost * qty;
+      const price = unitPrice * qty;
+      return {
+        accessory_id: child.accessory.id,
+        price,
+        cost,
+        quantity: qty,
+      };
+    });
+
     const save$ =
       this.isEditing && this.editingId !== null
         ? this.accessoryService.updateAccessory(
@@ -675,41 +705,18 @@ export class AccesoriosComponent implements OnInit {
             name,
             description,
           )
-        : this.accessoryService.addAccessory(name, description, ownerId);
+        : this.accessoryService.addAccessory(
+            name,
+            description,
+            ownerId,
+            materials,
+            accessoriesPayload,
+          );
 
     save$.subscribe({
       next: (acc: Accessory) => {
         const id =
           this.isEditing && this.editingId !== null ? this.editingId : acc.id;
-        const markup = toNumber(this.profitPercentage);
-        const materials: AccessoryMaterial[] = this.selected.map((sel) => {
-          const cost = this.calculateCost(sel);
-          const price = cost * (1 + markup / 100);
-          const unit = this.getMaterialType(sel.material)?.unit;
-          return {
-            accessory_id: id,
-            material_id: sel.material.id,
-            width: toNumber(sel.width),
-            length: toNumber(sel.length),
-            unit,
-            quantity: toNumber(sel.quantity),
-            cost,
-            price,
-          } as AccessoryMaterial;
-        });
-        const accessoriesPayload = this.selectedChildren.map((child) => {
-          const qty = toNumber(child.quantity);
-          const unitCost = toNumber(child.accessory.cost);
-          const unitPrice = toNumber(child.accessory.price);
-          const cost = unitCost * qty;
-          const price = unitPrice * qty;
-          return {
-            accessory_id: child.accessory.id,
-            price,
-            cost,
-            quantity: qty,
-          };
-        });
         const totalMaterialsPrice = materials.reduce(
           (sum, m) => sum + toNumber(m.price),
           0,
@@ -719,48 +726,41 @@ export class AccesoriosComponent implements OnInit {
           0,
         );
         const totalPrice = totalMaterialsPrice + totalAccessoriesPrice;
-        const materials$ = this.isEditing
-          ? this.accessoryService.updateAccessoryMaterials(
-              id,
-              markup,
-              materials,
-              accessoriesPayload,
-              totalMaterialsPrice,
-              totalAccessoriesPrice,
-              totalPrice,
-            )
-          : this.accessoryService.addAccessoryMaterials(
-              id,
-              markup,
-              materials,
-              accessoriesPayload,
-              totalMaterialsPrice,
-              totalAccessoriesPrice,
-              totalPrice,
-            );
-        materials$.subscribe({
-          next: () => {
-            const finalizeSave = () => {
+        const finalizeSave = () => {
+          this.isSaving = false;
+          if (this.isEditing) {
+            this.formSubmitted = false;
+          } else {
+            this.resetForm();
+            form.resetForm();
+          }
+          this.saveError = '';
+          this.successMessage = 'Accesorio guardado exitosamente';
+          setTimeout(() => (this.successMessage = ''), 3000);
+          this.updateApiTotals(id);
+        };
+
+        if (this.isEditing) {
+          const materials$ = this.accessoryService.updateAccessoryMaterials(
+            id,
+            markup,
+            materials,
+            accessoriesPayload,
+            totalMaterialsPrice,
+            totalAccessoriesPrice,
+            totalPrice,
+          );
+          materials$.subscribe({
+            next: finalizeSave,
+            error: (err) => {
               this.isSaving = false;
-              if (this.isEditing) {
-                this.formSubmitted = false;
-              } else {
-                this.resetForm();
-                form.resetForm();
-              }
-              this.saveError = '';
-              this.successMessage = 'Accesorio guardado exitosamente';
-              setTimeout(() => (this.successMessage = ''), 3000);
-              this.updateApiTotals(id);
-            };
-            finalizeSave();
-          },
-          error: (err) => {
-            this.isSaving = false;
-            this.saveError =
-              err?.error?.message || 'Error al guardar materiales';
-          },
-        });
+              this.saveError =
+                err?.error?.message || 'Error al guardar materiales';
+            },
+          });
+        } else {
+          finalizeSave();
+        }
       },
       error: (err) => {
         this.isSaving = false;

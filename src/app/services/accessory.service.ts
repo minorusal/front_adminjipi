@@ -40,6 +40,11 @@ export interface AccessoryMaterial {
   profit_percentage?: number;
 }
 
+export interface AccessoryMaterialPayload
+  extends Omit<AccessoryMaterial, 'accessory_id'> {
+  accessory_id?: number;
+}
+
 export interface PaginatedAccessories {
   docs: Accessory[];
   totalDocs: number;
@@ -92,9 +97,17 @@ export class AccessoryService {
   addAccessory(
     name: string,
     description: string,
-    ownerId: number
+    ownerId: number,
+    materials: AccessoryMaterialPayload[] = [],
+    accessories: AccessoryChildPayload[] = []
   ): Observable<Accessory> {
-    const body = { name, description, owner_id: ownerId };
+    const body: any = { name, description, owner_id: ownerId };
+    if (materials.length) {
+      body.materials = materials;
+    }
+    if (accessories.length) {
+      body.accessories = accessories;
+    }
     return this.http.post<Accessory>(
       `${environment.apiUrl}/accessories`,
       body,
