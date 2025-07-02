@@ -165,9 +165,20 @@ export class AccesoriosComponent implements OnInit {
 
   addChildAccessory(acc: Accessory): void {
     if (!this.selectedChildren.some(a => a.accessory.id === acc.id)) {
-      this.selectedChildren.push({ accessory: acc, quantity: 1 });
+      const sel: SelectedAccessory = { accessory: { ...acc }, quantity: 1 };
+      this.selectedChildren.push(sel);
       this.childSearchText = '';
       this.accessoryResults = [];
+
+      // Fetch full accessory details to populate cost and price
+      this.accessoryService.getAccessory(acc.id).subscribe({
+        next: full => {
+          sel.accessory = { ...sel.accessory, ...full };
+        },
+        error: () => {
+          // ignore error and keep partial data
+        }
+      });
     }
   }
 
