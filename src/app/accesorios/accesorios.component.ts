@@ -171,14 +171,7 @@ export class AccesoriosComponent implements OnInit {
       this.accessoryResults = [];
 
       // Fetch full accessory details to populate cost and price
-      this.accessoryService.getAccessory(acc.id).subscribe({
-        next: full => {
-          sel.accessory = { ...sel.accessory, ...full };
-        },
-        error: () => {
-          // ignore error and keep partial data
-        }
-      });
+      this.populateAccessoryTotals(sel);
     }
   }
 
@@ -200,6 +193,39 @@ export class AccesoriosComponent implements OnInit {
   closeRemoveChildModal(): void {
     this.showRemoveChildModal = false;
     this.childToRemove = null;
+  }
+
+  private populateAccessoryTotals(sel: SelectedAccessory): void {
+    this.accessoryService.getAccessory(sel.accessory.id).subscribe({
+      next: acc => {
+        sel.accessory = { ...sel.accessory, ...acc };
+        if (sel.accessory.cost === undefined || sel.accessory.price === undefined) {
+          this.accessoryService.getAccessoryMaterials(sel.accessory.id).subscribe({
+            next: mats => {
+              const items: any[] = Array.isArray((mats as any).materials)
+                ? (mats as any).materials
+                : Array.isArray(mats)
+                ? (mats as any)
+                : [];
+              let cost = 0;
+              let price = 0;
+              for (const m of items) {
+                cost += Number(m.cost ?? 0);
+                price += Number(m.price ?? 0);
+              }
+              sel.accessory.cost = cost;
+              sel.accessory.price = price;
+            },
+            error: () => {
+              // ignore errors and keep whatever data we have
+            }
+          });
+        }
+      },
+      error: () => {
+        // ignore errors and keep existing partial data
+      }
+    });
   }
 
   confirmRemove(): void {
@@ -339,14 +365,7 @@ export class AccesoriosComponent implements OnInit {
 
             // Fetch full accessory details to ensure name, cost and price are available
             for (const sel of this.selectedChildren) {
-              this.accessoryService.getAccessory(sel.accessory.id).subscribe({
-                next: acc => {
-                  sel.accessory = { ...sel.accessory, ...acc };
-                },
-                error: () => {
-                  // ignore errors and keep existing partial data
-                }
-              });
+              this.populateAccessoryTotals(sel);
             }
           },
           error: () => {
