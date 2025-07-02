@@ -640,16 +640,12 @@ export class AccesoriosComponent implements OnInit {
       next: (acc: Accessory) => {
         const id = this.isEditing && this.editingId !== null ? this.editingId : acc.id;
         const materials: AccessoryMaterial[] = this.selected.map(sel => {
-          const cost = this.calculateCost(sel);
           return {
             accessory_id: id,
             material_id: sel.material.id,
             width: sel.width,
             length: sel.length,
-            quantity: sel.quantity,
-            cost,
-            price: cost * (1 + this.profitPercentage / 100),
-            profit_percentage: this.profitPercentage
+            quantity: sel.quantity
           };
         });
         const materials$ = this.isEditing
