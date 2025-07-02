@@ -666,36 +666,60 @@ export class AccesoriosComponent implements OnInit {
     save$.subscribe({
       next: (acc: Accessory) => {
         const id = this.isEditing && this.editingId !== null ? this.editingId : acc.id;
+        const markup = this.profitPercentage;
         const materials: AccessoryMaterial[] = this.selected.map(sel => {
+          const cost = this.calculateCost(sel);
+          const price = cost * (1 + markup / 100);
+          const unit = this.getMaterialType(sel.material)?.unit;
           return {
             accessory_id: id,
             material_id: sel.material.id,
             width: sel.width,
             length: sel.length,
-            quantity: sel.quantity
-          };
+            unit,
+            quantity: sel.quantity,
+            cost,
+            price
+          } as AccessoryMaterial;
         });
         const accessoriesPayload = this.selectedChildren.map(child => {
           const qty = toNumber(child.quantity);
-          const price = toNumber(child.accessory.price);
-          const cost = toNumber(child.accessory.cost);
+          const cost = toNumber(child.accessory.cost) * qty;
+          const price = cost * (1 + markup / 100);
           return {
             accessory_id: child.accessory.id,
-            price: price * qty,
-            cost: cost * qty,
+            price,
+            cost,
             quantity: child.quantity
           };
         });
+        const totalMaterialsPrice = materials.reduce(
+          (sum, m) => sum + toNumber(m.price),
+          0
+        );
+        const totalAccessoriesPrice = accessoriesPayload.reduce(
+          (sum, a) => sum + toNumber(a.price),
+          0
+        );
+        const totalPrice = totalMaterialsPrice + totalAccessoriesPrice;
         const materials$ = this.isEditing
           ? this.accessoryService.updateAccessoryMaterials(
               id,
+              markup,
               materials,
-              accessoriesPayload
+              accessoriesPayload,
+              totalMaterialsPrice,
+              totalAccessoriesPrice,
+              totalPrice
             )
           : this.accessoryService.addAccessoryMaterials(
               id,
+              markup,
               materials,
-              accessoriesPayload
+              accessoriesPayload,
+              totalMaterialsPrice,
+              totalAccessoriesPrice,
+              totalPrice
             );
         materials$.subscribe({
           next: () => {
