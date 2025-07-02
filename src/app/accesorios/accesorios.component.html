@@ -157,18 +157,35 @@
         <tr class="desc-row">
           <td colspan="2">Resultado de sumar el costo total con la ganancia.</td>
         </tr>
-        <tr *ngIf="apiCost != null || apiPrice != null" class="section-header">
+        <tr class="section-header">
           <th colspan="2">Valores calculados</th>
         </tr>
-        <tr *ngIf="apiCost != null">
+        <tr>
           <th>Costo actualizado</th>
+          <td>{{ combinedCost | number:'1.2-2' }}</td>
+        </tr>
+        <tr class="desc-row">
+          <td colspan="2">Costo total sumando materiales y accesorios.</td>
+        </tr>
+        <tr>
+          <th>Precio actualizado</th>
+          <td>{{ totalWithProfit | number:'1.2-2' }}</td>
+        </tr>
+        <tr class="desc-row">
+          <td colspan="2">Precio final registrado tras aplicar la ganancia.</td>
+        </tr>
+        <tr *ngIf="apiCost != null || apiPrice != null" class="section-header">
+          <th colspan="2">Valores guardados</th>
+        </tr>
+        <tr *ngIf="apiCost != null">
+          <th>Costo guardado</th>
           <td>{{ apiCost | number:'1.2-2' }}</td>
         </tr>
         <tr *ngIf="apiCost != null" class="desc-row">
           <td colspan="2">Costo guardado en el servidor.</td>
         </tr>
         <tr *ngIf="apiPrice != null">
-          <th>Precio actualizado</th>
+          <th>Precio guardado</th>
           <td>{{ apiPrice | number:'1.2-2' }}</td>
         </tr>
         <tr *ngIf="apiPrice != null" class="desc-row">

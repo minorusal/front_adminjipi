@@ -147,6 +147,8 @@ describe('AccesoriosComponent', () => {
 
     expect(component.totalMaterialPrice).toBeCloseTo(28, 2);
     expect(component.totalWithProfit).toBeCloseTo(49, 2);
+    expect(component.combinedCost).toBeCloseTo(35, 2);
+    expect(component.combinedPrice).toBeCloseTo(49, 2);
   });
 
   it('should not fetch totals when accessory already has cost and price', () => {
