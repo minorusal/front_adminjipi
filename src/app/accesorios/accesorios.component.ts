@@ -530,8 +530,12 @@ export class AccesoriosComponent implements OnInit {
     return this.selected.reduce((sum, sel) => sum + this.calculateCost(sel), 0);
   }
 
-  get totalWithProfit(): number {
+  get totalMaterialPrice(): number {
     return this.totalCost * (1 + this.profitPercentage / 100);
+  }
+
+  get totalWithProfit(): number {
+    return this.totalMaterialPrice + this.totalAccessoryPrice;
   }
 
   get totalAccessoryCost(): number {

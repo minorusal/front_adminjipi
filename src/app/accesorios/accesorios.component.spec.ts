@@ -129,6 +129,25 @@ describe('AccesoriosComponent', () => {
     expect(component.totalAccessoryPrice).toBe(38);
   });
 
+  it('should compute material price and total with profit', () => {
+    component.profitPercentage = 40;
+    component.selected = [
+      {
+        material: { id: 1, name: 'Mat', material_type_id: 1, price: 10 } as any,
+        quantity: 2
+      }
+    ] as any;
+    component.selectedChildren = [
+      {
+        accessory: { id: 3, name: 'Child', cost: 5, price: 7 } as any,
+        quantity: 3
+      }
+    ] as any;
+
+    expect(component.totalMaterialPrice).toBeCloseTo(28, 2);
+    expect(component.totalWithProfit).toBeCloseTo(49, 2);
+  });
+
   it('should not fetch totals when accessory already has cost and price', () => {
     const acc: any = { id: 3, name: 'C', cost: 7, price: 9 };
     spyOn<any>(component, 'populateAccessoryTotals');

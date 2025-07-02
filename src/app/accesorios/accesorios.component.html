@@ -114,6 +114,10 @@
           <th>Total accesorios</th>
           <td>{{ totalAccessoryCost | number:'1.2-2' }}</td>
         </tr>
+        <tr>
+          <th>Precio materiales</th>
+          <td>{{ totalMaterialPrice | number:'1.2-2' }}</td>
+        </tr>
         <tr *ngIf="selectedChildren.length">
           <th>Precio accesorios</th>
           <td>{{ totalAccessoryPrice | number:'1.2-2' }}</td>
