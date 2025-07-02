@@ -140,6 +140,11 @@ export class AccessoryService {
     );
   }
 
+  /**
+   * Update the materials used in an accessory. The provided materials payload
+   * omits the `accessory_id` property as it is derived from the supplied
+   * `accessoryId` argument.
+   */
   updateAccessoryMaterials(
     accessoryId: number,
     markupPercentage: number,
