@@ -675,12 +675,17 @@ export class AccesoriosComponent implements OnInit {
             quantity: sel.quantity
           };
         });
-        const accessoriesPayload = this.selectedChildren.map(child => ({
-          accessory_id: child.accessory.id,
-          price: this.calculateChildPrice(child),
-          cost: this.calculateChildCost(child),
-          quantity: child.quantity
-        }));
+        const accessoriesPayload = this.selectedChildren.map(child => {
+          const qty = toNumber(child.quantity);
+          const price = toNumber(child.accessory.price);
+          const cost = toNumber(child.accessory.cost);
+          return {
+            accessory_id: child.accessory.id,
+            price: price * qty,
+            cost: cost * qty,
+            quantity: child.quantity
+          };
+        });
         const materials$ = this.isEditing
           ? this.accessoryService.updateAccessoryMaterials(
               id,
