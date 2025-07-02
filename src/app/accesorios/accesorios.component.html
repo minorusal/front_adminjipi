@@ -130,6 +130,14 @@
           <th>Total + ganancia</th>
           <td>{{ totalWithProfit | number:'1.2-2' }}</td>
         </tr>
+        <tr *ngIf="apiCost != null">
+          <th>Costo actualizado</th>
+          <td>{{ apiCost | number:'1.2-2' }}</td>
+        </tr>
+        <tr *ngIf="apiPrice != null">
+          <th>Precio actualizado</th>
+          <td>{{ apiPrice | number:'1.2-2' }}</td>
+        </tr>
       </tbody>
     </table>
   </div>
