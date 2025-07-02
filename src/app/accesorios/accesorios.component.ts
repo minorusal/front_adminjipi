@@ -698,7 +698,7 @@ export class AccesoriosComponent implements OnInit {
         const accessoriesPayload = this.selectedChildren.map((child) => {
           const qty = toNumber(child.quantity);
           const unitCost = toNumber(child.accessory.cost);
-          const unitPrice = unitCost * (1 + markup / 100);
+          const unitPrice = toNumber(child.accessory.price);
           const cost = unitCost * qty;
           const price = unitPrice * qty;
           return {
