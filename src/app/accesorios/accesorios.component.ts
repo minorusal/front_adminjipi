@@ -444,6 +444,32 @@ export class AccesoriosComponent implements OnInit {
     return type.id === 1 || ident.includes('pieza') || ident.includes('unidad');
   }
 
+  private toNumber(value: any): number {
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : 0;
+    }
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return 0;
+      }
+      // Remove currency symbols and other non-numeric characters
+      const cleaned = trimmed.replace(/[^0-9.,-]/g, '');
+      const lastComma = cleaned.lastIndexOf(',');
+      const lastDot = cleaned.lastIndexOf('.');
+      let normalized = cleaned;
+      if (lastComma > lastDot) {
+        // comma used as decimal separator -> remove dots used as thousands
+        normalized = cleaned.replace(/\./g, '').replace(',', '.');
+      } else {
+        // dot used as decimal separator -> remove commas
+        normalized = cleaned.replace(/,/g, '');
+      }
+      const n = parseFloat(normalized);
+      return Number.isFinite(n) ? n : 0;
+    }
+    return 0;
+  }
 
   isMaterialInfoValid(sel: SelectedMaterial): boolean {
     if (this.isAreaType(sel.material)) {
