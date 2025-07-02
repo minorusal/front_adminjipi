@@ -56,8 +56,6 @@ export class AccesoriosComponent implements OnInit {
   ownerId: number | null = null;
   isEditing = false;
   editingId: number | null = null;
-  apiCost: number | null = null;
-  apiPrice: number | null = null;
   activeTab: 'create' | 'edit' | 'list' = 'create';
   listSearchText = '';
   currentPage = 1;
@@ -279,8 +277,6 @@ export class AccesoriosComponent implements OnInit {
     this.formSubmitted = false;
     this.saveError = '';
     this.successMessage = '';
-    this.apiCost = null;
-    this.apiPrice = null;
   }
 
   setTab(tab: 'create' | 'edit' | 'list'): void {
@@ -604,8 +600,6 @@ export class AccesoriosComponent implements OnInit {
     }
     this.accessoryService.getAccessoryCost(id, this.ownerId).subscribe({
       next: (res) => {
-        this.apiCost = res.cost;
-        this.apiPrice = res.price;
         if (typeof res.profit_percentage === 'number') {
           this.profitPercentage = res.profit_percentage;
         }

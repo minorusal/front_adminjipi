@@ -174,23 +174,6 @@
         <tr class="desc-row">
           <td colspan="2">Precio final registrado tras aplicar la ganancia.</td>
         </tr>
-        <tr *ngIf="apiCost != null || apiPrice != null" class="section-header">
-          <th colspan="2">Valores guardados</th>
-        </tr>
-        <tr *ngIf="apiCost != null">
-          <th>Costo guardado</th>
-          <td>{{ apiCost | number:'1.2-2' }}</td>
-        </tr>
-        <tr *ngIf="apiCost != null" class="desc-row">
-          <td colspan="2">Costo guardado en el servidor.</td>
-        </tr>
-        <tr *ngIf="apiPrice != null">
-          <th>Precio guardado</th>
-          <td>{{ apiPrice | number:'1.2-2' }}</td>
-        </tr>
-        <tr *ngIf="apiPrice != null" class="desc-row">
-          <td colspan="2">Precio final registrado tras aplicar la ganancia.</td>
-        </tr>
       </tbody>
     </table>
   </div>
