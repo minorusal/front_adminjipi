@@ -54,6 +54,8 @@ export class AccesoriosComponent implements OnInit {
   ownerId: number | null = null;
   isEditing = false;
   editingId: number | null = null;
+  apiCost: number | null = null;
+  apiPrice: number | null = null;
   activeTab: 'create' | 'edit' | 'list' = 'create';
   listSearchText = '';
   currentPage = 1;
@@ -247,7 +249,11 @@ export class AccesoriosComponent implements OnInit {
         this.accessoryService
           .deleteAccessoryComponent(this.childToRemove.component_id)
           .subscribe({
-            next: () => {},
+            next: () => {
+              if (this.editingId) {
+                this.updateApiTotals(this.editingId);
+              }
+            },
             error: () => {}
           });
       }
@@ -266,6 +272,8 @@ export class AccesoriosComponent implements OnInit {
     this.formSubmitted = false;
     this.saveError = '';
     this.successMessage = '';
+    this.apiCost = null;
+    this.apiPrice = null;
   }
 
   setTab(tab: 'create' | 'edit' | 'list'): void {
@@ -317,6 +325,7 @@ export class AccesoriosComponent implements OnInit {
       next: acc => {
         this.accessoryName = acc.name;
         this.accessoryDescription = acc.description;
+        this.updateApiTotals(id);
         this.accessoryService.getAccessoryMaterials(id).subscribe({
           next: mats => {
             const materials: any[] = Array.isArray((mats as any).materials)
@@ -575,6 +584,24 @@ export class AccesoriosComponent implements OnInit {
     return cost > 0 ? ((price - cost) / cost) * 100 : 0;
   }
 
+  private updateApiTotals(id: number): void {
+    if (this.ownerId === null || isNaN(this.ownerId)) {
+      return;
+    }
+    this.accessoryService.getAccessoryCost(id, this.ownerId).subscribe({
+      next: res => {
+        this.apiCost = res.cost;
+        this.apiPrice = res.price;
+        if (typeof res.profit_percentage === 'number') {
+          this.profitPercentage = res.profit_percentage;
+        }
+      },
+      error: () => {
+        // ignore errors
+      }
+    });
+  }
+
   submitAccessory(form: any): void {
     if (this.isSaving) {
       return;
@@ -667,6 +694,7 @@ export class AccesoriosComponent implements OnInit {
                 this.saveError = '';
                 this.successMessage = 'Accesorio guardado exitosamente';
                 setTimeout(() => (this.successMessage = ''), 3000);
+                this.updateApiTotals(id);
               };
               for (const child of newChildren) {
                 this.accessoryService
@@ -697,6 +725,7 @@ export class AccesoriosComponent implements OnInit {
                 this.saveError = '';
                 this.successMessage = 'Accesorio guardado exitosamente';
                 setTimeout(() => (this.successMessage = ''), 3000);
+                this.updateApiTotals(id);
               };
               finalizeSave();
             }

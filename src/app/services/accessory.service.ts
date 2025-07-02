@@ -60,6 +60,15 @@ export interface AccessoryComponent {
   child?: Accessory;
 }
 
+export interface AccessoryTotals {
+  accessory_id: number;
+  accessory_name: string;
+  cost: number;
+  price: number;
+  profit_margin: number;
+  profit_percentage: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -185,5 +194,13 @@ export class AccessoryService {
       `${environment.apiUrl}/accessory-components/${id}`,
       this.httpOptions()
     );
+  }
+
+  getAccessoryCost(id: number, ownerId?: number): Observable<AccessoryTotals> {
+    let url = `${environment.apiUrl}/accessories/${id}/cost`;
+    if (ownerId !== undefined) {
+      url += `?owner_id=${ownerId}`;
+    }
+    return this.http.get<AccessoryTotals>(url, this.httpOptions());
   }
 }

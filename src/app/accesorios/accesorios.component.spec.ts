@@ -26,7 +26,8 @@ describe('AccesoriosComponent', () => {
       'updateAccessory',
       'getAccessory',
       'getAccessoryMaterials',
-      'getAccessoryComponents'
+      'getAccessoryComponents',
+      'getAccessoryCost'
     ]);
     TestBed.configureTestingModule({
       declarations: [AccesoriosComponent],
@@ -181,6 +182,16 @@ describe('AccesoriosComponent', () => {
           child: { id: 2, name: 'Child', description: '' }
         }
       ])
+    );
+    (accessoryServiceSpy.getAccessoryCost as jasmine.Spy).and.returnValue(
+      of({
+        accessory_id: 10,
+        accessory_name: 'Parent',
+        cost: 0,
+        price: 0,
+        profit_margin: 0,
+        profit_percentage: 0
+      })
     );
 
     spyOn<any>(component, 'populateAccessoryTotals');
