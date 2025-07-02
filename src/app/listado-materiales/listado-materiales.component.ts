@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { MaterialService, Material, NewMaterial } from '../services/material.service';
 import { MaterialTypeService, MaterialType } from '../services/material-type.service';
+import { toNumber } from '../utils/number-parse';
 
 @Component({
   selector: 'app-listado-materiales',
@@ -91,8 +92,12 @@ export class ListadoMaterialesComponent implements OnInit {
   }
 
   parseNumber(value: string): number | undefined {
-    const n = parseInt(value, 10);
-    return isNaN(n) ? undefined : n;
+    const trimmed = value?.toString().trim();
+    if (!trimmed || !/\d/.test(trimmed)) {
+      return undefined;
+    }
+    const n = toNumber(trimmed);
+    return Number.isFinite(n) ? Math.trunc(n) : undefined;
   }
 
   private getMaterialType(id: number | undefined): MaterialType | undefined {
