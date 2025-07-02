@@ -60,6 +60,13 @@ export interface AccessoryComponent {
   child?: Accessory;
 }
 
+export interface AccessoryChildPayload {
+  accessory_id: number;
+  price: number;
+  cost: number;
+  quantity: number;
+}
+
 export interface AccessoryTotals {
   accessory_id: number;
   accessory_name: string;
@@ -97,9 +104,10 @@ export class AccessoryService {
 
   addAccessoryMaterials(
     accessoryId: number,
-    materials: AccessoryMaterial[]
+    materials: AccessoryMaterial[],
+    accessories: AccessoryChildPayload[] = []
   ): Observable<any> {
-    const body = { accessory_id: accessoryId, materials };
+    const body = { accessory_id: accessoryId, materials, accessories };
     return this.http.post<any>(
       `${environment.apiUrl}/accessory-materials`,
       body,
@@ -109,9 +117,10 @@ export class AccessoryService {
 
   updateAccessoryMaterials(
     accessoryId: number,
-    materials: AccessoryMaterial[]
+    materials: AccessoryMaterial[],
+    accessories: AccessoryChildPayload[] = []
   ): Observable<any> {
-    const body = { accessory_id: accessoryId, materials };
+    const body = { accessory_id: accessoryId, materials, accessories };
     return this.http.put<any>(
       `${environment.apiUrl}/accessory-materials/${accessoryId}`,
       body,

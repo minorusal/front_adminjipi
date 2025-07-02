@@ -675,60 +675,39 @@ export class AccesoriosComponent implements OnInit {
             quantity: sel.quantity
           };
         });
+        const accessoriesPayload = this.selectedChildren.map(child => ({
+          accessory_id: child.accessory.id,
+          price: this.calculateChildPrice(child),
+          cost: this.calculateChildCost(child),
+          quantity: child.quantity
+        }));
         const materials$ = this.isEditing
-          ? this.accessoryService.updateAccessoryMaterials(id, materials)
-          : this.accessoryService.addAccessoryMaterials(id, materials);
+          ? this.accessoryService.updateAccessoryMaterials(
+              id,
+              materials,
+              accessoriesPayload
+            )
+          : this.accessoryService.addAccessoryMaterials(
+              id,
+              materials,
+              accessoriesPayload
+            );
         materials$.subscribe({
           next: () => {
-            const newChildren = this.selectedChildren.filter(c => !c.component_id);
-            if (newChildren.length) {
-              let pending = newChildren.length;
-              const finalizeSave = () => {
-                this.isSaving = false;
-                if (this.isEditing) {
-                  this.formSubmitted = false;
-                } else {
-                  this.resetForm();
-                  form.resetForm();
-                }
-                this.saveError = '';
-                this.successMessage = 'Accesorio guardado exitosamente';
-                setTimeout(() => (this.successMessage = ''), 3000);
-                this.updateApiTotals(id);
-              };
-              for (const child of newChildren) {
-                this.accessoryService
-                  .addAccessoryComponent(id, child.accessory.id, child.quantity)
-                  .subscribe({
-                    next: res => {
-                      child.component_id = res.id;
-                      if (--pending === 0) {
-                        finalizeSave();
-                      }
-                    },
-                    error: () => {
-                      if (--pending === 0) {
-                        finalizeSave();
-                      }
-                    }
-                  });
+            const finalizeSave = () => {
+              this.isSaving = false;
+              if (this.isEditing) {
+                this.formSubmitted = false;
+              } else {
+                this.resetForm();
+                form.resetForm();
               }
-            } else {
-              const finalizeSave = () => {
-                this.isSaving = false;
-                if (this.isEditing) {
-                  this.formSubmitted = false;
-                } else {
-                  this.resetForm();
-                  form.resetForm();
-                }
-                this.saveError = '';
-                this.successMessage = 'Accesorio guardado exitosamente';
-                setTimeout(() => (this.successMessage = ''), 3000);
-                this.updateApiTotals(id);
-              };
-              finalizeSave();
-            }
+              this.saveError = '';
+              this.successMessage = 'Accesorio guardado exitosamente';
+              setTimeout(() => (this.successMessage = ''), 3000);
+              this.updateApiTotals(id);
+            };
+            finalizeSave();
           },
           error: err => {
             this.isSaving = false;
