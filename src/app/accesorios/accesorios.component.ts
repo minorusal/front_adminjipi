@@ -210,8 +210,8 @@ export class AccesoriosComponent implements OnInit {
               let cost = 0;
               let price = 0;
               for (const m of items) {
-                cost += Number(m.cost ?? 0);
-                price += Number(m.price ?? 0);
+                cost += this.toNumber(m.cost);
+                price += this.toNumber(m.price);
               }
               sel.accessory.cost = cost;
               sel.accessory.price = price;
