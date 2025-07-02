@@ -8,6 +8,7 @@ import {
   AccessoryMaterial,
   Accessory
 } from '../services/accessory.service';
+import { toNumber } from '../utils/number-parse';
 
 interface SelectedAccessory {
   accessory: Accessory;
@@ -210,8 +211,8 @@ export class AccesoriosComponent implements OnInit {
               let cost = 0;
               let price = 0;
               for (const m of items) {
-                cost += this.toNumber(m.cost);
-                price += this.toNumber(m.price);
+                cost += toNumber(m.cost);
+                price += toNumber(m.price);
               }
               sel.accessory.cost = cost;
               sel.accessory.price = price;
@@ -443,34 +444,6 @@ export class AccesoriosComponent implements OnInit {
     return type.id === 1 || ident.includes('pieza') || ident.includes('unidad');
   }
 
-  private toNumber(value: any): number {
-    if (typeof value === 'number') {
-      return Number.isFinite(value) ? value : 0;
-    }
-    if (typeof value === 'string') {
-      const trimmed = value.trim();
-      if (!trimmed) {
-        return 0;
-      }
-      // Remove spaces and currency symbols
-      const cleaned = trimmed.replace(/[^0-9.,-]/g, '').replace(/\s/g, '');
-      const lastComma = cleaned.lastIndexOf(',');
-      const lastDot = cleaned.lastIndexOf('.');
-      let normalized = cleaned;
-      if (lastComma > lastDot) {
-        // comma used as decimal separator -> remove dots as thousands
-        normalized = cleaned.replace(/\./g, '').replace(',', '.');
-      } else if (lastDot > lastComma) {
-        // dot used as decimal separator -> remove commas
-        normalized = cleaned.replace(/,/g, '');
-      } else {
-        normalized = cleaned.replace(/,/g, '');
-      }
-      const n = parseFloat(normalized);
-      return Number.isFinite(n) ? n : 0;
-    }
-    return 0;
-  }
 
   isMaterialInfoValid(sel: SelectedMaterial): boolean {
     if (this.isAreaType(sel.material)) {
@@ -494,12 +467,12 @@ export class AccesoriosComponent implements OnInit {
   }
 
   calculateCost(sel: SelectedMaterial): number {
-    const price = this.toNumber(sel.material.price);
+    const price = toNumber(sel.material.price);
     if (this.isAreaType(sel.material)) {
-      const width = this.toNumber(sel.width);
-      const length = this.toNumber(sel.length);
-      const baseWidth = this.toNumber(sel.material.width_m);
-      const baseLength = this.toNumber(sel.material.length_m);
+      const width = toNumber(sel.width);
+      const length = toNumber(sel.length);
+      const baseWidth = toNumber(sel.material.width_m);
+      const baseLength = toNumber(sel.material.length_m);
       const baseArea = baseWidth * baseLength;
       const area = width * length;
       if (baseArea > 0) {
@@ -508,7 +481,7 @@ export class AccesoriosComponent implements OnInit {
       return area * price;
     }
     if (this.isPieceType(sel.material)) {
-      const qty = this.toNumber(sel.quantity);
+      const qty = toNumber(sel.quantity);
       return qty * price;
     }
     return price;
@@ -524,29 +497,29 @@ export class AccesoriosComponent implements OnInit {
 
   get totalAccessoryCost(): number {
     return this.selectedChildren.reduce((sum, child) => {
-      const qty = this.toNumber(child.quantity ?? 1);
-      const cost = this.toNumber(child.accessory?.cost);
+      const qty = toNumber(child.quantity ?? 1);
+      const cost = toNumber(child.accessory?.cost);
       return sum + cost * qty;
     }, 0);
   }
 
   get totalAccessoryPrice(): number {
     return this.selectedChildren.reduce((sum, child) => {
-      const qty = this.toNumber(child.quantity ?? 1);
-      const price = this.toNumber(child.accessory?.price);
+      const qty = toNumber(child.quantity ?? 1);
+      const price = toNumber(child.accessory?.price);
       return sum + price * qty;
     }, 0);
   }
 
   calculateChildCost(child: SelectedAccessory): number {
-    const qty = this.toNumber(child.quantity ?? 1);
-    const cost = this.toNumber(child.accessory?.cost);
+    const qty = toNumber(child.quantity ?? 1);
+    const cost = toNumber(child.accessory?.cost);
     return cost * qty;
   }
 
   calculateChildPrice(child: SelectedAccessory): number {
-    const qty = this.toNumber(child.quantity ?? 1);
-    const price = this.toNumber(child.accessory?.price);
+    const qty = toNumber(child.quantity ?? 1);
+    const price = toNumber(child.accessory?.price);
     return price * qty;
   }
 
@@ -554,8 +527,8 @@ export class AccesoriosComponent implements OnInit {
     if (!acc || acc.cost === undefined || acc.price === undefined) {
       return 0;
     }
-    const cost = this.toNumber(acc.cost);
-    const price = this.toNumber(acc.price);
+    const cost = toNumber(acc.cost);
+    const price = toNumber(acc.price);
     return cost > 0 ? ((price - cost) / cost) * 100 : 0;
   }
 
