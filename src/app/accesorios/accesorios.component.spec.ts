@@ -7,6 +7,7 @@ import { MaterialService } from '../services/material.service';
 import { MaterialTypeService } from '../services/material-type.service';
 import { CookieService } from '../services/cookie.service';
 import { AccessoryService } from '../services/accessory.service';
+import { of } from 'rxjs';
 
 describe('AccesoriosComponent', () => {
   let component: AccesoriosComponent;
@@ -23,7 +24,9 @@ describe('AccesoriosComponent', () => {
       'addAccessoryMaterials',
       'updateAccessoryMaterials',
       'updateAccessory',
-      'getAccessory'
+      'getAccessory',
+      'getAccessoryMaterials',
+      'getAccessoryComponents'
     ]);
     TestBed.configureTestingModule({
       declarations: [AccesoriosComponent],
@@ -136,6 +139,40 @@ describe('AccesoriosComponent', () => {
     expect(component.selectedChildren.length).toBe(1);
     expect(component.selectedChildren[0].accessory.cost).toBe(7);
     expect(component.selectedChildren[0].accessory.price).toBe(9);
+  });
+
+  it('should load component cost and price from API response', () => {
+    (accessoryServiceSpy.getAccessory as jasmine.Spy).and.returnValue(of({
+      id: 10,
+      name: 'Parent',
+      description: 'P'
+    } as any));
+    (accessoryServiceSpy.getAccessoryMaterials as jasmine.Spy).and.returnValue(
+      of([])
+    );
+    (accessoryServiceSpy.getAccessoryComponents as jasmine.Spy).and.returnValue(
+      of([
+        {
+          id: 1,
+          parent_accessory_id: 10,
+          child_accessory_id: 2,
+          quantity: 5,
+          cost: 7.57,
+          price: 10.6,
+          child: { id: 2, name: 'Child', description: '' }
+        }
+      ])
+    );
+
+    spyOn<any>(component, 'populateAccessoryTotals');
+
+    (component as any).loadAccessory(10);
+
+    expect(component.selectedChildren.length).toBe(1);
+    const child = component.selectedChildren[0];
+    expect(child.accessory.cost).toBe(7.57);
+    expect(child.accessory.price).toBe(10.6);
+    expect((component as any).populateAccessoryTotals).not.toHaveBeenCalled();
   });
 
   it('should convert different numeric formats to numbers', () => {
