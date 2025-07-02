@@ -104,10 +104,22 @@ export class AccessoryService {
 
   addAccessoryMaterials(
     accessoryId: number,
+    markupPercentage: number,
     materials: AccessoryMaterial[],
-    accessories: AccessoryChildPayload[] = []
+    accessories: AccessoryChildPayload[] = [],
+    totalMaterialsPrice?: number,
+    totalAccessoriesPrice?: number,
+    totalPrice?: number
   ): Observable<any> {
-    const body = { accessory_id: accessoryId, materials, accessories };
+    const body = {
+      accessory_id: accessoryId,
+      markup_percentage: markupPercentage,
+      materials,
+      accessories,
+      total_materials_price: totalMaterialsPrice,
+      total_accessories_price: totalAccessoriesPrice,
+      total_price: totalPrice
+    };
     return this.http.post<any>(
       `${environment.apiUrl}/accessory-materials`,
       body,
@@ -117,10 +129,22 @@ export class AccessoryService {
 
   updateAccessoryMaterials(
     accessoryId: number,
+    markupPercentage: number,
     materials: AccessoryMaterial[],
-    accessories: AccessoryChildPayload[] = []
+    accessories: AccessoryChildPayload[] = [],
+    totalMaterialsPrice?: number,
+    totalAccessoriesPrice?: number,
+    totalPrice?: number
   ): Observable<any> {
-    const body = { accessory_id: accessoryId, materials, accessories };
+    const body = {
+      accessory_id: accessoryId,
+      markup_percentage: markupPercentage,
+      materials,
+      accessories,
+      total_materials_price: totalMaterialsPrice,
+      total_accessories_price: totalAccessoriesPrice,
+      total_price: totalPrice
+    };
     return this.http.put<any>(
       `${environment.apiUrl}/accessory-materials/${accessoryId}`,
       body,
