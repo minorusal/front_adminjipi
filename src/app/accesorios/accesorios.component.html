@@ -77,7 +77,7 @@
           placeholder="Buscar materiales"
           [(ngModel)]="searchText"
           name="search"
-          [ngModelOptions]="{ standalone: true, updateOn: 'input' }"
+          [ngModelOptions]="{ standalone: true, updateOn: 'change' }"
           (input)="onSearchChange()"
         />
       </div>
@@ -94,7 +94,7 @@
           placeholder="Buscar accesorios"
           [(ngModel)]="childSearchText"
           name="searchChild"
-          [ngModelOptions]="{ standalone: true, updateOn: 'input' }"
+          [ngModelOptions]="{ standalone: true, updateOn: 'change' }"
           (input)="onAccessorySearchChange()"
         />
       </div>
@@ -200,7 +200,7 @@
                 min="0"
                 class="dim-input"
                 [(ngModel)]="sel.length"
-                [ngModelOptions]="{ standalone: true, updateOn: 'input' }"
+                [ngModelOptions]="{ standalone: true, updateOn: 'change' }"
                 placeholder="Largo"
                 (input)="onMaterialInput(sel)"
               />
@@ -209,7 +209,7 @@
                 min="0"
                 class="dim-input"
                 [(ngModel)]="sel.width"
-                [ngModelOptions]="{ standalone: true, updateOn: 'input' }"
+                [ngModelOptions]="{ standalone: true, updateOn: 'change' }"
                 placeholder="Ancho"
                 (input)="onMaterialInput(sel)"
               />
@@ -221,7 +221,7 @@
                   min="0"
                 class="dim-input"
                 [(ngModel)]="sel.quantity"
-                [ngModelOptions]="{ standalone: true, updateOn: 'input' }"
+                [ngModelOptions]="{ standalone: true, updateOn: 'change' }"
                 placeholder="Piezas"
                 (input)="onMaterialInput(sel)"
               />
@@ -273,7 +273,7 @@
               min="1"
               class="dim-input"
               [(ngModel)]="child.quantity"
-              [ngModelOptions]="{ standalone: true, updateOn: 'input' }"
+              [ngModelOptions]="{ standalone: true, updateOn: 'change' }"
             />
           </td>
           <td>{{ calculateChildCost(child) | number:'1.2-2' }}</td>
