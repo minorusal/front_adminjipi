@@ -448,7 +448,20 @@ export class AccesoriosComponent implements OnInit {
       return Number.isFinite(value) ? value : 0;
     }
     if (typeof value === 'string') {
-      const sanitized = value.replace(/,/g, '');
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return 0;
+      }
+      const hasComma = trimmed.includes(',');
+      const hasDot = trimmed.includes('.');
+      let sanitized = trimmed;
+      if (hasComma && !hasDot) {
+        // treat comma as decimal separator when no dot is present
+        sanitized = sanitized.replace(',', '.');
+      } else {
+        // otherwise assume commas are thousands separators
+        sanitized = sanitized.replace(/,/g, '');
+      }
       const n = parseFloat(sanitized);
       return Number.isFinite(n) ? n : 0;
     }
