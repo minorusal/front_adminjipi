@@ -126,6 +126,18 @@ describe('AccesoriosComponent', () => {
     expect(component.totalAccessoryPrice).toBe(38);
   });
 
+  it('should not fetch totals when accessory already has cost and price', () => {
+    const acc: any = { id: 3, name: 'C', cost: 7, price: 9 };
+    spyOn<any>(component, 'populateAccessoryTotals');
+
+    component.addChildAccessory(acc);
+
+    expect((component as any).populateAccessoryTotals).not.toHaveBeenCalled();
+    expect(component.selectedChildren.length).toBe(1);
+    expect(component.selectedChildren[0].accessory.cost).toBe(7);
+    expect(component.selectedChildren[0].accessory.price).toBe(9);
+  });
+
   it('should convert different numeric formats to numbers', () => {
     const toNumber = (component as any).toNumber.bind(component);
 
