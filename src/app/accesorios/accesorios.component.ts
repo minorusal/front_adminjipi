@@ -679,7 +679,7 @@ export class AccesoriosComponent implements OnInit {
       next: (acc: Accessory) => {
         const id =
           this.isEditing && this.editingId !== null ? this.editingId : acc.id;
-        const markup = this.profitPercentage;
+        const markup = toNumber(this.profitPercentage);
         const materials: AccessoryMaterial[] = this.selected.map((sel) => {
           const cost = this.calculateCost(sel);
           const price = cost * (1 + markup / 100);
@@ -687,10 +687,10 @@ export class AccesoriosComponent implements OnInit {
           return {
             accessory_id: id,
             material_id: sel.material.id,
-            width: sel.width,
-            length: sel.length,
+            width: toNumber(sel.width),
+            length: toNumber(sel.length),
             unit,
-            quantity: sel.quantity,
+            quantity: toNumber(sel.quantity),
             cost,
             price,
           } as AccessoryMaterial;
