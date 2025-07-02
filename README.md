@@ -19,12 +19,21 @@ Angular environment files (see next section).
 The following routes are used in `AccesoriosComponent` for creating and
 updating accessories and their materials/components:
 
-- `POST /accessories`
+- `POST /accessories` Crea un accesorio y puede incluir los campos `materials`
+  y `accessories` para vincularlos en la misma solicitud. La respuesta devuelve
+  los totales de costo y precio calculados.
 - `PUT /accessories/:id`
-- `POST /accessory-materials`
+- `POST /accessory-materials` Vincula materiales a un accesorio de forma
+  independiente. Cuando se envían `cost` o `price` se multiplican por
+  `quantity` para guardar el total.
 - `PUT /accessory-materials/:id`
 - `POST /accessory-components`
 - `DELETE /accessory-components/:id`
+
+Al incluir `materials` o `accessories` en la petición de creación, cada
+elemento debe respetar el formato documentado por la API. La respuesta
+contiene los totales `total_materials_price`, `total_accessories_price` y
+`total_price` calculados para el nuevo accesorio.
 
 When an accessory is saved, the backend must calculate and persist
 `cost`, `price` and `profit_percentage` so that the frontend does not have
