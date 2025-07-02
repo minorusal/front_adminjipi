@@ -125,4 +125,20 @@ describe('AccesoriosComponent', () => {
     expect(component.totalAccessoryCost).toBe(25);
     expect(component.totalAccessoryPrice).toBe(38);
   });
+
+  it('should parse different number formats', () => {
+    const toNumber = (component as any).toNumber.bind(component);
+
+    expect(toNumber('10,6')).toBeCloseTo(10.6, 5);
+    expect(toNumber('10.6')).toBeCloseTo(10.6, 5);
+    expect(toNumber('1.234,56')).toBeCloseTo(1234.56, 5);
+    expect(toNumber('1,234.56')).toBeCloseTo(1234.56, 5);
+  });
+
+  it('should handle currency symbols and whitespace', () => {
+    const toNumber = (component as any).toNumber.bind(component);
+
+    expect(toNumber(' $1,234.56 ')).toBeCloseTo(1234.56, 5);
+    expect(toNumber('\u20AC\u00A01.234,56')).toBeCloseTo(1234.56, 5);
+  });
 });
