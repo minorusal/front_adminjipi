@@ -452,18 +452,16 @@ export class AccesoriosComponent implements OnInit {
       if (!trimmed) {
         return 0;
       }
-      // Remove spaces and currency symbols
-      const cleaned = trimmed.replace(/[^0-9.,-]/g, '').replace(/\s/g, '');
+      // Remove currency symbols and other non-numeric characters
+      const cleaned = trimmed.replace(/[^0-9.,-]/g, '');
       const lastComma = cleaned.lastIndexOf(',');
       const lastDot = cleaned.lastIndexOf('.');
       let normalized = cleaned;
       if (lastComma > lastDot) {
-        // comma used as decimal separator -> remove dots as thousands
+        // comma used as decimal separator -> remove dots used as thousands
         normalized = cleaned.replace(/\./g, '').replace(',', '.');
-      } else if (lastDot > lastComma) {
-        // dot used as decimal separator -> remove commas
-        normalized = cleaned.replace(/,/g, '');
       } else {
+        // dot used as decimal separator -> remove commas
         normalized = cleaned.replace(/,/g, '');
       }
       const n = parseFloat(normalized);

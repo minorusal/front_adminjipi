@@ -125,4 +125,14 @@ describe('AccesoriosComponent', () => {
     expect(component.totalAccessoryCost).toBe(25);
     expect(component.totalAccessoryPrice).toBe(38);
   });
+
+  it('should convert different numeric formats to numbers', () => {
+    const toNumber = (component as any).toNumber.bind(component);
+
+    expect(toNumber('1,234.56')).toBeCloseTo(1234.56, 2);
+    expect(toNumber('1.234,56')).toBeCloseTo(1234.56, 2);
+    expect(toNumber('$ 1 234,56')).toBeCloseTo(1234.56, 2);
+    expect(toNumber('')).toBe(0);
+    expect(toNumber('abc')).toBe(0);
+  });
 });
