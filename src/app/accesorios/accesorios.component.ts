@@ -27,6 +27,8 @@ interface SelectedMaterial {
   material: Material;
   width?: number;
   length?: number;
+  /** Unit of measure used when editing an existing accessory */
+  unit?: string;
   quantity?: number;
   _invalid?: boolean;
 }
@@ -355,6 +357,7 @@ export class AccesoriosComponent implements OnInit {
                 material: mat,
                 width: m.width ?? m.width_m_used,
                 length: m.length ?? m.length_m_used,
+                unit: m.unit,
                 quantity: m.quantity,
               } as SelectedMaterial;
             });
@@ -477,6 +480,28 @@ export class AccesoriosComponent implements OnInit {
     return type.id === 1 || ident.includes('pieza') || ident.includes('unidad');
   }
 
+  /** Determine if the selected material should be treated as area based on its unit */
+  isAreaSel(sel: SelectedMaterial): boolean {
+    const unit = sel.unit ?? this.getMaterialType(sel.material)?.unit;
+    if (unit) {
+      const ident = unit.toLowerCase();
+      return (
+        ident.includes('m2') || ident.includes('m²') || ident.includes('area') || ident.includes('área')
+      );
+    }
+    return this.isAreaType(sel.material);
+  }
+
+  /** Determine if the selected material should be treated as piece/unit based on its unit */
+  isPieceSel(sel: SelectedMaterial): boolean {
+    const unit = sel.unit ?? this.getMaterialType(sel.material)?.unit;
+    if (unit) {
+      const ident = unit.toLowerCase();
+      return ident.includes('unit') || ident.includes('pieza') || ident.includes('unidad');
+    }
+    return this.isPieceType(sel.material);
+  }
+
   private toNumber(value: any): number {
     if (typeof value === 'number') {
       return Number.isFinite(value) ? value : 0;
@@ -505,10 +530,10 @@ export class AccesoriosComponent implements OnInit {
   }
 
   isMaterialInfoValid(sel: SelectedMaterial): boolean {
-    if (this.isAreaType(sel.material)) {
+    if (this.isAreaSel(sel)) {
       return !!sel.width && sel.width > 0 && !!sel.length && sel.length > 0;
     }
-    if (this.isPieceType(sel.material)) {
+    if (this.isPieceSel(sel)) {
       return !!sel.quantity && sel.quantity > 0;
     }
     return true;
@@ -522,7 +547,7 @@ export class AccesoriosComponent implements OnInit {
 
   calculateCost(sel: SelectedMaterial): number {
     const price = toNumber(sel.material.price);
-    if (this.isAreaType(sel.material)) {
+    if (this.isAreaSel(sel)) {
       const width = toNumber(sel.width);
       const length = toNumber(sel.length);
       const baseWidth = toNumber(sel.material.width_m);
@@ -534,7 +559,7 @@ export class AccesoriosComponent implements OnInit {
       }
       return area * price;
     }
-    if (this.isPieceType(sel.material)) {
+    if (this.isPieceSel(sel)) {
       const qty = toNumber(sel.quantity);
       return qty * price;
     }
@@ -704,7 +729,7 @@ export class AccesoriosComponent implements OnInit {
     const materialsDetailed: AccessoryMaterialDetail[] = this.selected.map((sel) => {
       const cost = this.calculateCost(sel);
       const price = cost * (1 + markup / 100);
-      const unit = this.isAreaType(sel.material) ? 'm²' : 'unit';
+      const unit = this.isAreaSel(sel) ? 'm²' : 'unit';
       return {
         material_id: sel.material.id,
         width: toNumber(sel.width),

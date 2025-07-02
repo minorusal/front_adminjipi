@@ -25,6 +25,8 @@ export interface AccessoryMaterial {
   material?: Material;
   /** Material type identifier when returned from the API */
   material_type_id?: number;
+  /** Unit of measure for the material when returned from the API */
+  unit?: string;
   /**
    * Values used when the material is measured by area.
    * For backwards compatibility the API might also return `width`/`length`.
