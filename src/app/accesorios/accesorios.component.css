@@ -157,6 +157,17 @@ th {
   text-align: left;
 }
 
+.summary-table .section-header th {
+  background-color: #565869;
+  text-align: center;
+}
+
+.summary-table .desc-row td {
+  background-color: #3b3b4b;
+  font-size: 0.85rem;
+  color: #ccc;
+}
+
 .dim-input {
   width: 70px;
   margin-right: 0.25rem;

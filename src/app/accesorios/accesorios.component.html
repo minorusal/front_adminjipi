@@ -106,37 +106,73 @@
 
     <table class="summary-table">
       <tbody>
+        <tr class="section-header">
+          <th colspan="2">Materiales</th>
+        </tr>
         <tr>
           <th>Total materiales</th>
           <td>{{ totalCost | number:'1.2-2' }}</td>
         </tr>
-        <tr *ngIf="selectedChildren.length">
-          <th>Total accesorios</th>
-          <td>{{ totalAccessoryCost | number:'1.2-2' }}</td>
+        <tr class="desc-row">
+          <td colspan="2">Suma de los costos individuales de los materiales agregados.</td>
         </tr>
         <tr>
           <th>Precio materiales</th>
           <td>{{ totalMaterialPrice | number:'1.2-2' }}</td>
         </tr>
+        <tr class="desc-row">
+          <td colspan="2">Monto que se cobrará por los materiales seleccionados.</td>
+        </tr>
+        <tr *ngIf="selectedChildren.length" class="section-header">
+          <th colspan="2">Accesorios hijos</th>
+        </tr>
+        <tr *ngIf="selectedChildren.length">
+          <th>Total accesorios</th>
+          <td>{{ totalAccessoryCost | number:'1.2-2' }}</td>
+        </tr>
+        <tr *ngIf="selectedChildren.length" class="desc-row">
+          <td colspan="2">Suma de costos de cada accesorio hijo por su cantidad.</td>
+        </tr>
         <tr *ngIf="selectedChildren.length">
           <th>Precio accesorios</th>
           <td>{{ totalAccessoryPrice | number:'1.2-2' }}</td>
+        </tr>
+        <tr *ngIf="selectedChildren.length" class="desc-row">
+          <td colspan="2">Precio total calculado para los accesorios hijos.</td>
+        </tr>
+        <tr class="section-header">
+          <th colspan="2">Ganancia</th>
         </tr>
         <tr>
           <th>Porcentaje de ganancia</th>
           <td>{{ profitPercentage | number:'1.2-2' }}%</td>
         </tr>
+        <tr class="desc-row">
+          <td colspan="2">Porcentaje aplicado al costo total para obtener la utilidad.</td>
+        </tr>
         <tr>
           <th>Total + ganancia</th>
           <td>{{ totalWithProfit | number:'1.2-2' }}</td>
+        </tr>
+        <tr class="desc-row">
+          <td colspan="2">Resultado de sumar el costo total con la ganancia.</td>
+        </tr>
+        <tr *ngIf="apiCost != null || apiPrice != null" class="section-header">
+          <th colspan="2">Valores calculados</th>
         </tr>
         <tr *ngIf="apiCost != null">
           <th>Costo actualizado</th>
           <td>{{ apiCost | number:'1.2-2' }}</td>
         </tr>
+        <tr *ngIf="apiCost != null" class="desc-row">
+          <td colspan="2">Costo guardado en el servidor.</td>
+        </tr>
         <tr *ngIf="apiPrice != null">
           <th>Precio actualizado</th>
           <td>{{ apiPrice | number:'1.2-2' }}</td>
+        </tr>
+        <tr *ngIf="apiPrice != null" class="desc-row">
+          <td colspan="2">Precio final registrado tras aplicar la ganancia.</td>
         </tr>
       </tbody>
     </table>
