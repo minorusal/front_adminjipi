@@ -171,8 +171,11 @@ export class AccesoriosComponent implements OnInit {
       this.childSearchText = '';
       this.accessoryResults = [];
 
-      // Fetch full accessory details to populate cost and price
-      this.populateAccessoryTotals(sel);
+      // Fetch full accessory details to populate cost and price only when
+      // the selected accessory lacks this information.
+      if (acc.cost === undefined || acc.price === undefined) {
+        this.populateAccessoryTotals(sel);
+      }
     }
   }
 
