@@ -443,6 +443,18 @@ export class AccesoriosComponent implements OnInit {
     return type.id === 1 || ident.includes('pieza') || ident.includes('unidad');
   }
 
+  private toNumber(value: any): number {
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : 0;
+    }
+    if (typeof value === 'string') {
+      const sanitized = value.replace(/,/g, '');
+      const n = parseFloat(sanitized);
+      return Number.isFinite(n) ? n : 0;
+    }
+    return 0;
+  }
+
   isMaterialInfoValid(sel: SelectedMaterial): boolean {
     if (this.isAreaType(sel.material)) {
       return (
@@ -465,12 +477,12 @@ export class AccesoriosComponent implements OnInit {
   }
 
   calculateCost(sel: SelectedMaterial): number {
-    const price = sel.material.price ?? 0;
+    const price = this.toNumber(sel.material.price);
     if (this.isAreaType(sel.material)) {
-      const width = sel.width ?? 0;
-      const length = sel.length ?? 0;
-      const baseWidth = sel.material.width_m ?? 0;
-      const baseLength = sel.material.length_m ?? 0;
+      const width = this.toNumber(sel.width);
+      const length = this.toNumber(sel.length);
+      const baseWidth = this.toNumber(sel.material.width_m);
+      const baseLength = this.toNumber(sel.material.length_m);
       const baseArea = baseWidth * baseLength;
       const area = width * length;
       if (baseArea > 0) {
@@ -479,7 +491,7 @@ export class AccesoriosComponent implements OnInit {
       return area * price;
     }
     if (this.isPieceType(sel.material)) {
-      const qty = sel.quantity ?? 0;
+      const qty = this.toNumber(sel.quantity);
       return qty * price;
     }
     return price;
@@ -495,29 +507,29 @@ export class AccesoriosComponent implements OnInit {
 
   get totalAccessoryCost(): number {
     return this.selectedChildren.reduce((sum, child) => {
-      const qty = child.quantity ?? 1;
-      const cost = child.accessory?.cost ?? 0;
+      const qty = this.toNumber(child.quantity ?? 1);
+      const cost = this.toNumber(child.accessory?.cost);
       return sum + cost * qty;
     }, 0);
   }
 
   get totalAccessoryPrice(): number {
     return this.selectedChildren.reduce((sum, child) => {
-      const qty = child.quantity ?? 1;
-      const price = child.accessory?.price ?? 0;
+      const qty = this.toNumber(child.quantity ?? 1);
+      const price = this.toNumber(child.accessory?.price);
       return sum + price * qty;
     }, 0);
   }
 
   calculateChildCost(child: SelectedAccessory): number {
-    const qty = child.quantity ?? 1;
-    const cost = child.accessory?.cost ?? 0;
+    const qty = this.toNumber(child.quantity ?? 1);
+    const cost = this.toNumber(child.accessory?.cost);
     return cost * qty;
   }
 
   calculateChildPrice(child: SelectedAccessory): number {
-    const qty = child.quantity ?? 1;
-    const price = child.accessory?.price ?? 0;
+    const qty = this.toNumber(child.quantity ?? 1);
+    const price = this.toNumber(child.accessory?.price);
     return price * qty;
   }
 
@@ -525,8 +537,8 @@ export class AccesoriosComponent implements OnInit {
     if (!acc || acc.cost === undefined || acc.price === undefined) {
       return 0;
     }
-    const cost = Number(acc.cost);
-    const price = Number(acc.price);
+    const cost = this.toNumber(acc.cost);
+    const price = this.toNumber(acc.price);
     return cost > 0 ? ((price - cost) / cost) * 100 : 0;
   }
 
