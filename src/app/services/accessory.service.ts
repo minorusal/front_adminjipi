@@ -53,6 +53,10 @@ export interface AccessoryComponent {
   parent_accessory_id: number;
   child_accessory_id: number;
   quantity: number;
+  /** Cost for the specified quantity */
+  cost?: number;
+  /** Price for the specified quantity */
+  price?: number;
   child?: Accessory;
 }
 

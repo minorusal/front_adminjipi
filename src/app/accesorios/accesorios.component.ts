@@ -355,10 +355,15 @@ export class AccesoriosComponent implements OnInit {
               ? (comps as any)
               : [];
             this.selectedChildren = items.map(c => {
-              const child: Accessory = (c as any).child ?? {
+              const base: Accessory = (c as any).child ?? {
                 id: c.child_accessory_id,
                 name: (c as any).child_name ?? '',
                 description: (c as any).child_description ?? ''
+              };
+              const child: Accessory = {
+                ...base,
+                cost: c.cost,
+                price: c.price
               };
               return {
                 accessory: child,
@@ -369,7 +374,12 @@ export class AccesoriosComponent implements OnInit {
 
             // Fetch full accessory details to ensure name, cost and price are available
             for (const sel of this.selectedChildren) {
-              this.populateAccessoryTotals(sel);
+              if (
+                sel.accessory.cost === undefined ||
+                sel.accessory.price === undefined
+              ) {
+                this.populateAccessoryTotals(sel);
+              }
             }
           },
           error: () => {
