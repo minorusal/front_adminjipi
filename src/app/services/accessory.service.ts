@@ -143,7 +143,7 @@ export class AccessoryService {
   updateAccessoryMaterials(
     accessoryId: number,
     markupPercentage: number,
-    materials: AccessoryMaterial[],
+    materials: AccessoryMaterialPayload[],
     accessories: AccessoryChildPayload[] = [],
     totalMaterialsPrice?: number,
     totalAccessoriesPrice?: number,
