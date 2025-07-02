@@ -10,6 +10,9 @@ import {
   AccessoryService,
   AccessoryMaterial,
   AccessoryMaterialPayload,
+  AccessoryCreatePayload,
+  AccessoryMaterialDetail,
+  AccessoryChildDetail,
   Accessory,
 } from '../services/accessory.service';
 import { toNumber } from '../utils/number-parse';
@@ -698,6 +701,47 @@ export class AccesoriosComponent implements OnInit {
       };
     });
 
+    const materialsDetailed: AccessoryMaterialDetail[] = this.selected.map((sel) => {
+      const cost = this.calculateCost(sel);
+      const price = cost * (1 + markup / 100);
+      const unit = this.isAreaType(sel.material) ? 'm²' : 'unit';
+      return {
+        material_id: sel.material.id,
+        width: toNumber(sel.width),
+        length: toNumber(sel.length),
+        unit,
+        quantity: toNumber(sel.quantity),
+        cost,
+        price,
+        investment: toNumber(sel.material.price),
+        description: sel.material.description,
+      } as AccessoryMaterialDetail;
+    });
+    const accessoriesDetailed: AccessoryChildDetail[] = this.selectedChildren.map((child) => {
+      return {
+        accessory_id: child.accessory.id,
+        name: child.accessory.name,
+        quantity: toNumber(child.quantity),
+        cost: this.calculateChildCost(child),
+        price: this.calculateChildPrice(child),
+      } as AccessoryChildDetail;
+    });
+
+    const payload: AccessoryCreatePayload = {
+      name,
+      description,
+      owner_id: ownerId,
+      markup_percentage: markup,
+      materials: materialsDetailed,
+      accessories: accessoriesDetailed,
+      total_materials_cost: this.totalCost,
+      total_materials_price: this.totalMaterialPrice,
+      total_accessories_cost: this.totalAccessoryCost,
+      total_accessories_price: this.totalAccessoryPrice,
+      total_cost: this.combinedCost,
+      total_price: this.combinedPrice,
+    };
+
     const save$ =
       this.isEditing && this.editingId !== null
         ? this.accessoryService.updateAccessory(
@@ -705,13 +749,7 @@ export class AccesoriosComponent implements OnInit {
             name,
             description,
           )
-        : this.accessoryService.addAccessory(
-            name,
-            description,
-            ownerId,
-            materials,
-            accessoriesPayload,
-          );
+        : this.accessoryService.createAccessoryDetailed(payload);
 
     save$.subscribe({
       next: (acc: Accessory) => {

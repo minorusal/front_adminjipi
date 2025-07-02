@@ -72,6 +72,41 @@ export interface AccessoryChildPayload {
   quantity: number;
 }
 
+export interface AccessoryMaterialDetail {
+  material_id: number;
+  width?: number;
+  length?: number;
+  unit: string;
+  quantity?: number;
+  cost: number;
+  price: number;
+  investment: number;
+  description: string;
+}
+
+export interface AccessoryChildDetail {
+  accessory_id: number;
+  name: string;
+  quantity: number;
+  cost: number;
+  price: number;
+}
+
+export interface AccessoryCreatePayload {
+  name: string;
+  description: string;
+  owner_id: number;
+  markup_percentage: number;
+  materials: AccessoryMaterialDetail[];
+  accessories: AccessoryChildDetail[];
+  total_materials_cost: number;
+  total_materials_price: number;
+  total_accessories_cost: number;
+  total_accessories_price: number;
+  total_cost: number;
+  total_price: number;
+}
+
 export interface AccessoryTotals {
   accessory_id: number;
   accessory_name: string;
@@ -111,6 +146,14 @@ export class AccessoryService {
     return this.http.post<Accessory>(
       `${environment.apiUrl}/accessories`,
       body,
+      this.httpOptions()
+    );
+  }
+
+  createAccessoryDetailed(payload: AccessoryCreatePayload): Observable<Accessory> {
+    return this.http.post<Accessory>(
+      `${environment.apiUrl}/accessories`,
+      payload,
       this.httpOptions()
     );
   }
