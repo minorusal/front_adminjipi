@@ -66,6 +66,8 @@ export class AccesoriosComponent implements OnInit {
   ownerId: number | null = null;
   isEditing = false;
   editingId: number | null = null;
+  /** Flag to avoid recalculating costs while loading from API */
+  initializingMaterials = false;
   activeTab: 'create' | 'edit' | 'list' = 'create';
   listSearchText = '';
   currentPage = 1;
@@ -334,6 +336,7 @@ export class AccesoriosComponent implements OnInit {
   }
 
   private loadAccessory(id: number): void {
+    this.initializingMaterials = true;
     this.accessoryService.getAccessory(id).subscribe({
       next: (acc) => {
         this.accessoryName = acc.name;
@@ -373,9 +376,11 @@ export class AccesoriosComponent implements OnInit {
                 investment: basePrice,
               } as SelectedMaterial;
             });
+            this.initializingMaterials = false;
           },
           error: () => {
             this.selected = [];
+            this.initializingMaterials = false;
           },
         });
         this.accessoryService.getAccessoryComponents(id).subscribe({
@@ -552,6 +557,9 @@ export class AccesoriosComponent implements OnInit {
   }
 
   onMaterialInput(sel: SelectedMaterial): void {
+    if (this.initializingMaterials) {
+      return;
+    }
     if (sel._invalid && this.isMaterialInfoValid(sel)) {
       sel._invalid = false;
     }
@@ -580,7 +588,12 @@ export class AccesoriosComponent implements OnInit {
   }
 
   get totalCost(): number {
-    return this.selected.reduce((sum, sel) => sum + this.calculateCost(sel), 0);
+    return this.selected.reduce((sum, sel) => {
+      if (this.isEditing && sel.cost !== undefined) {
+        return sum + toNumber(sel.cost);
+      }
+      return sum + this.calculateCost(sel);
+    }, 0);
   }
 
   get totalMaterialPrice(): number {
@@ -712,7 +725,10 @@ export class AccesoriosComponent implements OnInit {
 
     const markup = toNumber(this.profitPercentage);
     const materials: AccessoryMaterialPayload[] = this.selected.map((sel) => {
-      const cost = this.calculateCost(sel);
+      const cost =
+        this.isEditing && sel.cost !== undefined
+          ? toNumber(sel.cost)
+          : this.calculateCost(sel);
       const price = cost * (1 + markup / 100);
       const unit = this.getMaterialType(sel.material)?.unit;
       return {
@@ -740,7 +756,10 @@ export class AccesoriosComponent implements OnInit {
     });
 
     const materialsDetailed: AccessoryMaterialDetail[] = this.selected.map((sel) => {
-      const cost = this.calculateCost(sel);
+      const cost =
+        this.isEditing && sel.cost !== undefined
+          ? toNumber(sel.cost)
+          : this.calculateCost(sel);
       const price = cost * (1 + markup / 100);
       const unit = this.isAreaSel(sel) ? 'm²' : 'unit';
       return {
