@@ -404,17 +404,40 @@ export class AccesoriosComponent implements OnInit {
                 length_m: m.length_m,
                 price: basePrice,
               };
+              const width = this.toNumber(m.width ?? m.width_m_used);
+              const length = this.toNumber(m.length ?? m.length_m_used);
               const cost = this.toNumber(m.cost);
               return {
                 material: mat,
-                width: this.toNumber(m.width ?? m.width_m_used),
-                length: this.toNumber(m.length ?? m.length_m_used),
+                width,
+                length,
                 unit: m.unit,
                 quantity: this.toNumber(m.quantity),
                 cost,
                 investment: basePrice,
               } as SelectedMaterial;
             });
+
+            // Recalculate costs for area-based materials when not provided
+            for (const sel of this.selected) {
+              if (this.isAreaSel(sel) && (!sel.cost || sel.cost === 0)) {
+                sel.cost = this.calculateCost(sel);
+              }
+            }
+
+            // If API totals were missing, derive them from the loaded materials
+            const calcTotal = this.selected.reduce(
+              (sum, sel) => sum + this.toNumber(sel.cost),
+              0,
+            );
+            if (!this.apiTotals.total_materials_cost) {
+              this.apiTotals.total_materials_cost = calcTotal;
+            }
+            if (!this.apiTotals.total_materials_price) {
+              this.apiTotals.total_materials_price =
+                calcTotal * (1 + this.profitPercentage / 100);
+            }
+
             this.initializingMaterials = false;
           },
           error: () => {
