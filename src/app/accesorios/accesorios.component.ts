@@ -347,10 +347,11 @@ export class AccesoriosComponent implements OnInit {
                 ? (mats as any)
                 : [];
             this.selected = materials.map((m) => {
-              const basePrice =
+              const basePrice = this.toNumber(
                 (m as any).investment ??
-                (m as any).material?.price ??
-                m.price;
+                  (m as any).material?.price ??
+                  m.price,
+              );
               const mat: Material = (m as any).material ?? {
                 id: m.material_id ?? m.id,
                 name: m.material_name ?? m.name,
@@ -361,13 +362,14 @@ export class AccesoriosComponent implements OnInit {
                 length_m: m.length_m,
                 price: basePrice,
               };
+              const cost = this.toNumber(m.cost);
               return {
                 material: mat,
-                width: m.width ?? m.width_m_used,
-                length: m.length ?? m.length_m_used,
+                width: this.toNumber(m.width ?? m.width_m_used),
+                length: this.toNumber(m.length ?? m.length_m_used),
                 unit: m.unit,
-                quantity: m.quantity,
-                cost: m.cost,
+                quantity: this.toNumber(m.quantity),
+                cost,
                 investment: basePrice,
               } as SelectedMaterial;
             });
