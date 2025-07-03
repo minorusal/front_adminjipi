@@ -22,7 +22,10 @@ updating accessories and their materials/components:
 - `POST /accessories` Crea un accesorio y puede incluir los campos `materials`
   y `accessories` para vincularlos en la misma solicitud. La respuesta devuelve
   los totales de costo y precio calculados.
-- `PUT /accessories/:id`
+- `PUT /accessories/:id` Actualiza un accesorio existente. Solo envía los
+  campos básicos (`name`, `description`, `markup_percentage`, `owner_id`,
+  `materials` y `accessories`). Los totales de costo y precio se recalculan en
+  el servidor y **no** deben incluirse en el payload.
 - `POST /accessory-materials` Vincula materiales a un accesorio de forma
   independiente. Cuando se envían `cost` o `price` se multiplican por
   `quantity` para guardar el total.

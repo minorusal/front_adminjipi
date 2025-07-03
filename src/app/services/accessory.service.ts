@@ -130,11 +130,6 @@ export interface AccessoryUpdatePayload {
   markup_percentage: number;
   materials: AccessoryMaterialDetail[];
   accessories: AccessoryChildDetail[];
-  totals: {
-    total_materials_cost: number;
-    total_accessories_cost: number;
-    total_cost: number;
-  };
 }
 
 export interface AccessoryTotals {
