@@ -30,6 +30,10 @@ interface SelectedMaterial {
   /** Unit of measure used when editing an existing accessory */
   unit?: string;
   quantity?: number;
+  /** Stored cost for this material selection */
+  cost?: number;
+  /** Base investment of the material */
+  investment?: number;
   _invalid?: boolean;
 }
 
@@ -166,7 +170,7 @@ export class AccesoriosComponent implements OnInit {
 
   addMaterial(mat: Material): void {
     if (!this.selected.some((m) => m.material.id === mat.id)) {
-      this.selected.push({ material: mat });
+      this.selected.push({ material: mat, investment: mat.price, cost: undefined });
       this.searchText = '';
       this.results = [];
     }
@@ -343,6 +347,10 @@ export class AccesoriosComponent implements OnInit {
                 ? (mats as any)
                 : [];
             this.selected = materials.map((m) => {
+              const basePrice =
+                (m as any).investment ??
+                (m as any).material?.price ??
+                m.price;
               const mat: Material = (m as any).material ?? {
                 id: m.material_id ?? m.id,
                 name: m.material_name ?? m.name,
@@ -351,7 +359,7 @@ export class AccesoriosComponent implements OnInit {
                 thickness_mm: m.thickness_mm,
                 width_m: m.width_m,
                 length_m: m.length_m,
-                price: m.price,
+                price: basePrice,
               };
               return {
                 material: mat,
@@ -359,6 +367,8 @@ export class AccesoriosComponent implements OnInit {
                 length: m.length ?? m.length_m_used,
                 unit: m.unit,
                 quantity: m.quantity,
+                cost: m.cost,
+                investment: basePrice,
               } as SelectedMaterial;
             });
           },
@@ -543,6 +553,7 @@ export class AccesoriosComponent implements OnInit {
     if (sel._invalid && this.isMaterialInfoValid(sel)) {
       sel._invalid = false;
     }
+    sel.cost = this.calculateCost(sel);
   }
 
   calculateCost(sel: SelectedMaterial): number {
@@ -738,7 +749,7 @@ export class AccesoriosComponent implements OnInit {
         quantity: toNumber(sel.quantity),
         cost,
         price,
-        investment: toNumber(sel.material.price),
+        investment: toNumber(sel.investment ?? sel.material.price),
         description: sel.material.description,
       } as AccessoryMaterialDetail;
     });
