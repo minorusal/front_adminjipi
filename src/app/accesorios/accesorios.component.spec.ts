@@ -24,6 +24,7 @@ describe('AccesoriosComponent', () => {
       'addAccessoryMaterials',
       'updateAccessoryMaterials',
       'updateAccessory',
+      'updateAccessoryDetailed',
       'getAccessory',
       'getAccessoryMaterials',
       'getAccessoryComponents',

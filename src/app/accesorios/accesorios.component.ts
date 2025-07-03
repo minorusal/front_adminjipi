@@ -11,6 +11,7 @@ import {
   AccessoryMaterial,
   AccessoryMaterialPayload,
   AccessoryCreatePayload,
+  AccessoryUpdatePayload,
   AccessoryMaterialDetail,
   AccessoryChildDetail,
   Accessory,
@@ -615,6 +616,12 @@ export class AccesoriosComponent implements OnInit {
 
   calculateCost(sel: SelectedMaterial): number {
     const price = toNumber(sel.material.price);
+    const investment = toNumber(sel.investment ?? sel.material.price);
+    if (sel.unit === 'm²') {
+      const width = toNumber(sel.width);
+      const length = toNumber(sel.length);
+      return width * length * investment;
+    }
     if (this.isAreaSel(sel)) {
       const width = toNumber(sel.width);
       const length = toNumber(sel.length);
@@ -792,43 +799,13 @@ export class AccesoriosComponent implements OnInit {
     this.isSaving = true;
 
     const markup = toNumber(this.profitPercentage);
-    const materials: AccessoryMaterialPayload[] = this.selected.map((sel) => {
-      const cost =
-        this.isEditing && sel.cost !== undefined
-          ? toNumber(sel.cost)
-          : this.calculateCost(sel);
-      const price = cost * (1 + markup / 100);
-      const unit = this.getMaterialType(sel.material)?.unit;
-      return {
-        material_id: sel.material.id,
-        width: toNumber(sel.width),
-        length: toNumber(sel.length),
-        unit,
-        quantity: toNumber(sel.quantity),
-        cost,
-        price,
-      } as AccessoryMaterialPayload;
-    });
-    const accessoriesPayload = this.selectedChildren.map((child) => {
-      const qty = toNumber(child.quantity);
-      const unitCost = toNumber(child.accessory.cost);
-      const unitPrice = toNumber(child.accessory.price);
-      const cost = unitCost * qty;
-      const price = unitPrice * qty;
-      return {
-        accessory_id: child.accessory.id,
-        price,
-        cost,
-        quantity: qty,
-      };
-    });
 
     const materialsDetailed: AccessoryMaterialDetail[] = this.selected.map((sel) => {
       const cost =
         this.isEditing && sel.cost !== undefined
           ? toNumber(sel.cost)
           : this.calculateCost(sel);
-      const price = cost * (1 + markup / 100);
+      const price = cost + (markup / 100) * cost;
       const unit = this.isAreaSel(sel) ? 'm²' : 'unit';
       return {
         material_id: sel.material.id,
@@ -867,28 +844,29 @@ export class AccesoriosComponent implements OnInit {
       total_price: this.combinedPrice,
     };
 
+    const updatePayload = {
+      name,
+      description,
+      owner_id: ownerId,
+      markup_percentage: markup,
+      materials: materialsDetailed,
+      accessories: accessoriesDetailed,
+      totals: {
+        total_materials_cost: this.totalCost,
+        total_accessories_cost: this.totalAccessoryCost,
+        total_cost: this.combinedCost,
+      },
+    } as AccessoryUpdatePayload;
+
     const save$ =
       this.isEditing && this.editingId !== null
-        ? this.accessoryService.updateAccessory(
-            this.editingId,
-            name,
-            description,
-          )
+        ? this.accessoryService.updateAccessoryDetailed(this.editingId, updatePayload)
         : this.accessoryService.createAccessoryDetailed(payload);
 
     save$.subscribe({
       next: (acc: Accessory) => {
         const id =
           this.isEditing && this.editingId !== null ? this.editingId : acc.id;
-        const totalMaterialsPrice = materials.reduce(
-          (sum, m) => sum + toNumber(m.price),
-          0,
-        );
-        const totalAccessoriesPrice = accessoriesPayload.reduce(
-          (sum, a) => sum + toNumber(a.price),
-          0,
-        );
-        const totalPrice = totalMaterialsPrice + totalAccessoriesPrice;
         const finalizeSave = () => {
           this.isSaving = false;
           if (this.isEditing) {
@@ -912,27 +890,7 @@ export class AccesoriosComponent implements OnInit {
           this.totalsDirty = false;
         };
 
-        if (this.isEditing) {
-          const materials$ = this.accessoryService.updateAccessoryMaterials(
-            id,
-            markup,
-            materials,
-            accessoriesPayload,
-            totalMaterialsPrice,
-            totalAccessoriesPrice,
-            totalPrice,
-          );
-          materials$.subscribe({
-            next: finalizeSave,
-            error: (err) => {
-              this.isSaving = false;
-              this.saveError =
-                err?.error?.message || 'Error al guardar materiales';
-            },
-          });
-        } else {
-          finalizeSave();
-        }
+        finalizeSave();
       },
       error: (err) => {
         this.isSaving = false;
