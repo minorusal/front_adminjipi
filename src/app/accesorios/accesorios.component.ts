@@ -66,6 +66,17 @@ export class AccesoriosComponent implements OnInit {
   ownerId: number | null = null;
   isEditing = false;
   editingId: number | null = null;
+  /** Totals loaded from the API when editing */
+  apiTotals = {
+    total_materials_cost: 0,
+    total_materials_price: 0,
+    total_accessories_cost: 0,
+    total_accessories_price: 0,
+    total_cost: 0,
+    total_price: 0,
+  };
+  /** Whether totals should be recalculated after user edits */
+  totalsDirty = false;
   /** Flag to avoid recalculating costs while loading from API */
   initializingMaterials = false;
   activeTab: 'create' | 'edit' | 'list' = 'create';
@@ -175,6 +186,7 @@ export class AccesoriosComponent implements OnInit {
       this.selected.push({ material: mat, investment: mat.price, cost: undefined });
       this.searchText = '';
       this.results = [];
+      this.totalsDirty = true;
     }
   }
 
@@ -184,6 +196,7 @@ export class AccesoriosComponent implements OnInit {
       this.selectedChildren.push(sel);
       this.childSearchText = '';
       this.accessoryResults = [];
+      this.totalsDirty = true;
 
       // Fetch full accessory details to populate cost and price only when
       // the selected accessory lacks this information.
@@ -257,6 +270,7 @@ export class AccesoriosComponent implements OnInit {
         (m) => m.material.id !== this.materialToRemove!.material.id,
       );
     }
+    this.totalsDirty = true;
     this.closeRemoveModal();
   }
 
@@ -278,6 +292,7 @@ export class AccesoriosComponent implements OnInit {
         (c) => c.accessory.id !== this.childToRemove!.accessory.id,
       );
     }
+    this.totalsDirty = true;
     this.closeRemoveChildModal();
   }
 
@@ -286,6 +301,15 @@ export class AccesoriosComponent implements OnInit {
     this.accessoryDescription = '';
     this.selected = [];
     this.selectedChildren = [];
+    this.apiTotals = {
+      total_materials_cost: 0,
+      total_materials_price: 0,
+      total_accessories_cost: 0,
+      total_accessories_price: 0,
+      total_cost: 0,
+      total_price: 0,
+    };
+    this.totalsDirty = false;
     this.formSubmitted = false;
     this.saveError = '';
     this.successMessage = '';
@@ -341,6 +365,21 @@ export class AccesoriosComponent implements OnInit {
       next: (acc) => {
         this.accessoryName = acc.name;
         this.accessoryDescription = acc.description;
+        this.apiTotals = {
+          total_materials_cost: this.toNumber((acc as any).total_materials_cost),
+          total_materials_price: this.toNumber((acc as any).total_materials_price),
+          total_accessories_cost: this.toNumber((acc as any).total_accessories_cost),
+          total_accessories_price: this.toNumber((acc as any).total_accessories_price),
+          total_cost: this.toNumber((acc as any).total_cost),
+          total_price: this.toNumber((acc as any).total_price),
+        };
+        if ((acc as any).markup_percentage !== undefined) {
+          const mp = this.toNumber((acc as any).markup_percentage);
+          if (!Number.isNaN(mp)) {
+            this.profitPercentage = mp;
+          }
+        }
+        this.totalsDirty = false;
         this.updateApiTotals(id);
         this.accessoryService.getAccessoryMaterials(id).subscribe({
           next: (mats) => {
@@ -564,6 +603,11 @@ export class AccesoriosComponent implements OnInit {
       sel._invalid = false;
     }
     sel.cost = this.calculateCost(sel);
+    this.totalsDirty = true;
+  }
+
+  onChildInput(): void {
+    this.totalsDirty = true;
   }
 
   calculateCost(sel: SelectedMaterial): number {
@@ -588,6 +632,9 @@ export class AccesoriosComponent implements OnInit {
   }
 
   get totalCost(): number {
+    if (this.isEditing && !this.totalsDirty) {
+      return this.toNumber(this.apiTotals.total_materials_cost);
+    }
     return this.selected.reduce((sum, sel) => {
       if (this.isEditing && sel.cost !== undefined) {
         return sum + toNumber(sel.cost);
@@ -597,14 +644,23 @@ export class AccesoriosComponent implements OnInit {
   }
 
   get totalMaterialPrice(): number {
+    if (this.isEditing && !this.totalsDirty) {
+      return this.toNumber(this.apiTotals.total_materials_price);
+    }
     return this.totalCost * (1 + this.profitPercentage / 100);
   }
 
   get totalWithProfit(): number {
+    if (this.isEditing && !this.totalsDirty) {
+      return this.toNumber(this.apiTotals.total_price);
+    }
     return this.totalMaterialPrice + this.totalAccessoryPrice;
   }
 
   get totalAccessoryCost(): number {
+    if (this.isEditing && !this.totalsDirty) {
+      return this.toNumber(this.apiTotals.total_accessories_cost);
+    }
     return this.selectedChildren.reduce((sum, child) => {
       const qty = toNumber(child.quantity ?? 1);
       const cost = toNumber(child.accessory?.cost);
@@ -613,6 +669,9 @@ export class AccesoriosComponent implements OnInit {
   }
 
   get totalAccessoryPrice(): number {
+    if (this.isEditing && !this.totalsDirty) {
+      return this.toNumber(this.apiTotals.total_accessories_price);
+    }
     return this.selectedChildren.reduce((sum, child) => {
       const qty = toNumber(child.quantity ?? 1);
       const price = toNumber(child.accessory?.price);
@@ -621,10 +680,16 @@ export class AccesoriosComponent implements OnInit {
   }
 
   get combinedCost(): number {
+    if (this.isEditing && !this.totalsDirty) {
+      return this.toNumber(this.apiTotals.total_cost);
+    }
     return this.totalCost + this.totalAccessoryCost;
   }
 
   get combinedPrice(): number {
+    if (this.isEditing && !this.totalsDirty) {
+      return this.toNumber(this.apiTotals.total_price);
+    }
     return this.totalWithProfit;
   }
 
@@ -833,6 +898,15 @@ export class AccesoriosComponent implements OnInit {
           this.successMessage = 'Accesorio guardado exitosamente';
           setTimeout(() => (this.successMessage = ''), 3000);
           this.updateApiTotals(id);
+          this.apiTotals = {
+            total_materials_cost: this.totalCost,
+            total_materials_price: this.totalMaterialPrice,
+            total_accessories_cost: this.totalAccessoryCost,
+            total_accessories_price: this.totalAccessoryPrice,
+            total_cost: this.combinedCost,
+            total_price: this.combinedPrice,
+          };
+          this.totalsDirty = false;
         };
 
         if (this.isEditing) {
