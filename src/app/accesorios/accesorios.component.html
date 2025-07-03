@@ -277,8 +277,8 @@
               (input)="onChildInput()"
             />
           </td>
-          <td>{{ calculateChildCost(child) | number:'1.2-2' }}</td>
-          <td>{{ calculateChildPrice(child) | number:'1.2-2' }}</td>
+          <td>{{ child.accessory.cost | number:'1.2-2' }}</td>
+          <td>{{ child.accessory.price | number:'1.2-2' }}</td>
           <td>
             <button
               type="button"
