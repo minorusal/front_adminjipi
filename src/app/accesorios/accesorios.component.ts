@@ -621,11 +621,7 @@ export class AccesoriosComponent implements OnInit {
   calculateCost(sel: SelectedMaterial): number {
     const price = toNumber(sel.material.price);
     const investment = toNumber(sel.investment ?? sel.material.price);
-    if (sel.unit === 'm²') {
-      const width = toNumber(sel.width);
-      const length = toNumber(sel.length);
-      return width * length * investment;
-    }
+
     if (this.isAreaSel(sel)) {
       const width = toNumber(sel.width);
       const length = toNumber(sel.length);
@@ -633,10 +629,15 @@ export class AccesoriosComponent implements OnInit {
       const baseLength = toNumber(sel.material.length_m);
       const baseArea = baseWidth * baseLength;
       const area = width * length;
+
+      const totalPrice = investment > 0 ? investment : price;
+
       if (baseArea > 0) {
-        return (area / baseArea) * price;
+        const costPerSq = totalPrice / baseArea;
+        return costPerSq * area;
       }
-      return area * price;
+
+      return area * totalPrice;
     }
     if (this.isPieceSel(sel)) {
       const qty = toNumber(sel.quantity);

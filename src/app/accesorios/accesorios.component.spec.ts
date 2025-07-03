@@ -102,6 +102,28 @@ describe('AccesoriosComponent', () => {
     expect(cost).toBeCloseTo(600, 2);
   });
 
+  it('should compute area cost using base dimensions when unit is m²', () => {
+    const mat = {
+      id: 3,
+      name: 'MDF',
+      description: 'Board',
+      material_type_id: 2,
+      price: 1000,
+      width_m: 1.22,
+      length_m: 2.44
+    } as any;
+
+    component.materialTypes = [
+      { id: 2, name: 'Area', unit: 'm2', description: '' } as any
+    ];
+
+    const sel: any = { material: mat, width: 0.6, length: 0.3, unit: 'm²' };
+
+    const cost = component.calculateCost(sel);
+
+    expect(cost).toBeCloseTo(60.47, 2);
+  });
+
   it('should filter accessories by search text', () => {
     component.accessories = [
       { id: 1, name: 'Alpha', description: 'Primero' } as any,
