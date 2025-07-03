@@ -436,19 +436,22 @@ export class AccesoriosComponent implements OnInit {
                 ? (comps as any)
                 : [];
             this.selectedChildren = items.map((c) => {
+              const qty = this.toNumber(c.quantity ?? 1);
               const base: Accessory = (c as any).child ?? {
                 id: c.child_accessory_id,
                 name: (c as any).child_name ?? '',
                 description: (c as any).child_description ?? '',
               };
+              const cost = this.toNumber(c.cost);
+              const price = this.toNumber(c.price);
               const child: Accessory = {
                 ...base,
-                cost: c.cost,
-                price: c.price,
+                cost: qty > 0 ? cost / qty : cost,
+                price: qty > 0 ? price / qty : price,
               };
               return {
                 accessory: child,
-                quantity: c.quantity ?? 1,
+                quantity: qty,
                 component_id: c.id,
               } as SelectedAccessory;
             });
