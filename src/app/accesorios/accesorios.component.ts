@@ -420,10 +420,12 @@ export class AccesoriosComponent implements OnInit {
             });
 
             this.initializingMaterials = false;
+            this.recalcApiTotalsFromSelection();
           },
           error: () => {
             this.selected = [];
             this.initializingMaterials = false;
+            this.recalcApiTotalsFromSelection();
           },
         });
         this.accessoryService.getAccessoryComponents(id).subscribe({
@@ -460,9 +462,11 @@ export class AccesoriosComponent implements OnInit {
                 this.populateAccessoryTotals(sel);
               }
             }
+            this.recalcApiTotalsFromSelection();
           },
           error: () => {
             this.selectedChildren = [];
+            this.recalcApiTotalsFromSelection();
           },
         });
       },
@@ -724,6 +728,41 @@ export class AccesoriosComponent implements OnInit {
     return cost > 0 ? ((price - cost) / cost) * 100 : 0;
   }
 
+  /**
+   * When editing an accessory the backend might not return the aggregated
+   * totals. Recompute them from the selected materials and child accessories so
+   * the summary table shows correct values.
+   */
+  private recalcApiTotalsFromSelection(): void {
+    const markup = this.toNumber(this.profitPercentage);
+
+    const materialCost = this.selected.reduce((sum, sel) => {
+      const c =
+        sel.cost !== undefined ? this.toNumber(sel.cost) : this.calculateCost(sel);
+      return sum + c;
+    }, 0);
+
+    const accessoryCost = this.selectedChildren.reduce(
+      (sum, child) => sum + this.calculateChildCost(child),
+      0
+    );
+
+    const materialPrice = materialCost * (1 + markup / 100);
+    const accessoryPrice = this.selectedChildren.reduce(
+      (sum, child) => sum + this.calculateChildPrice(child),
+      0
+    );
+
+    this.apiTotals = {
+      total_materials_cost: materialCost,
+      total_materials_price: materialPrice,
+      total_accessories_cost: accessoryCost,
+      total_accessories_price: accessoryPrice,
+      total_cost: materialCost + accessoryCost,
+      total_price: materialPrice + accessoryPrice,
+    };
+  }
+
   private updateApiTotals(id: number): void {
     if (this.ownerId === null || isNaN(this.ownerId)) {
       return;
@@ -733,6 +772,7 @@ export class AccesoriosComponent implements OnInit {
         if (typeof res.profit_percentage === 'number') {
           this.profitPercentage = res.profit_percentage;
         }
+        this.recalcApiTotalsFromSelection();
       },
       error: () => {
         // ignore errors
