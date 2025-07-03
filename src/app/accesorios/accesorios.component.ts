@@ -847,17 +847,22 @@ export class AccesoriosComponent implements OnInit {
           : this.calculateCost(sel);
       const price = cost + (markup / 100) * cost;
       const unit = this.isAreaSel(sel) ? 'm²' : 'unit';
-      return {
+      const detail: AccessoryMaterialDetail = {
         material_id: sel.material.id,
         width: toNumber(sel.width),
         length: toNumber(sel.length),
         unit,
-        quantity: toNumber(sel.quantity),
         cost,
         price,
         investment: toNumber(sel.investment ?? sel.material.price),
         description: sel.material.description,
-      } as AccessoryMaterialDetail;
+      };
+
+      if (unit !== 'm²') {
+        detail.quantity = toNumber(sel.quantity);
+      }
+
+      return detail;
     });
     const accessoriesDetailed: AccessoryChildDetail[] = this.selectedChildren.map((child) => {
       return {
