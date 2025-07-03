@@ -13,6 +13,20 @@ export interface Accessory {
   cost?: number;
   /** Final price including profit percentage */
   price?: number;
+  /** Stored markup percentage */
+  markup_percentage?: number;
+  /** Total cost of all materials */
+  total_materials_cost?: number;
+  /** Total price of all materials */
+  total_materials_price?: number;
+  /** Total cost of all child accessories */
+  total_accessories_cost?: number;
+  /** Total price of all child accessories */
+  total_accessories_price?: number;
+  /** Combined materials and accessories cost */
+  total_cost?: number;
+  /** Final price including profit */
+  total_price?: number;
   owner_id?: number;
   created_at?: string;
   updated_at?: string;
