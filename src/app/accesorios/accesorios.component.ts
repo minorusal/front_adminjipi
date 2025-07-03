@@ -896,11 +896,6 @@ export class AccesoriosComponent implements OnInit {
       markup_percentage: markup,
       materials: materialsDetailed,
       accessories: accessoriesDetailed,
-      totals: {
-        total_materials_cost: this.totalCost,
-        total_accessories_cost: this.totalAccessoryCost,
-        total_cost: this.combinedCost,
-      },
     } as AccessoryUpdatePayload;
 
     const save$ =
@@ -925,12 +920,12 @@ export class AccesoriosComponent implements OnInit {
           setTimeout(() => (this.successMessage = ''), 3000);
           this.updateApiTotals(id);
           this.apiTotals = {
-            total_materials_cost: this.totalCost,
-            total_materials_price: this.totalMaterialPrice,
-            total_accessories_cost: this.totalAccessoryCost,
-            total_accessories_price: this.totalAccessoryPrice,
-            total_cost: this.combinedCost,
-            total_price: this.combinedPrice,
+            total_materials_cost: this.toNumber((acc as any).total_materials_cost),
+            total_materials_price: this.toNumber((acc as any).total_materials_price),
+            total_accessories_cost: this.toNumber((acc as any).total_accessories_cost),
+            total_accessories_price: this.toNumber((acc as any).total_accessories_price),
+            total_cost: this.toNumber((acc as any).total_cost),
+            total_price: this.toNumber((acc as any).total_price),
           };
           this.totalsDirty = false;
         };
