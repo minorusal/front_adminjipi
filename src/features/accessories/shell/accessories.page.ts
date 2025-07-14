@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MaterialService, Material } from '../services/material.service';
+import { MaterialService, Material } from '../../../app/core/services/material.service';
 import {
   MaterialTypeService,
   MaterialType,
-} from '../services/material-type.service';
-import { CookieService } from '../services/cookie.service';
+} from '../../../app/core/services/material-type.service';
+import { CookieService } from '../../../app/core/services/cookie.service';
 import {
   AccessoryService,
   AccessoryMaterial,
@@ -15,8 +15,8 @@ import {
   AccessoryMaterialDetail,
   AccessoryChildDetail,
   Accessory,
-} from '../services/accessory.service';
-import { toNumber } from '../utils/number-parse';
+} from '../../../app/core/services/accessory.service';
+import { toNumber } from '../../../app/shared/utils/number-parse';
 
 interface SelectedAccessory {
   accessory: Accessory;
@@ -39,11 +39,11 @@ interface SelectedMaterial {
 }
 
 @Component({
-  selector: 'app-accesorios',
-  templateUrl: './accesorios.component.html',
-  styleUrls: ['./accesorios.component.css'],
+  selector: 'app-accessories',
+  templateUrl: './accessories.page.html',
+  styleUrls: ['./accessories.page.css'],
 })
-export class AccesoriosComponent implements OnInit {
+export class AccessoriesPage implements OnInit {
   searchText = '';
   results: Material[] = [];
   selected: SelectedMaterial[] = [];

@@ -2,26 +2,26 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ListadoMaterialesComponent } from './listado-materiales.component';
-import { MaterialService } from '../services/material.service';
-import { MaterialTypeService } from '../services/material-type.service';
-import { CookieService } from '../services/cookie.service';
-import { environment } from '../../environments/environment';
+import { MaterialsPage } from './materials.page';
+import { MaterialService } from '../../../app/core/services/material.service';
+import { MaterialTypeService } from '../../../app/core/services/material-type.service';
+import { CookieService } from '../../../app/core/services/cookie.service';
+import { environment } from '../../../environments/environment';
 
-describe('ListadoMaterialesComponent', () => {
-  let component: ListadoMaterialesComponent;
-  let fixture: ComponentFixture<ListadoMaterialesComponent>;
+describe('MaterialsPage', () => {
+  let component: MaterialsPage;
+  let fixture: ComponentFixture<MaterialsPage>;
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ListadoMaterialesComponent],
+      declarations: [MaterialsPage],
       imports: [HttpClientTestingModule, FormsModule],
       providers: [MaterialService, MaterialTypeService, CookieService],
       schemas: [NO_ERRORS_SCHEMA]
     });
 
-    fixture = TestBed.createComponent(ListadoMaterialesComponent);
+    fixture = TestBed.createComponent(MaterialsPage);
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
   });

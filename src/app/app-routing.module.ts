@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component';
-import { SettingsComponent } from './settings/settings.component';
+import { SettingsPage } from '../features/settings/shell/settings.page';
 import { VentasComponent } from './ventas/ventas.component';
 import { ProductosComponent } from './productos/productos.component';
 import { BodegasComponent } from './bodegas/bodegas.component';
-import { ListadoMaterialesComponent } from './listado-materiales/listado-materiales.component';
+import { MaterialsPage } from '../features/materials/shell/materials.page';
 import { CotizacionesComponent } from './cotizaciones/cotizaciones.component';
-import { AccesoriosComponent } from './accesorios/accesorios.component';
+import { AccessoriesPage } from '../features/accessories/shell/accessories.page';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -15,11 +15,11 @@ const routes: Routes = [
   { path: 'ventas', component: VentasComponent },
   { path: 'inventario/productos', component: ProductosComponent },
   { path: 'inventario/bodegas', component: BodegasComponent },
-  { path: 'materiales', component: ListadoMaterialesComponent },
+  { path: 'materiales', component: MaterialsPage },
   { path: 'cotizaciones', component: CotizacionesComponent },
-  { path: 'accesorios/editar/:id', component: AccesoriosComponent },
-  { path: 'accesorios', component: AccesoriosComponent },
-  { path: 'settings', component: SettingsComponent }
+  { path: 'accesorios/editar/:id', component: AccessoriesPage },
+  { path: 'accesorios', component: AccessoriesPage },
+  { path: 'settings', component: SettingsPage }
 ];
 
 @NgModule({

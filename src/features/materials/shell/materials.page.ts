@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { MaterialService, Material, NewMaterial } from '../services/material.service';
-import { MaterialTypeService, MaterialType } from '../services/material-type.service';
-import { toNumber } from '../utils/number-parse';
+import { MaterialService, Material, NewMaterial } from '../../../app/core/services/material.service';
+import { MaterialTypeService, MaterialType } from '../../../app/core/services/material-type.service';
+import { toNumber } from '../../../app/shared/utils/number-parse';
 
 @Component({
-  selector: 'app-listado-materiales',
-  templateUrl: './listado-materiales.component.html',
-  styleUrls: ['./listado-materiales.component.css']
+  selector: 'app-materials',
+  templateUrl: './materials.page.html',
+  styleUrls: ['./materials.page.css']
 })
-export class ListadoMaterialesComponent implements OnInit {
+export class MaterialsPage implements OnInit {
   materiales: Material[] = [];
   filterId = '';
   filterNombre = '';
