@@ -1,0 +1,8 @@
+<app-login-form
+  [isLoading]="(isLoading$ | async) ?? false"
+  (login)="login($event)"
+></app-login-form>
+
+<div *ngIf="(error$ | async) as error">
+  <p>{{ error }}</p>
+</div>
