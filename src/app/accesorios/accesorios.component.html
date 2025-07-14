@@ -37,6 +37,7 @@
       required
       pattern=".*\S.*"
       #nameRef="ngModel"
+      (keydown.enter)="$event.preventDefault()"
     />
     <div
       class="error"
@@ -79,6 +80,7 @@
           name="search"
           [ngModelOptions]="{ standalone: true, updateOn: 'change' }"
           (input)="onSearchChange()"
+          (keydown.enter)="$event.preventDefault()"
         />
       </div>
     <ul class="results" *ngIf="results.length">
@@ -92,10 +94,11 @@
         <input
           type="text"
           placeholder="Buscar accesorios"
-          [(ngModel)]="childSearchText"
+          [(ngModel)]="accessorySearchText"
           name="searchChild"
           [ngModelOptions]="{ standalone: true, updateOn: 'change' }"
           (input)="onAccessorySearchChange()"
+          (keydown.enter)="$event.preventDefault()"
         />
       </div>
       <ul class="results" *ngIf="accessoryResults.length">
@@ -184,7 +187,8 @@
           <th>Nombre</th>
           <th>Descripción</th>
           <th>Tipo</th>
-          <th>Costo por tipo seleccionado</th>
+          <th>Costo de venta por tipo seleccionado</th>
+          <th>Porcentaje de ganancia</th>
           <th>Inversión</th>
           <th></th>
         </tr>
@@ -200,18 +204,20 @@
                 min="0"
                 class="dim-input"
                 [(ngModel)]="sel.length"
-                [ngModelOptions]="{ standalone: true, updateOn: 'change' }"
+                [ngModelOptions]="{ standalone: true }"
                 placeholder="Largo"
                 (input)="onMaterialInput(sel)"
+                (keydown.enter)="$event.preventDefault()"
               />
               <input
                 type="number"
                 min="0"
                 class="dim-input"
                 [(ngModel)]="sel.width"
-                [ngModelOptions]="{ standalone: true, updateOn: 'change' }"
+                [ngModelOptions]="{ standalone: true }"
                 placeholder="Ancho"
                 (input)="onMaterialInput(sel)"
+                (keydown.enter)="$event.preventDefault()"
               />
             </ng-container>
             <ng-template #otherType>
@@ -221,9 +227,10 @@
                   min="0"
                   class="dim-input"
                   [(ngModel)]="sel.quantity"
-                [ngModelOptions]="{ standalone: true, updateOn: 'change' }"
+                [ngModelOptions]="{ standalone: true }"
                 placeholder="Piezas"
                 (input)="onMaterialInput(sel)"
+                (keydown.enter)="$event.preventDefault()"
               />
               </ng-container>
               <ng-template #typeName>
@@ -238,8 +245,9 @@
               }}
             </div>
           </td>
+          <td>{{ (sel.investment * (1 + profitPercentage / 100)) | number:'1.2-2' }}</td>
+          <td>{{ profitPercentage }}%</td>
           <td>{{ sel.cost | number:'1.2-2' }}</td>
-          <td>{{ sel.investment | number:'1.2-2' }}</td>
           <td>
             <button
               type="button"
@@ -257,9 +265,10 @@
     <table *ngIf="selectedChildren.length">
       <thead>
         <tr>
-          <th>Accesorio hijo</th>
+          <th>Nombre</th>
           <th>Cantidad</th>
           <th>Costo</th>
+          <th>Porcentaje de ganancia</th>
           <th>Precio</th>
           <th></th>
         </tr>
@@ -268,17 +277,21 @@
         <tr *ngFor="let child of selectedChildren">
           <td>{{ child.accessory.name }}</td>
           <td>
-            <input
-              type="number"
-              min="1"
-              class="dim-input"
-              [(ngModel)]="child.quantity"
-              [ngModelOptions]="{ standalone: true, updateOn: 'change' }"
-              (input)="onChildInput()"
-            />
+            <div class="quantity-container">
+              <input
+                type="number"
+                min="0"
+                class="dim-input"
+                [(ngModel)]="child.quantity"
+                [ngModelOptions]="{ standalone: true }"
+                (input)="onChildInput()"
+                (keydown.enter)="$event.preventDefault()"
+              />
+            </div>
           </td>
-          <td>{{ child.accessory.cost | number:'1.2-2' }}</td>
-          <td>{{ child.accessory.price | number:'1.2-2' }}</td>
+          <td *ngIf="child.accessory">{{ ((child.accessory.cost ?? 0) * child.quantity) | number:'1.2-2' }}</td>
+          <td>{{ profitPercentage | number:'1.2-2' }}%</td>
+          <td *ngIf="child.accessory">{{ ((child.accessory.price ?? 0) * child.quantity) | number:'1.2-2' }}</td>
           <td>
             <button
               type="button"
@@ -347,9 +360,9 @@
         <th>ID</th>
         <th>Nombre</th>
         <th>Descripción</th>
-        <th>Costo total</th>
-        <th>% Precio</th>
-        <th>Precio total</th>
+        <th>Costo Total</th>
+        <th>% Ganancia</th>
+        <th>Precio Total</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -358,9 +371,9 @@
         <td>{{ acc.id }}</td>
         <td>{{ acc.name }}</td>
         <td>{{ acc.description }}</td>
-        <td>{{ acc.cost }}</td>
-        <td>{{ calculatePricePercentage(acc) | number:'1.2-2' }}%</td>
-        <td>{{ acc.price }}</td>
+        <td>{{ acc.total_cost | number:'1.2-2' }}</td>
+        <td>{{ acc.markup_percentage | number:'1.2-2' }}%</td>
+        <td>{{ acc.total_price | number:'1.2-2' }}</td>
         <td>
           <button
             type="button"

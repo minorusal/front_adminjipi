@@ -1,77 +1,104 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CookieService } from './cookie.service';
 import { environment } from '../../environments/environment';
 
+// Interface for a material attribute (e.g., thickness, width)
+export interface MaterialAttribute {
+  value: number;
+  unit: string;
+}
+
+// Interface for the detailed material object used for "get by ID" and "update"
 export interface Material {
   id: number;
   name: string;
   description: string;
-  material_type_id?: number;
-  thickness_mm?: number;
-  width_m?: number;
-  length_m?: number;
-  price?: number;
-  created_at?: string;
-  updated_at?: string;
-  owner_id?: number;
+  material_type_id: number;
+  owner_id: number;
+  purchase_price: string;
+  profit_percentage_at_creation?: string;
+  sale_price: string;
+  attributes: {
+    [key: string]: MaterialAttribute;
+  };
+  type_name: string;
 }
 
+// Interface for the material object in a list (paginated response)
+export interface MaterialInList {
+  id: number;
+  name:string;
+  description: string;
+  purchase_price?: number;
+  profit_percentage_at_creation?: number;
+  sale_price: number;
+  type_name: string;
+}
+
+// Interface for the paginated response from the API
 export interface PaginatedMaterials {
-  docs: Material[];
+  docs: MaterialInList[];
   totalDocs: number;
-  limit: number;
-  page: number;
   totalPages: number;
+  page: number;
+  limit: number;
+  search?: string;
 }
 
-export type NewMaterial = Omit<Material, 'id' | 'created_at' | 'updated_at' | 'owner_id'>;
+// Interface for the payload when creating a new material
+export interface CreateMaterialPayload {
+  name: string;
+  description: string;
+  material_type_id: number;
+  owner_id: number;
+  purchase_price: number;
+  profit_percentage?: number;
+  attributes: {
+    [key: string]: MaterialAttribute;
+  };
+}
+
+// The update payload is the same as the create payload
+export type UpdateMaterialPayload = CreateMaterialPayload;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MaterialService {
-  constructor(private http: HttpClient, private cookieService: CookieService) {}
+  private apiUrl = `${environment.apiUrl}/api/materials`;
 
-  private httpOptions() {
-    const token = this.cookieService.get('token');
-    return token
-      ? { headers: new HttpHeaders({ token }), withCredentials: true }
-      : { withCredentials: true };
+  constructor(private http: HttpClient) {}
+
+  getMaterials(
+    page: number,
+    limit: number,
+    search?: string
+  ): Observable<PaginatedMaterials> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+
+    if (search) {
+      params = params.set('search', search);
+    }
+
+    return this.http.get<PaginatedMaterials>(this.apiUrl, { params });
   }
 
-  getMaterials(page?: number, limit?: number, search?: string): Observable<PaginatedMaterials> {
-    let url = `${environment.apiUrl}/materials`;
-    const params: string[] = [];
-    if (page !== undefined) {
-      params.push(`page=${page}`);
-    }
-    if (limit !== undefined) {
-      params.push(`limit=${limit}`);
-    }
-    if (search !== undefined && search !== '') {
-      params.push(`search=${encodeURIComponent(search)}`);
-    }
-    if (params.length) {
-      url += `?${params.join('&')}`;
-    }
-    return this.http.get<PaginatedMaterials>(url, this.httpOptions());
+  getMaterialById(id: number): Observable<Material> {
+    return this.http.get<Material>(`${this.apiUrl}/${id}`);
   }
 
-  addMaterial(material: NewMaterial): Observable<Material> {
-    return this.http.post<Material>(
-      `${environment.apiUrl}/materials`,
-      material,
-      this.httpOptions()
-    );
+  createMaterial(payload: CreateMaterialPayload): Observable<Material> {
+    return this.http.post<Material>(this.apiUrl, payload);
   }
 
-  updateMaterial(id: number, material: NewMaterial): Observable<Material> {
-    return this.http.put<Material>(
-      `${environment.apiUrl}/materials/${id}`,
-      material,
-      this.httpOptions()
-    );
+  updateMaterial(id: number, payload: UpdateMaterialPayload): Observable<Material> {
+    return this.http.put<Material>(`${this.apiUrl}/${id}`, payload);
+  }
+
+  deleteMaterial(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }

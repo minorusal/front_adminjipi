@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MenuService, MenuNode } from '../services/menu.service';
-import { CookieService } from '../services/cookie.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -12,27 +11,12 @@ export class SidebarComponent implements OnInit {
 
   menuTree: MenuNode[] = [];
   expanded: Record<number, boolean> = {};
-  private ownerId!: number;
 
   constructor(
-    private menuService: MenuService,
-    private cookieService: CookieService
+    private menuService: MenuService
   ) {}
 
   ngOnInit(): void {
-    const loginData = this.cookieService.get('loginData');
-    if (loginData) {
-      try {
-        const data = JSON.parse(loginData);
-        this.ownerId = parseInt(data.ownerCompany.id, 10);
-      } catch (_) {
-        // ignore parse errors
-      }
-    }
-
-    const hasValidOwner =
-      typeof this.ownerId === 'number' && !isNaN(this.ownerId);
-    
     const stored = localStorage.getItem('menuExpanded');
     if (stored) {
       try {
@@ -42,18 +26,14 @@ export class SidebarComponent implements OnInit {
       }
     }
 
-    if (hasValidOwner) {
-      this.loadMenuTree();
-    } else {
-      console.warn('SidebarComponent: ownerId could not be determined');
-    }
+    this.loadMenuTree();
   }
 
 
   loadMenuTree(): void {
     this.menuService
-      .getMenuTree(this.ownerId)
-      .subscribe((tree) => (this.menuTree = tree));
+      .getMenuTree()
+      .subscribe((tree: MenuNode[]) => (this.menuTree = tree));
   }
 
   toggleNode(id: number): void {

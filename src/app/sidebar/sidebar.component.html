@@ -1,65 +1,35 @@
-<nav class="sidemenu" [class.open]="open">
+<nav class="sidebar-nav" [class.open]="open">
   <ul>
-    <ng-container
-      *ngTemplateOutlet="renderNodes; context: { $implicit: menuTree }"
-    ></ng-container>
-    <li class="bottom-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
-      <a class="menu-item" [routerLink]="'accesorios'">
-        <span>Accesorios</span>
-      </a>
-    </li>
-    <li class="bottom-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
-      <a class="menu-item" [routerLink]="'settings'">
-        <span class="icon">&#9881;</span>
-        <span>Configuración</span>
-      </a>
-    </li>
-  </ul>
-
-  <ng-template #renderNodes let-nodes>
-    <ng-container *ngFor="let node of nodes">
-      <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
-        <div
-          class="menu-item"
-          (keydown)="onKeydown($event, node)"
+    <ng-container *ngFor="let node of menuTree">
+      <li 
+        class="nav-item"
+        [class.has-treeview]="node.children && node.children.length"
+        [class.menu-open]="isOpen(node.id)"
+        routerLinkActive="active"
+      >
+        <a 
+          [routerLink]="node.path"
+          class="nav-link"
           (click)="onItemClick(node, $event)"
+          (keydown)="onKeydown($event, node)"
           tabindex="0"
           [attr.aria-expanded]="node.children ? isOpen(node.id) : null"
         >
-          <a
-            *ngIf="node.path"
-            class="name-btn"
-            [routerLink]="node.path"
-            
-            >{{ node.name }}</a
-          >
-          <button
-            *ngIf="!node.path"
-            class="name-btn"
-            type="button"
-          >
+          <p>
             {{ node.name }}
-          </button>
-          <button
-            *ngIf="node.children && node.children.length"
-            class="arrow-btn"
-            type="button"
-            (click)="toggleNode(node.id); $event.stopPropagation()"
-            [attr.aria-expanded]="isOpen(node.id)"
-          >
-            <span class="arrow" [class.open]="isOpen(node.id)">&#9656;</span>
-          </button>
-        </div>
-        <ul
-          class="submenu"
-          *ngIf="node.children && node.children.length"
-          [class.open]="isOpen(node.id)"
-        >
-          <ng-container
-            *ngTemplateOutlet="renderNodes; context: { $implicit: node.children }"
-          ></ng-container>
+            <i *ngIf="node.children && node.children.length" class="right-arrow"></i>
+          </p>
+        </a>
+        <ul class="nav nav-treeview" *ngIf="node.children && isOpen(node.id)">
+          <ng-container *ngFor="let child of node.children">
+            <li class="nav-item">
+              <a [routerLink]="child.path" class="nav-link" routerLinkActive="active">
+                <p>{{ child.name }}</p>
+              </a>
+            </li>
+          </ng-container>
         </ul>
       </li>
     </ng-container>
-  </ng-template>
+  </ul>
 </nav>

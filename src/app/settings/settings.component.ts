@@ -1,11 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { CookieService } from '../services/cookie.service';
-import { MenuService, MenuNode } from '../services/menu.service';
-import { NestedTreeControl } from '@angular/cdk/tree';
-import { MatTreeNestedDataSource } from '@angular/material/tree';
-import { environment } from '../../environments/environment';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MenuService, MenuNode, MenuItem } from '../services/menu.service';
 
 @Component({
   selector: 'app-settings',
@@ -14,60 +9,44 @@ import { environment } from '../../environments/environment';
 })
 export class SettingsComponent implements OnInit {
   menuForm: FormGroup;
-  parentMenus: any[] = [];
   menuTree: MenuNode[] = [];
+  flatMenu: MenuNode[] = [];
   expanded: Record<number, boolean> = {};
-  private ownerId!: number;
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
-    private cookieService: CookieService,
     private menuService: MenuService
   ) {
     this.menuForm = this.fb.group({
       name: [''],
-      url: [''],
-      parent: ['']
+      path: [''],
+      parent_id: ['']
     });
   }
 
 
   ngOnInit(): void {
-    const loginData = this.cookieService.get('loginData');
-    if (loginData) {
-      try {
-        const data = JSON.parse(loginData);
-        this.ownerId = parseInt(data.ownerCompany.id, 10);
-      } catch (_) {
-        // ignore parse errors
-      }
-    }
-
-    const hasValidOwner =
-      typeof this.ownerId === 'number' && !isNaN(this.ownerId);
-
-    if (hasValidOwner) {
-      this.loadParentMenus();
-      this.loadMenuTree();
-    } else {
-      console.warn('SettingsComponent: ownerId could not be determined');
-    }
-  }
-
-  loadParentMenus(): void {
-    this.menuService
-      .getParentMenus(this.ownerId)
-      .subscribe((menus) => (this.parentMenus = menus));
+    this.loadMenuTree();
   }
 
   loadMenuTree(): void {
     this.menuService
-      .getMenuTree(this.ownerId)
-      .subscribe((tree) => {
+      .getMenuTree()
+      .subscribe((tree: MenuNode[]) => {
         this.menuTree = tree;
+        this.flatMenu = this.flattenTree(tree);
         this.initExpanded(tree);
       });
+  }
+
+  private flattenTree(nodes: MenuNode[], level = 0, result: MenuNode[] = []): MenuNode[] {
+    for (const node of nodes) {
+      result.push({ ...node, name: '—'.repeat(level) + ' ' + node.name });
+      if (node.children) {
+        this.flattenTree(node.children, level + 1, result);
+      }
+    }
+    return result;
   }
 
   private initExpanded(nodes: MenuNode[]): void {
@@ -93,26 +72,24 @@ export class SettingsComponent implements OnInit {
     !!node.children && node.children.length > 0;
 
   onSubmit(): void {
-    const { name, url, parent } = this.menuForm.value;
-    const body = {
-      name,
-      path: url || null,
-      parent_id: parent || null,
-      owner_id: this.ownerId
+    if (this.menuForm.invalid) {
+      return;
+    }
+    const formValue = this.menuForm.value;
+    const newNode: Partial<MenuItem> = {
+      name: formValue.name,
+      path: formValue.path,
+      parent_id: formValue.parent_id ? Number(formValue.parent_id) : null,
     };
-    const token = this.cookieService.get('token');
-    const options = token
-      ? { headers: new HttpHeaders({ token }), withCredentials: true }
-      : { withCredentials: true };
-    this.http.post(`${environment.apiUrl}/menus`, body, options).subscribe({
+
+    this.menuService.createMenuItem(newNode).subscribe({
       next: () => {
+        this.loadMenuTree();
         this.menuForm.reset();
-        if (typeof this.ownerId === 'number' && !isNaN(this.ownerId)) {
-          this.loadParentMenus();
-          this.loadMenuTree();
-        } else {
-          console.warn('SettingsComponent: ownerId could not be determined');
-        }
+      },
+      error: (err: any) => {
+        console.error('Failed to add menu item', err);
+        // Optionally, show an error message to the user
       }
     });
   }

@@ -1,91 +1,66 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { CookieService } from './cookie.service';
 import { Material } from './material.service';
+
+// Define la estructura para la respuesta paginada, coincidiendo con la API real
+export interface PaginatedResponse<T> {
+  docs: T[];
+  totalDocs: number;
+  totalPages: number;
+  page: number;
+  limit: number;
+}
 
 export interface Accessory {
   id: number;
   name: string;
   description: string;
-  /** Total cost of materials without profit */
   cost?: number;
-  /** Final price including profit percentage */
   price?: number;
-  /** Stored markup percentage */
   markup_percentage?: number;
-  /** Total cost of all materials */
   total_materials_cost?: number;
-  /** Total price of all materials */
   total_materials_price?: number;
-  /** Total cost of all child accessories */
   total_accessories_cost?: number;
-  /** Total price of all child accessories */
   total_accessories_price?: number;
-  /** Combined materials and accessories cost */
   total_cost?: number;
-  /** Final price including profit */
   total_price?: number;
+  // Add camelCase properties to handle API inconsistencies
+  totalCost?: number;
+  totalPrice?: number;
   owner_id?: number;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface AccessoryMaterial {
+  id: number;
+  name: string;
+  description: string;
   accessory_id: number;
   material_id: number;
-  /** Base material information when returned from the API */
   material?: Material;
-  /** Material type identifier when returned from the API */
   material_type_id?: number;
-  /** Unit of measure for the material when returned from the API */
   unit?: string;
-  /**
-   * Values used when the material is measured by area.
-   * For backwards compatibility the API might also return `width`/`length`.
-   */
   width?: number;
   length?: number;
   width_m_used?: number;
   length_m_used?: number;
-  /** Quantity when the material is a discrete piece or other unit */
   quantity?: number;
   cost?: number;
   price?: number;
   profit_percentage?: number;
 }
 
-export interface AccessoryMaterialPayload
-  extends Omit<AccessoryMaterial, 'accessory_id'> {
-  accessory_id?: number;
-}
-
-export interface PaginatedAccessories {
-  docs: Accessory[];
-  totalDocs: number;
-  limit: number;
-  page: number;
-  totalPages: number;
-}
-
 export interface AccessoryComponent {
   id: number;
-  parent_accessory_id: number;
   child_accessory_id: number;
   quantity: number;
-  /** Cost for the specified quantity */
-  cost?: number;
-  /** Price for the specified quantity */
-  price?: number;
-  child?: Accessory;
-}
-
-export interface AccessoryChildPayload {
-  accessory_id: number;
-  price: number;
+  component_name: string;
+  component_description: string;
   cost: number;
-  quantity: number;
+  price: number;
 }
 
 export interface AccessoryMaterialDetail {
@@ -130,6 +105,8 @@ export interface AccessoryUpdatePayload {
   markup_percentage: number;
   materials: AccessoryMaterialDetail[];
   accessories: AccessoryChildDetail[];
+  total_cost?: number;
+  total_price?: number;
 }
 
 export interface AccessoryTotals {
@@ -141,112 +118,25 @@ export interface AccessoryTotals {
   profit_percentage: number;
 }
 
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AccessoryService {
-  constructor(private http: HttpClient, private cookieService: CookieService) {}
+  private apiUrl = `${environment.apiUrl}/api/accessories`;
+  private componentsApiUrl = `${environment.apiUrl}/api/accessory-components`;
 
-  private httpOptions() {
-    const token = this.cookieService.get('token');
-    return token
-      ? { headers: new HttpHeaders({ token }), withCredentials: true }
-      : { withCredentials: true };
-  }
-
-  addAccessory(
-    name: string,
-    description: string,
-    ownerId: number,
-    materials: AccessoryMaterialPayload[] = [],
-    accessories: AccessoryChildPayload[] = []
-  ): Observable<Accessory> {
-    const body: any = { name, description, owner_id: ownerId };
-    if (materials.length) {
-      body.materials = materials;
-    }
-    if (accessories.length) {
-      body.accessories = accessories;
-    }
-    return this.http.post<Accessory>(
-      `${environment.apiUrl}/accessories`,
-      body,
-      this.httpOptions()
-    );
-  }
+  constructor(private http: HttpClient) {}
 
   createAccessoryDetailed(payload: AccessoryCreatePayload): Observable<Accessory> {
-    return this.http.post<Accessory>(
-      `${environment.apiUrl}/accessories`,
-      payload,
-      this.httpOptions()
-    );
+    return this.http.post<Accessory>(this.apiUrl, payload);
   }
 
   updateAccessoryDetailed(
     id: number,
     payload: AccessoryUpdatePayload
   ): Observable<Accessory> {
-    return this.http.put<Accessory>(
-      `${environment.apiUrl}/accessories/${id}`,
-      payload,
-      this.httpOptions()
-    );
-  }
-
-  addAccessoryMaterials(
-    accessoryId: number,
-    markupPercentage: number,
-    materials: AccessoryMaterial[],
-    accessories: AccessoryChildPayload[] = [],
-    totalMaterialsPrice?: number,
-    totalAccessoriesPrice?: number,
-    totalPrice?: number
-  ): Observable<any> {
-    const body = {
-      accessory_id: accessoryId,
-      markup_percentage: markupPercentage,
-      materials,
-      accessories,
-      total_materials_price: totalMaterialsPrice,
-      total_accessories_price: totalAccessoriesPrice,
-      total_price: totalPrice
-    };
-    return this.http.post<any>(
-      `${environment.apiUrl}/accessory-materials`,
-      body,
-      this.httpOptions()
-    );
-  }
-
-  /**
-   * Update the materials used in an accessory. The provided materials payload
-   * omits the `accessory_id` property as it is derived from the supplied
-   * `accessoryId` argument.
-   */
-  updateAccessoryMaterials(
-    accessoryId: number,
-    markupPercentage: number,
-    materials: AccessoryMaterialPayload[],
-    accessories: AccessoryChildPayload[] = [],
-    totalMaterialsPrice?: number,
-    totalAccessoriesPrice?: number,
-    totalPrice?: number
-  ): Observable<any> {
-    const body = {
-      accessory_id: accessoryId,
-      markup_percentage: markupPercentage,
-      materials,
-      accessories,
-      total_materials_price: totalMaterialsPrice,
-      total_accessories_price: totalAccessoriesPrice,
-      total_price: totalPrice
-    };
-    return this.http.put<any>(
-      `${environment.apiUrl}/accessory-materials/${accessoryId}`,
-      body,
-      this.httpOptions()
-    );
+    return this.http.put<Accessory>(`${this.apiUrl}/${id}`, payload);
   }
 
   getAccessories(
@@ -254,52 +144,39 @@ export class AccessoryService {
     page?: number,
     limit?: number,
     search?: string
-  ): Observable<PaginatedAccessories> {
-    let url = `${environment.apiUrl}/accessories?owner_id=${ownerId}`;
-    const params: string[] = [];
-    if (page !== undefined) {
-      params.push(`page=${page}`);
+  ): Observable<PaginatedResponse<Accessory>> {
+    let params = new HttpParams().set('owner_id', ownerId.toString());
+
+    if (page) {
+      params = params.set('page', page.toString());
     }
-    if (limit !== undefined) {
-      params.push(`limit=${limit}`);
+    if (limit) {
+      params = params.set('limit', limit.toString());
     }
-    if (search !== undefined && search !== '') {
-      params.push(`search=${encodeURIComponent(search)}`);
+    if (search) {
+      params = params.set('search', search);
     }
-    if (params.length) {
-      url += `&${params.join('&')}`;
-    }
-    return this.http.get<PaginatedAccessories>(url, this.httpOptions());
+    return this.http.get<PaginatedResponse<Accessory>>(this.apiUrl, { params });
   }
 
-  getAccessory(id: number): Observable<Accessory> {
-    return this.http.get<Accessory>(
-      `${environment.apiUrl}/accessories/${id}`,
-      this.httpOptions()
-    );
+  getAccessoryById(id: number): Observable<Accessory> {
+    return this.http.get<Accessory>(`${this.apiUrl}/${id}`);
   }
 
-  updateAccessory(
-    id: number,
-    name: string,
-    description: string
-  ): Observable<Accessory> {
-    const body = { name, description };
-    return this.http.put<Accessory>(
-      `${environment.apiUrl}/accessories/${id}`,
-      body,
-      this.httpOptions()
-    );
+  deleteAccessory(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  deleteAccessoryMaterial(accessoryId: number, accessoryMaterialId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${accessoryId}/materials/${accessoryMaterialId}`);
   }
 
   getAccessoryMaterials(id: number): Observable<AccessoryMaterial[]> {
-    const url = `${environment.apiUrl}/accessories/${id}/materials`;
-    return this.http.get<AccessoryMaterial[]>(url, this.httpOptions());
+    return this.http.get<AccessoryMaterial[]>(`${this.apiUrl}/${id}/materials`);
   }
 
   getAccessoryComponents(id: number): Observable<AccessoryComponent[]> {
-    const url = `${environment.apiUrl}/accessories/${id}/components`;
-    return this.http.get<AccessoryComponent[]>(url, this.httpOptions());
+    return this.http.get<AccessoryComponent[]>(`${this.apiUrl}/${id}/components`);
   }
 
   addAccessoryComponent(
@@ -310,27 +187,25 @@ export class AccessoryService {
     const body = {
       parent_accessory_id: parentId,
       child_accessory_id: childId,
-      quantity
+      quantity,
     };
     return this.http.post<AccessoryComponent>(
-      `${environment.apiUrl}/accessory-components`,
-      body,
-      this.httpOptions()
+      this.componentsApiUrl,
+      body
     );
   }
 
-  deleteAccessoryComponent(id: number): Observable<any> {
-    return this.http.delete<any>(
-      `${environment.apiUrl}/accessory-components/${id}`,
-      this.httpOptions()
-    );
+  deleteAccessoryComponent(accessoryId: number, accessoryComponentId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${accessoryId}/components/${accessoryComponentId}`);
   }
 
   getAccessoryCost(id: number, ownerId?: number): Observable<AccessoryTotals> {
-    let url = `${environment.apiUrl}/accessories/${id}/cost`;
-    if (ownerId !== undefined) {
-      url += `?owner_id=${ownerId}`;
+    let params = new HttpParams();
+    if (ownerId) {
+      params = params.set('ownerId', ownerId.toString());
     }
-    return this.http.get<AccessoryTotals>(url, this.httpOptions());
+    return this.http.get<AccessoryTotals>(`${this.apiUrl}/${id}/cost`, {
+      params,
+    });
   }
 }

@@ -1,62 +1,77 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { CookieService } from './cookie.service';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+/**
+ * Representa un nodo en la estructura de árbol del menú.
+ */
 export interface MenuNode {
   id: number;
   name: string;
-  path?: string | null;
+  path?: string;
   children?: MenuNode[];
 }
 
+/**
+ * Representa un único elemento de menú para operaciones CRUD.
+ */
+export interface MenuItem {
+  id: number;
+  name: string;
+  path?: string;
+  parent_id?: number | null;
+}
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MenuService {
+  private apiUrl = `${environment.apiUrl}/api/menus`; // Corregido a plural
 
-  constructor(private http: HttpClient, private cookieService: CookieService) {}
+  constructor(private http: HttpClient) {}
 
-  private httpOptions() {
-    const token = this.cookieService.get('token');
-    return token
-      ? { headers: new HttpHeaders({ token }), withCredentials: true }
-      : { withCredentials: true };
-  }
-
-  getParentMenus(ownerId: number): Observable<any[]> {
-    return this.http.get<any[]>(
-      `${environment.apiUrl}/menus/all?owner_id=${ownerId}`,
-      this.httpOptions()
-    );
+  /**
+   * Obtiene el árbol de menús completo.
+   * @returns Un Observable con la estructura de árbol del menú.
+   */
+  getMenuTree(): Observable<MenuNode[]> {
+    return this.http.get<MenuNode[]>(`${this.apiUrl}/tree`);
   }
 
   /**
-   * Fetches the hierarchical menu for the given company.
-   * If the request fails, an empty list is returned.
+   * Obtiene la lista plana de todos los menús.
+   * @returns Un Observable con la lista de menús.
    */
-  getMenuTree(ownerId: number): Observable<MenuNode[]> {
-    return this.http
-      .get<any[]>(`${environment.apiUrl}/menus?owner_id=${ownerId}`, this.httpOptions())
-      .pipe(
-        map(tree => {
-          const isFlat = tree.length && !tree.some(m => Array.isArray(m.children));
-          return isFlat ? this.buildTree(tree) : (tree as MenuNode[]);
-        }),
-        catchError(() => of([]))
-      );
+  getAllMenus(): Observable<MenuItem[]> {
+    return this.http.get<MenuItem[]>(this.apiUrl);
   }
 
-  private buildTree(items: any[], parentId: number | null = null): MenuNode[] {
-    return items
-      .filter(m => m.parent_id === parentId)
-      .map(m => ({
-        id: m.id,
-        name: m.name,
-        path: m.path,
-        children: this.buildTree(items, m.id)
-      }));
+  /**
+   * Crea un nuevo elemento de menú.
+   * @param menuItem El elemento de menú a crear.
+   * @returns Un Observable con el elemento de menú creado.
+   */
+  createMenuItem(menuItem: Partial<MenuItem>): Observable<MenuItem> {
+    return this.http.post<MenuItem>(this.apiUrl, menuItem);
+  }
+
+  /**
+   * Actualiza un elemento de menú existente.
+   * @param id El ID del elemento de menú a actualizar.
+   * @param menuItem Los datos actualizados del elemento de menú.
+   * @returns Un Observable con el elemento de menú actualizado.
+   */
+  updateMenuItem(id: number, menuItem: Partial<MenuItem>): Observable<MenuItem> {
+    return this.http.put<MenuItem>(`${this.apiUrl}/${id}`, menuItem);
+  }
+
+  /**
+   * Elimina un elemento de menú.
+   * @param id El ID del elemento de menú a eliminar.
+   * @returns Un Observable que se completa cuando la operación termina.
+   */
+  deleteMenuItem(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }

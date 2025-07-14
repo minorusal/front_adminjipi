@@ -1,225 +1,542 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { MaterialService, Material } from '../services/material.service';
-import {
-  MaterialTypeService,
-  MaterialType,
-} from '../services/material-type.service';
-import { CookieService } from '../services/cookie.service';
+import { NgForm } from '@angular/forms';
 import {
   AccessoryService,
+  Accessory,
   AccessoryMaterial,
-  AccessoryMaterialPayload,
+  PaginatedResponse,
   AccessoryCreatePayload,
   AccessoryUpdatePayload,
+  AccessoryComponent,
   AccessoryMaterialDetail,
   AccessoryChildDetail,
-  Accessory,
 } from '../services/accessory.service';
+import { MaterialService, Material, MaterialInList } from '../services/material.service';
+import { MaterialTypeService, MaterialType } from '../services/material-type.service';
 import { toNumber } from '../utils/number-parse';
-
-interface SelectedAccessory {
-  accessory: Accessory;
-  quantity: number;
-  component_id?: number;
-}
+import { CookieService } from '../services/cookie.service';
 
 interface SelectedMaterial {
+  id?: number; // Will hold the accessory_materials.id for deletion
   material: Material;
-  width?: number;
-  length?: number;
-  /** Unit of measure used when editing an existing accessory */
-  unit?: string;
-  quantity?: number;
-  /** Stored cost for this material selection */
-  cost?: number;
-  /** Base investment of the material */
-  investment?: number;
+  quantity: number;
+  width: number;
+  length: number;
+  cost: number;
+  investment: number;
   _invalid?: boolean;
 }
 
+interface SelectedChild {
+  id?: number; // Will hold the accessory_components.id for deletion
+  accessory: Accessory;
+  quantity: number;
+}
 @Component({
   selector: 'app-accesorios',
   templateUrl: './accesorios.component.html',
   styleUrls: ['./accesorios.component.css'],
 })
 export class AccesoriosComponent implements OnInit {
-  searchText = '';
-  results: Material[] = [];
-  selected: SelectedMaterial[] = [];
-  childSearchText = '';
-  accessoryResults: Accessory[] = [];
-  selectedChildren: SelectedAccessory[] = [];
-  showRemoveChildModal = false;
-  childToRemove: SelectedAccessory | null = null;
-  materialTypes: MaterialType[] = [];
-  searching = false;
-  showRemoveModal = false;
-  materialToRemove: SelectedMaterial | null = null;
-  profitPercentage = 0;
-  accessoryName = '';
-  accessoryDescription = '';
-  saveError = '';
-  successMessage = '';
-  isSaving = false;
-  formSubmitted = false;
-  accessories: Accessory[] = [];
-  ownerId: number | null = null;
+  // Tab control
+  activeTab: 'create' | 'list' | 'edit' = 'list';
+
+  // State
   isEditing = false;
   editingId: number | null = null;
-  /** Totals loaded from the API when editing */
-  apiTotals = {
-    total_materials_cost: 0,
-    total_materials_price: 0,
-    total_accessories_cost: 0,
-    total_accessories_price: 0,
-    total_cost: 0,
-    total_price: 0,
-  };
-  /** Whether totals should be recalculated after user edits */
-  totalsDirty = false;
-  /** Flag to avoid recalculating costs while loading from API */
-  initializingMaterials = false;
-  activeTab: 'create' | 'edit' | 'list' = 'create';
+  isLoading = false;
+  isSaving = false;
+  formSubmitted = false;
+
+  // Forms model
+  accessoryName = '';
+  accessoryDescription = '';
+  profitPercentage = 0; // Default to 0, will be loaded from cookie
+
+  // Data lists
+  accessories: Accessory[] = [];
+  filteredAccessories: Accessory[] = [];
+  materials: Material[] = [];
+  materialTypes: MaterialType[] = [];
+  results: MaterialInList[] = [];
+  accessoryResults: Accessory[] = [];
+  selected: SelectedMaterial[] = [];
+  selectedChildren: SelectedChild[] = [];
+
+  // Search
+  searchText = '';
+  accessorySearchText = '';
   listSearchText = '';
+
+  // Modals
+  showRemoveModal = false;
+  itemToRemove: any = null;
+  showRemoveChildModal = false;
+  childToRemove: any = null;
+  
+  // Messages
+  saveError = '';
+  successMessage = '';
+  
+  // Pagination
   currentPage = 1;
-  pageSize = 10;
   totalPages = 0;
+  pageSize = 10;
+  
+  // Totals
+  totalCost = 0;
+  totalMaterialPrice = 0;
+  totalAccessoryCost = 0;
+  totalAccessoryPrice = 0;
+  totalWithProfit = 0;
+  combinedCost = 0;
+
+  ownerId = 1;
 
   constructor(
+    private accessoryService: AccessoryService,
     private materialService: MaterialService,
     private materialTypeService: MaterialTypeService,
-    private cookieService: CookieService,
-    private accessoryService: AccessoryService,
-    private route: ActivatedRoute,
-    private router: Router,
+    private cookieService: CookieService
   ) {}
 
   ngOnInit(): void {
-    const editIdParam = this.route.snapshot.paramMap.get('id');
-    if (editIdParam) {
-      const id = parseInt(editIdParam, 10);
-      if (!isNaN(id)) {
-        this.isEditing = true;
-        this.editingId = id;
-        this.activeTab = 'edit';
-        this.loadAccessory(id);
-      }
+    const profitCookie = this.cookieService.get('profit_percentage');
+    if (profitCookie) {
+      this.profitPercentage = toNumber(profitCookie);
+    }
+    const ownerIdCookie = this.cookieService.get('owner_id');
+    if (ownerIdCookie) {
+      this.ownerId = toNumber(ownerIdCookie);
     }
 
-    const loginData = this.cookieService.get('loginData');
-    if (loginData) {
-      try {
-        const data = JSON.parse(loginData);
-        this.ownerId = parseInt(data.ownerCompany?.id, 10);
-        let profit = 0;
-        if (typeof data.profit_percentage === 'number') {
-          profit = data.profit_percentage;
-        } else if (data.profit_percentage !== undefined) {
-          profit = parseFloat(data.profit_percentage);
-        } else if (
-          data.ownerCompany &&
-          typeof data.ownerCompany.profit_percentage === 'number'
-        ) {
-          profit = data.ownerCompany.profit_percentage;
-        } else if (data.ownerCompany?.profit_percentage !== undefined) {
-          profit = parseFloat(data.ownerCompany.profit_percentage);
-        }
-        if (!Number.isNaN(profit)) {
-          this.profitPercentage = profit;
-        }
-      } catch (_) {
-        // ignore parse errors
-      }
-    }
-    this.materialTypeService.getMaterialTypes().subscribe({
-      next: (types) => {
-        this.materialTypes = Array.isArray(types) ? types : [];
-      },
-      error: () => {
-        this.materialTypes = [];
-      },
-    });
-    if (this.ownerId !== null && !isNaN(this.ownerId)) {
-      this.loadAccessories();
+    this.loadAccessories();
+    this.materialTypeService.getMaterialTypes().subscribe(types => this.materialTypes = types);
+  }
+
+  setTab(tab: 'create' | 'list' | 'edit'): void {
+    this.activeTab = tab;
+    if (tab === 'create') {
+      this.isEditing = false;
+      this.resetForm();
     }
   }
 
-  onSearchChange(): void {
-    if (this.searchText.trim() === '') {
-      this.results = [];
-      return;
-    }
-    this.searching = true;
-    this.materialService.getMaterials(1, 10, this.searchText).subscribe({
-      next: (res) => {
-        const docs: any = (res as any).docs ?? (res as any).items ?? res;
-        this.results = Array.isArray(docs) ? docs : [];
-        this.searching = false;
-      },
-      error: () => {
-        this.results = [];
-        this.searching = false;
-      },
-    });
-  }
-
-  onAccessorySearchChange(): void {
-    if (this.childSearchText.trim() === '' || this.ownerId === null) {
-      this.accessoryResults = [];
-      return;
-    }
+  loadAccessories(): void {
+    this.isLoading = true;
     this.accessoryService
-      .getAccessories(this.ownerId, 1, 10, this.childSearchText)
+      .getAccessories(this.ownerId, this.currentPage, this.pageSize, this.listSearchText)
       .subscribe({
-        next: (res) => {
-          const docs: any = (res as any).docs ?? (res as any).items ?? res;
-          this.accessoryResults = Array.isArray(docs) ? docs : [];
+        next: (res: PaginatedResponse<Accessory>) => {
+          this.accessories = res.docs; // <-- Corregido: de 'items' a 'docs'
+          this.totalPages = res.totalPages; // <-- Corregido: usar 'totalPages' directamente
+          this.onListSearchChange(); // Aplicar filtro inicial
+          this.isLoading = false;
         },
-        error: () => {
-          this.accessoryResults = [];
-        },
+        error: () => (this.isLoading = false),
       });
   }
 
-  addMaterial(mat: Material): void {
-    if (!this.selected.some((m) => m.material.id === mat.id)) {
-      this.selected.push({ material: mat, investment: mat.price, cost: undefined });
-      this.searchText = '';
+  onSearchChange(): void {
+    if (this.searchText.length > 2) {
+      this.materialService.getMaterials(1, 20, this.searchText).subscribe((res) => {
+        this.results = res.docs;
+      });
+    } else {
       this.results = [];
-      this.totalsDirty = true;
     }
   }
-
-  addChildAccessory(acc: Accessory): void {
-    if (!this.selectedChildren.some((a) => a.accessory.id === acc.id)) {
-      const sel: SelectedAccessory = { accessory: { ...acc }, quantity: 1 };
-      this.selectedChildren.push(sel);
-      this.childSearchText = '';
+  
+  onAccessorySearchChange(): void {
+    if (this.accessorySearchText.length > 2) {
+      this.accessoryService.getAccessories(this.ownerId, 1, 20, this.accessorySearchText).subscribe(res => {
+        this.accessoryResults = res.docs; // <-- Corregido aquí
+      });
+    } else {
       this.accessoryResults = [];
-      this.totalsDirty = true;
-
-      // Fetch full accessory details to populate cost and price only when
-      // the selected accessory lacks this information.
-      if (acc.cost === undefined || acc.price === undefined) {
-        this.populateAccessoryTotals(sel);
-      }
+    }
+  }
+  
+  onListSearchChange(): void {
+    if (!this.listSearchText) {
+      this.filteredAccessories = this.accessories;
+    } else {
+      const term = this.listSearchText.toLowerCase();
+      this.filteredAccessories = this.accessories.filter(
+        (acc) =>
+          acc.name.toLowerCase().includes(term) ||
+          acc.description?.toLowerCase().includes(term)
+      );
     }
   }
 
-  openRemoveModal(sel: SelectedMaterial): void {
-    this.materialToRemove = sel;
-    this.showRemoveModal = true;
+  addMaterial(material: MaterialInList): void {
+    const existing = this.selected.find((m) => m.material.id === material.id);
+    if (!existing) {
+      // Get the full material details before adding
+      this.materialService.getMaterialById(material.id).subscribe(fullMaterial => {
+        const typeName = this.getMaterialType(fullMaterial)?.name?.trim().toLowerCase();
+        const isArea = typeName === 'area';
+
+        let initialWidth = 0;
+        let initialLength = 0;
+
+        if (isArea) {
+            initialWidth = toNumber(fullMaterial.attributes?.['width']?.value);
+            initialLength = toNumber(fullMaterial.attributes?.['length']?.value);
+        }
+        
+        this.selected.push({
+          material: fullMaterial,
+          quantity: 1,
+          width: initialWidth,
+          length: initialLength,
+          cost: 0,
+          investment: 0,
+          _invalid: false
+        });
+        this.calculateTotals();
+      });
+    }
+    this.searchText = '';
+    this.results = [];
   }
 
-  openRemoveChildModal(sel: SelectedAccessory): void {
-    this.childToRemove = sel;
-    this.showRemoveChildModal = true;
+  addChildAccessory(accessory: Accessory): void {
+    const existing = this.selectedChildren.find(c => c.accessory.id === accessory.id);
+    if (!existing) {
+        this.accessoryService.getAccessoryById(accessory.id).subscribe(fullAccessory => {
+            // Map total_cost and total_price to cost and price for consistency.
+            // Handles both snake_case (total_cost) and camelCase (totalCost) from the API.
+            const mappedAccessory: Accessory = {
+              ...fullAccessory,
+              cost: fullAccessory.totalCost ?? fullAccessory.total_cost ?? 0,
+              price: fullAccessory.totalPrice ?? fullAccessory.total_price ?? 0,
+            };
+            this.selectedChildren.push({ accessory: mappedAccessory, quantity: 1});
+            this.calculateTotals();
+        });
+    }
+    this.accessorySearchText = '';
+    this.accessoryResults = [];
+  }
+
+  isAreaSel(sel: any): boolean {
+    const typeName = this.getMaterialType(sel.material)?.name?.toLowerCase() || '';
+    return typeName.includes('area');
+  }
+
+  isPieceSel(sel: any): boolean {
+    const typeName = this.getMaterialType(sel.material)?.name?.toLowerCase() || '';
+    return typeName.includes('pieza');
+  }
+  
+  getMaterialType(material: any): MaterialType | undefined {
+      if (!material) {
+        return undefined;
+      }
+      return this.materialTypes.find(t => t.id === material.material_type_id);
+  }
+
+  onMaterialInput(sel: any): void {
+    this.calculateTotals();
+  }
+  
+  onChildInput(): void {
+    this.calculateTotals();
+  }
+
+  calculateTotals(): void {
+    // 1. Calculate cost and investment for each selected material
+    this.selected.forEach(sel => {
+      const purchasePrice = toNumber(sel.material.purchase_price);
+      let investment = 0;
+  
+      if (this.isAreaSel(sel)) {
+        const materialWidth = toNumber(sel.material.attributes?.['width']?.value);
+        const materialLength = toNumber(sel.material.attributes?.['length']?.value);
+
+        // We use the 'investment' property to store the calculated cost of the piece
+        if (materialWidth > 0 && materialLength > 0) {
+          const materialArea = materialWidth * materialLength;
+          const pricePerUnitArea = purchasePrice / materialArea;
+          const pieceArea = toNumber(sel.width) * toNumber(sel.length);
+          investment = pricePerUnitArea * pieceArea;
+        } else {
+          investment = 0; // Cannot calculate if material dimensions are missing
+        }
+        
+        sel.cost = purchasePrice; // The cost of the full material
+      } else {
+        // For 'piece' or other types, investment is price * quantity
+        investment = purchasePrice * toNumber(sel.quantity);
+        sel.cost = purchasePrice; // Cost per piece
+      }
+      
+      sel.investment = investment;
+    });
+
+    // 2. Calculate total cost for all materials
+    this.totalCost = this.selected.reduce((sum, sel) => sum + sel.investment, 0);
+
+    // 3. Calculate total sale price for materials, including profit
+    const profitMargin = this.profitPercentage / 100;
+    this.totalMaterialPrice = this.totalCost * (1 + profitMargin);
+    
+    // 4. Calculate total cost and sale price for all child accessories
+    this.totalAccessoryCost = this.selectedChildren.reduce((sum, child) => {
+        const cost = toNumber(child.accessory.cost); // cost should always exist
+        return sum + (cost * toNumber(child.quantity));
+    }, 0);
+
+    this.totalAccessoryPrice = this.selectedChildren.reduce((sum, child) => {
+        // Use total_price if available, otherwise cost
+        const price = toNumber(child.accessory.price ?? child.accessory.cost);
+        return sum + (price * toNumber(child.quantity));
+    }, 0);
+
+    // 5. Calculate final total cost and sale price for the new accessory
+    this.combinedCost = this.totalCost + this.totalAccessoryCost;
+    
+    // Apply the main profit percentage to the combined cost of all parts.
+    const profitMarginCombined = this.profitPercentage / 100;
+    this.totalWithProfit = this.combinedCost * (1 + profitMarginCombined);
+  }
+
+  editAccessory(acc: Accessory): void {
+    // Create a deep copy of the accessory object to prevent unintended mutations.
+    // This is a common issue when passing objects by reference to forms.
+    const accessoryToEdit = JSON.parse(JSON.stringify(acc));
+
+    if (!accessoryToEdit || !accessoryToEdit.id) {
+      this.saveError = 'No se puede editar un accesorio inválido.';
+      return;
+    }
+  
+    this.isEditing = true;
+    this.editingId = accessoryToEdit.id;
+    this.activeTab = 'edit';
+    this.isLoading = true;
+    this.saveError = '';
+  
+    // Fetch all details concurrently
+    this.accessoryService.getAccessoryById(accessoryToEdit.id).subscribe({
+        next: (fullAccessory) => {
+            // Populate form
+            this.accessoryName = fullAccessory.name;
+            this.accessoryDescription = fullAccessory.description ?? '';
+            this.profitPercentage = fullAccessory.markup_percentage ?? 20;
+
+            // Populate materials
+            this.accessoryService.getAccessoryMaterials(accessoryToEdit.id).subscribe(materials => {
+                this.selected = materials.map((am: AccessoryMaterial) => {
+                    const purchasePrice = am.material?.purchase_price ?? 0;
+                    const investment = this.isAreaType(am.material?.type_name) 
+                        ? toNumber(purchasePrice) * toNumber(am.width_m_used) * toNumber(am.length_m_used)
+                        : toNumber(purchasePrice) * toNumber(am.quantity);
+
+                    return {
+                        id: am.id, // <-- IMPORTANT: Store accessory_material_id
+                        material: am.material as Material,
+                        quantity: am.quantity ?? 0,
+                        width: am.width_m_used ?? 0,
+                        length: am.length_m_used ?? 0,
+                        cost: toNumber(purchasePrice),
+                        investment: investment,
+                    };
+                });
+                this.calculateTotals();
+            });
+
+            // Populate child accessories
+            this.accessoryService.getAccessoryComponents(accessoryToEdit.id).subscribe(components => {
+                this.selectedChildren = components.map((comp: AccessoryComponent) => {
+                    return {
+                        id: comp.id, // <-- IMPORTANT: Store accessory_component_id
+                        accessory: { // Re-construct an Accessory object from component data
+                            id: comp.child_accessory_id,
+                            name: comp.component_name,
+                            description: comp.component_description,
+                            cost: comp.cost,
+                            price: comp.price,
+                        },
+                        quantity: comp.quantity,
+                    };
+                });
+                this.calculateTotals();
+            });
+
+            this.isLoading = false;
+        },
+        error: (err) => {
+            this.saveError = 'Error al cargar el accesorio. ' + (err.error?.message || '');
+            this.isLoading = false;
+        }
+    });
+  }
+
+  submitAccessory(form: NgForm): void {
+    this.formSubmitted = true;
+
+    // Recalculate totals one last time to ensure they are fresh
+    this.calculateTotals();
+
+    // Basic form validation
+    if (form.invalid) {
+      this.saveError = 'El formulario no es válido. Revisa los campos marcados.';
+      return;
+    }
+
+    this.isSaving = true;
+    this.saveError = '';
+
+    // Construct the materials and accessories details for the payload
+    const materialsPayload: AccessoryMaterialDetail[] = this.selected.map(s => ({
+      material_id: s.material.id,
+      width: toNumber(s.width),
+      length: toNumber(s.length),
+      quantity: toNumber(s.quantity),
+      unit: s.material.type_name,
+      cost: s.cost,
+      price: this.isAreaSel(s) ? toNumber(s.material.sale_price) * toNumber(s.width) * toNumber(s.length) : toNumber(s.material.sale_price) * toNumber(s.quantity),
+      investment: s.investment,
+      description: s.material.description,
+    }));
+
+    const accessoriesPayload: AccessoryChildDetail[] = this.selectedChildren.map(c => ({
+      accessory_id: c.accessory.id,
+      name: c.accessory.name,
+      quantity: toNumber(c.quantity),
+      cost: toNumber(c.accessory.cost),
+      price: toNumber(c.accessory.price)
+    }));
+
+    if (this.isEditing && this.editingId) {
+      // Logic for UPDATE
+      const payload: AccessoryUpdatePayload = {
+        name: this.accessoryName,
+        description: this.accessoryDescription,
+        owner_id: this.ownerId,
+        markup_percentage: this.profitPercentage,
+        materials: materialsPayload,
+        accessories: accessoriesPayload,
+        // Assuming backend recalculates totals, but sending our calculated ones if needed
+        total_cost: this.combinedCost,
+        total_price: this.totalWithProfit,
+      };
+
+      this.accessoryService.updateAccessoryDetailed(this.editingId, payload).subscribe({
+        next: () => {
+          this.successMessage = 'Accesorio actualizado con éxito.';
+          this.isSaving = false;
+          this.resetForm();
+          this.setTab('list');
+          this.loadAccessories();
+        },
+        error: (err) => {
+          this.isSaving = false;
+          this.saveError = `Error al actualizar el accesorio: ${err.message}`;
+        }
+      });
+    } else {
+      // Logic for CREATE
+      const payload: AccessoryCreatePayload = {
+        name: this.accessoryName,
+        description: this.accessoryDescription,
+        owner_id: this.ownerId,
+        markup_percentage: this.profitPercentage,
+        materials: materialsPayload,
+        accessories: accessoriesPayload,
+        total_materials_cost: this.totalCost,
+        total_materials_price: this.totalMaterialPrice,
+        total_accessories_cost: this.totalAccessoryCost,
+        total_accessories_price: this.totalAccessoryPrice,
+        total_cost: this.combinedCost,
+        total_price: this.totalWithProfit,
+      };
+
+      this.accessoryService.createAccessoryDetailed(payload).subscribe({
+        next: () => {
+          this.successMessage = 'Accesorio creado con éxito.';
+          this.isSaving = false;
+          this.resetForm();
+          this.setTab('list');
+          this.loadAccessories();
+        },
+        error: (err) => {
+          this.isSaving = false;
+          this.saveError = `Error al crear el accesorio: ${err.message}`;
+        }
+      });
+    }
+  }
+  
+  deleteAccessory(id: number): void {
+      if(confirm('¿Está seguro de que desea eliminar este accesorio?')) {
+          this.accessoryService.deleteAccessory(id).subscribe(() => this.loadAccessories());
+      }
+  }
+
+  resetForm(): void {
+    this.accessoryName = '';
+    this.accessoryDescription = '';
+    // Re-read profit percentage from cookie to ensure it's not lost
+    const profitCookie = this.cookieService.get('profit_percentage');
+    this.profitPercentage = profitCookie ? toNumber(profitCookie) : 0;
+    this.selected = [];
+    this.selectedChildren = [];
+    this.editingId = null;
+    this.isEditing = false;
+    this.formSubmitted = false;
+    this.saveError = '';
+    this.successMessage = '';
+  }
+  
+  // Modal methods
+  openRemoveModal(item: any): void {
+    this.itemToRemove = item;
+    this.showRemoveModal = true;
   }
 
   closeRemoveModal(): void {
     this.showRemoveModal = false;
-    this.materialToRemove = null;
+    this.itemToRemove = null;
+  }
+
+  confirmRemove(): void {
+    if (!this.itemToRemove) return;
+
+    // If the item has an ID, it exists on the server and needs an API call
+    if (this.itemToRemove.id && this.editingId) {
+      this.accessoryService.deleteAccessoryMaterial(this.editingId, this.itemToRemove.id).subscribe({
+        next: () => {
+          this.successMessage = 'Material eliminado correctamente.';
+          // "Golden Rule": Refresh the entire accessory state
+          this.editAccessory({ id: this.editingId! } as Accessory); 
+        },
+        error: (err) => {
+          this.saveError = 'Error al eliminar el material. ' + (err.error?.message || '');
+        },
+        complete: () => {
+          this.closeRemoveModal();
+          setTimeout(() => this.successMessage = '', 3000);
+        }
+      });
+    } else {
+      // If it has no ID, it's a newly-added item that hasn't been saved yet.
+      // Just remove it from the local array.
+    const index = this.selected.indexOf(this.itemToRemove);
+    if (index > -1) {
+      this.selected.splice(index, 1);
+        this.calculateTotals();
+      }
+      this.closeRemoveModal();
+    }
+  }
+
+  openRemoveChildModal(child: any): void {
+    this.childToRemove = child;
+    this.showRemoveChildModal = true;
   }
 
   closeRemoveChildModal(): void {
@@ -227,726 +544,53 @@ export class AccesoriosComponent implements OnInit {
     this.childToRemove = null;
   }
 
-  private populateAccessoryTotals(sel: SelectedAccessory): void {
-    this.accessoryService.getAccessory(sel.accessory.id).subscribe({
-      next: (acc) => {
-        sel.accessory = { ...sel.accessory, ...acc };
-        if (
-          sel.accessory.cost === undefined ||
-          sel.accessory.price === undefined
-        ) {
-          this.accessoryService
-            .getAccessoryMaterials(sel.accessory.id)
-            .subscribe({
-              next: (mats) => {
-                const items: any[] = Array.isArray((mats as any).materials)
-                  ? (mats as any).materials
-                  : Array.isArray(mats)
-                    ? (mats as any)
-                    : [];
-                let cost = 0;
-                let price = 0;
-                for (const m of items) {
-                  cost += toNumber(m.cost);
-                  price += toNumber(m.price);
-                }
-                sel.accessory.cost = cost;
-                sel.accessory.price = price;
-              },
-              error: () => {
-                // ignore errors and keep whatever data we have
-              },
-            });
-        }
-      },
-      error: () => {
-        // ignore errors and keep existing partial data
-      },
-    });
-  }
-
-  confirmRemove(): void {
-    if (this.materialToRemove) {
-      this.selected = this.selected.filter(
-        (m) => m.material.id !== this.materialToRemove!.material.id,
-      );
-    }
-    this.totalsDirty = true;
-    this.closeRemoveModal();
-  }
-
   confirmRemoveChild(): void {
-    if (this.childToRemove) {
-      if (this.childToRemove.component_id) {
-        this.accessoryService
-          .deleteAccessoryComponent(this.childToRemove.component_id)
-          .subscribe({
-            next: () => {
-              if (this.editingId) {
-                this.updateApiTotals(this.editingId);
-              }
-            },
-            error: () => {},
-          });
-      }
-      this.selectedChildren = this.selectedChildren.filter(
-        (c) => c.accessory.id !== this.childToRemove!.accessory.id,
-      );
-    }
-    this.totalsDirty = true;
-    this.closeRemoveChildModal();
-  }
+    if (!this.childToRemove) return;
 
-  private resetForm(): void {
-    this.accessoryName = '';
-    this.accessoryDescription = '';
-    this.selected = [];
-    this.selectedChildren = [];
-    this.apiTotals = {
-      total_materials_cost: 0,
-      total_materials_price: 0,
-      total_accessories_cost: 0,
-      total_accessories_price: 0,
-      total_cost: 0,
-      total_price: 0,
-    };
-    this.totalsDirty = false;
-    this.formSubmitted = false;
-    this.saveError = '';
-    this.successMessage = '';
-  }
-
-  setTab(tab: 'create' | 'edit' | 'list'): void {
-    this.activeTab = tab;
-    if (tab === 'list' && this.ownerId !== null && !isNaN(this.ownerId)) {
-      this.loadAccessories();
-    } else if (tab === 'create') {
-      this.isEditing = false;
-      this.editingId = null;
-      this.resetForm();
-    }
-  }
-
-  loadAccessories(): void {
-    if (this.ownerId === null || isNaN(this.ownerId)) {
-      this.accessories = [];
-      this.totalPages = 0;
-      return;
-    }
-    this.accessoryService
-      .getAccessories(
-        this.ownerId,
-        this.currentPage,
-        this.pageSize,
-        this.listSearchText,
-      )
-      .subscribe({
-        next: (res) => {
-          const docs: any = (res as any).docs ?? (res as any).items ?? res;
-          this.accessories = Array.isArray(docs) ? docs : [];
-          let pages: any = (res as any).totalPages;
-          if (!Number.isFinite(pages)) {
-            const totalDocs = (res as any).totalDocs;
-            if (Number.isFinite(totalDocs) && this.pageSize > 0) {
-              pages = Math.ceil(totalDocs / this.pageSize);
-            }
-          }
-          this.totalPages = Number.isFinite(pages) ? pages : 0;
+    // If the child has an ID, it's saved in the DB and needs an API call
+    if (this.childToRemove.id && this.editingId) {
+      this.accessoryService.deleteAccessoryComponent(this.editingId, this.childToRemove.id).subscribe({
+        next: () => {
+          this.successMessage = 'Accesorio hijo eliminado correctamente.';
+          // "Golden Rule": Refresh the entire accessory state
+          this.editAccessory({ id: this.editingId! } as Accessory);
         },
-        error: () => {
-          this.accessories = [];
-          this.totalPages = 0;
+        error: (err) => {
+          this.saveError = 'Error al eliminar el accesorio hijo. ' + (err.error?.message || '');
         },
+        complete: () => {
+          this.closeRemoveChildModal();
+          setTimeout(() => this.successMessage = '', 3000);
+        }
       });
-  }
-
-  private loadAccessory(id: number): void {
-    this.initializingMaterials = true;
-    this.accessoryService.getAccessory(id).subscribe({
-      next: (acc) => {
-        this.accessoryName = acc.name;
-        this.accessoryDescription = acc.description;
-        this.apiTotals = {
-          total_materials_cost: this.toNumber((acc as any).total_materials_cost),
-          total_materials_price: this.toNumber((acc as any).total_materials_price),
-          total_accessories_cost: this.toNumber((acc as any).total_accessories_cost),
-          total_accessories_price: this.toNumber((acc as any).total_accessories_price),
-          total_cost: this.toNumber((acc as any).total_cost),
-          total_price: this.toNumber((acc as any).total_price),
-        };
-        if ((acc as any).markup_percentage !== undefined) {
-          const mp = this.toNumber((acc as any).markup_percentage);
-          if (!Number.isNaN(mp)) {
-            this.profitPercentage = mp;
-          }
-        }
-        this.totalsDirty = false;
-        this.updateApiTotals(id);
-        this.accessoryService.getAccessoryMaterials(id).subscribe({
-          next: (mats) => {
-            const materials: any[] = Array.isArray((mats as any).materials)
-              ? (mats as any).materials
-              : Array.isArray(mats)
-                ? (mats as any)
-                : [];
-            this.selected = materials.map((m) => {
-              const basePrice = this.toNumber(
-                (m as any).investment ??
-                  (m as any).material?.price ??
-                  m.price,
-              );
-              const mat: Material = (m as any).material ?? {
-                id: m.material_id ?? m.id,
-                name: m.material_name ?? m.name,
-                description: m.description,
-                material_type_id: m.material_type_id,
-                thickness_mm: m.thickness_mm,
-                width_m: m.width_m,
-                length_m: m.length_m,
-                price: basePrice,
-              };
-              const width = this.toNumber(m.width ?? m.width_m_used);
-              const length = this.toNumber(m.length ?? m.length_m_used);
-              const cost = this.toNumber(m.cost);
-              return {
-                material: mat,
-                width,
-                length,
-                unit: m.unit,
-                quantity: this.toNumber(m.quantity),
-                cost,
-                investment: basePrice,
-              } as SelectedMaterial;
-            });
-
-            this.initializingMaterials = false;
-            this.recalcApiTotalsFromSelection();
-          },
-          error: () => {
-            this.selected = [];
-            this.initializingMaterials = false;
-            this.recalcApiTotalsFromSelection();
-          },
-        });
-        this.accessoryService.getAccessoryComponents(id).subscribe({
-          next: (comps) => {
-            const items: any[] = Array.isArray((comps as any).components)
-              ? (comps as any).components
-              : Array.isArray(comps)
-                ? (comps as any)
-                : [];
-            this.selectedChildren = items.map((c) => {
-              const qty = this.toNumber(c.quantity ?? 1);
-              const base: Accessory = (c as any).child ?? {
-                id: c.child_accessory_id,
-                name: (c as any).child_name ?? '',
-                description: (c as any).child_description ?? '',
-              };
-              const cost = this.toNumber(c.cost);
-              const price = this.toNumber(c.price);
-              const child: Accessory = {
-                ...base,
-                cost: qty > 0 ? cost / qty : cost,
-                price: qty > 0 ? price / qty : price,
-              };
-              return {
-                accessory: child,
-                quantity: qty,
-                component_id: c.id,
-              } as SelectedAccessory;
-            });
-
-            // Fetch full accessory details to ensure name, cost and price are available
-            for (const sel of this.selectedChildren) {
-              if (
-                sel.accessory.cost === undefined ||
-                sel.accessory.price === undefined
-              ) {
-                this.populateAccessoryTotals(sel);
-              }
-            }
-            this.recalcApiTotalsFromSelection();
-          },
-          error: () => {
-            this.selectedChildren = [];
-            this.recalcApiTotalsFromSelection();
-          },
-        });
-      },
-      error: () => {
-        // ignore errors
-      },
-    });
-  }
-
-  get filteredAccessories(): Accessory[] {
-    const term = this.listSearchText.trim().toLowerCase();
-    if (!term) {
-      return this.accessories;
+    } else {
+      // If no ID, it's a new item. Just remove locally.
+    const index = this.selectedChildren.indexOf(this.childToRemove);
+    if (index > -1) {
+      this.selectedChildren.splice(index, 1);
+        this.calculateTotals();
+      }
+      this.closeRemoveChildModal();
     }
-    return this.accessories.filter(
-      (acc) =>
-        acc.id.toString().includes(term) ||
-        acc.name?.toLowerCase().includes(term) ||
-        acc.description?.toLowerCase().includes(term),
-    );
   }
-
-  onListSearchChange(): void {
-    this.currentPage = 1;
-    this.loadAccessories();
-  }
-
-  get pages(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
+  
+  // Pagination methods
   goToPage(page: number): void {
-    if (page < 1 || page > this.totalPages || page === this.currentPage) {
-      return;
-    }
-    this.currentPage = page;
-    this.loadAccessories();
+      if(page < 1 || page > this.totalPages) return;
+      this.currentPage = page;
+      this.loadAccessories();
   }
-
-  getMaterialType(mat: Material): MaterialType | undefined {
-    return this.materialTypes.find((t) => t.id === mat.material_type_id);
-  }
-
-  isAreaType(mat: Material): boolean {
-    const typeId = mat.material_type_id;
-    if (typeId != null) {
-      return typeId === 2;
-    }
-    const type = this.getMaterialType(mat);
-    // Avoid classifying piece based materials as area even if they have
-    // width/length metadata by explicitly checking the piece type first
-    if (this.isPieceType(mat)) {
-      return false;
-    }
-    const ident = (type?.unit || type?.name || '').toLowerCase();
-    return (
-      (mat.width_m !== undefined && mat.length_m !== undefined) ||
-      type?.id === 2 ||
-      ident.includes('m2') ||
-      ident.includes('área') ||
-      ident.includes('area')
-    );
-  }
-
-  isPieceType(mat: Material): boolean {
-    const typeId = mat.material_type_id;
-    if (typeId != null) {
-      return typeId === 1;
-    }
-    const type = this.getMaterialType(mat);
-    if (!type) {
-      return false;
-    }
-    const ident = (type.unit || type.name || '').toLowerCase();
-    return type.id === 1 || ident.includes('pieza') || ident.includes('unidad');
-  }
-
-  /** Determine if the selected material should be treated as area based on its unit */
-  isAreaSel(sel: SelectedMaterial): boolean {
-    const unit = sel.unit ?? this.getMaterialType(sel.material)?.unit;
-    if (unit) {
-      const ident = unit.toLowerCase();
-      return (
-        ident.includes('m2') || ident.includes('m²') || ident.includes('area') || ident.includes('área')
-      );
-    }
-    return this.isAreaType(sel.material);
-  }
-
-  /** Determine if the selected material should be treated as piece/unit based on its unit */
-  isPieceSel(sel: SelectedMaterial): boolean {
-    const unit = sel.unit ?? this.getMaterialType(sel.material)?.unit;
-    if (unit) {
-      const ident = unit.toLowerCase();
-      return ident.includes('unit') || ident.includes('pieza') || ident.includes('unidad');
-    }
-    return this.isPieceType(sel.material);
-  }
-
-  private toNumber(value: any): number {
-    if (typeof value === 'number') {
-      return Number.isFinite(value) ? value : 0;
-    }
-    if (typeof value === 'string') {
-      const trimmed = value.trim();
-      if (!trimmed) {
-        return 0;
+  
+  get pages(): number[] {
+      const pagesArray = [];
+      for(let i = 1; i <= this.totalPages; i++) {
+          pagesArray.push(i);
       }
-      // Remove currency symbols and other non-numeric characters
-      const cleaned = trimmed.replace(/[^0-9.,-]/g, '');
-      const lastComma = cleaned.lastIndexOf(',');
-      const lastDot = cleaned.lastIndexOf('.');
-      let normalized = cleaned;
-      if (lastComma > lastDot) {
-        // comma used as decimal separator -> remove dots used as thousands
-        normalized = cleaned.replace(/\./g, '').replace(',', '.');
-      } else {
-        // dot used as decimal separator -> remove commas
-        normalized = cleaned.replace(/,/g, '');
-      }
-      const n = parseFloat(normalized);
-      return Number.isFinite(n) ? n : 0;
-    }
-    return 0;
+      return pagesArray;
   }
 
-  isMaterialInfoValid(sel: SelectedMaterial): boolean {
-    if (this.isAreaSel(sel)) {
-      return !!sel.width && sel.width > 0 && !!sel.length && sel.length > 0;
-    }
-    if (this.isPieceSel(sel)) {
-      return !!sel.quantity && sel.quantity > 0;
-    }
-    return true;
-  }
-
-  onMaterialInput(sel: SelectedMaterial): void {
-    if (this.initializingMaterials) {
-      return;
-    }
-    if (sel._invalid && this.isMaterialInfoValid(sel)) {
-      sel._invalid = false;
-    }
-    sel.cost = this.calculateCost(sel);
-    this.totalsDirty = true;
-  }
-
-  onChildInput(): void {
-    this.totalsDirty = true;
-  }
-
-  calculateCost(sel: SelectedMaterial): number {
-    const price = toNumber(sel.material.price);
-    const investment = toNumber(sel.investment ?? sel.material.price);
-
-    if (this.isAreaSel(sel)) {
-      const width = toNumber(sel.width);
-      const length = toNumber(sel.length);
-      const baseWidth = toNumber(sel.material.width_m);
-      const baseLength = toNumber(sel.material.length_m);
-      const baseArea = baseWidth * baseLength;
-      const area = width * length;
-
-      const totalPrice = investment > 0 ? investment : price;
-
-      if (baseArea > 0) {
-        const costPerSq = totalPrice / baseArea;
-        return costPerSq * area;
-      }
-
-      return area * totalPrice;
-    }
-    if (this.isPieceSel(sel)) {
-      const qty = toNumber(sel.quantity);
-      return qty * price;
-    }
-    return price;
-  }
-
-  get totalCost(): number {
-    if (this.isEditing && !this.totalsDirty) {
-      return this.toNumber(this.apiTotals.total_materials_cost);
-    }
-    return this.selected.reduce((sum, sel) => {
-      if (this.isEditing && sel.cost !== undefined) {
-        return sum + toNumber(sel.cost);
-      }
-      return sum + this.calculateCost(sel);
-    }, 0);
-  }
-
-  get totalMaterialPrice(): number {
-    if (this.isEditing && !this.totalsDirty) {
-      return this.toNumber(this.apiTotals.total_materials_price);
-    }
-    return this.totalCost * (1 + this.profitPercentage / 100);
-  }
-
-  get totalWithProfit(): number {
-    if (this.isEditing && !this.totalsDirty) {
-      return this.toNumber(this.apiTotals.total_price);
-    }
-    return this.totalMaterialPrice + this.totalAccessoryPrice;
-  }
-
-  get totalAccessoryCost(): number {
-    if (this.isEditing && !this.totalsDirty) {
-      return this.toNumber(this.apiTotals.total_accessories_cost);
-    }
-    return this.selectedChildren.reduce((sum, child) => {
-      const qty = toNumber(child.quantity ?? 1);
-      const cost = toNumber(child.accessory?.cost);
-      return sum + cost * qty;
-    }, 0);
-  }
-
-  get totalAccessoryPrice(): number {
-    if (this.isEditing && !this.totalsDirty) {
-      return this.toNumber(this.apiTotals.total_accessories_price);
-    }
-    return this.selectedChildren.reduce((sum, child) => {
-      const qty = toNumber(child.quantity ?? 1);
-      const price = toNumber(child.accessory?.price);
-      return sum + price * qty;
-    }, 0);
-  }
-
-  get combinedCost(): number {
-    if (this.isEditing && !this.totalsDirty) {
-      return this.toNumber(this.apiTotals.total_cost);
-    }
-    return this.totalCost + this.totalAccessoryCost;
-  }
-
-  get combinedPrice(): number {
-    if (this.isEditing && !this.totalsDirty) {
-      return this.toNumber(this.apiTotals.total_price);
-    }
-    return this.totalWithProfit;
-  }
-
-  calculateChildCost(child: SelectedAccessory): number {
-    const qty = toNumber(child.quantity ?? 1);
-    const cost = toNumber(child.accessory?.cost);
-    return cost * qty;
-  }
-
-  calculateChildPrice(child: SelectedAccessory): number {
-    const qty = toNumber(child.quantity ?? 1);
-    const price = toNumber(child.accessory?.price);
-    return price * qty;
-  }
-
-  calculatePricePercentage(acc: Accessory): number {
-    if (!acc || acc.cost === undefined || acc.price === undefined) {
-      return 0;
-    }
-    const cost = toNumber(acc.cost);
-    const price = toNumber(acc.price);
-    return cost > 0 ? ((price - cost) / cost) * 100 : 0;
-  }
-
-  /**
-   * When editing an accessory the backend might not return the aggregated
-   * totals. Recompute them from the selected materials and child accessories so
-   * the summary table shows correct values.
-   */
-  private recalcApiTotalsFromSelection(): void {
-    const markup = this.toNumber(this.profitPercentage);
-
-    const materialCost = this.selected.reduce((sum, sel) => {
-      const c =
-        sel.cost !== undefined ? this.toNumber(sel.cost) : this.calculateCost(sel);
-      return sum + c;
-    }, 0);
-
-    const accessoryCost = this.selectedChildren.reduce(
-      (sum, child) => sum + this.calculateChildCost(child),
-      0
-    );
-
-    const materialPrice = materialCost * (1 + markup / 100);
-    const accessoryPrice = this.selectedChildren.reduce(
-      (sum, child) => sum + this.calculateChildPrice(child),
-      0
-    );
-
-    this.apiTotals = {
-      total_materials_cost: materialCost,
-      total_materials_price: materialPrice,
-      total_accessories_cost: accessoryCost,
-      total_accessories_price: accessoryPrice,
-      total_cost: materialCost + accessoryCost,
-      total_price: materialPrice + accessoryPrice,
-    };
-  }
-
-  private updateApiTotals(id: number): void {
-    if (this.ownerId === null || isNaN(this.ownerId)) {
-      return;
-    }
-    this.accessoryService.getAccessoryCost(id, this.ownerId).subscribe({
-      next: (res) => {
-        if (typeof res.profit_percentage === 'number') {
-          this.profitPercentage = res.profit_percentage;
-        }
-        this.recalcApiTotalsFromSelection();
-      },
-      error: () => {
-        // ignore errors
-      },
-    });
-  }
-
-  submitAccessory(form: any): void {
-    if (this.isSaving) {
-      return;
-    }
-    this.formSubmitted = true;
-    this.saveError = '';
-    if (!form.valid) {
-      form.form.markAllAsTouched();
-      return;
-    }
-    // Prevent saving without selecting any material
-    if (this.selected.length === 0) {
-      this.saveError = 'Debes seleccionar al menos un material';
-      return;
-    }
-
-    for (const child of this.selectedChildren) {
-      if (!child.quantity || child.quantity <= 0) {
-        this.saveError = 'Ingresa cantidades válidas para los accesorios hijos';
-        return;
-      }
-    }
-
-    // Validate dynamic inputs
-    let hasInvalid = false;
-    for (const sel of this.selected) {
-      if (!this.isMaterialInfoValid(sel)) {
-        sel._invalid = true;
-        hasInvalid = true;
-      } else {
-        sel._invalid = false;
-      }
-    }
-    if (hasInvalid) {
-      this.saveError =
-        'Completa las cantidades o medidas de los materiales seleccionados';
-      return;
-    }
-
-    const loginData = this.cookieService.get('loginData');
-    let ownerId: number | null = null;
-    if (loginData) {
-      try {
-        const data = JSON.parse(loginData);
-        ownerId = parseInt(data.ownerCompany.id, 10);
-      } catch {
-        ownerId = null;
-      }
-    }
-    if (ownerId === null || isNaN(ownerId)) {
-      this.saveError = 'No se pudo determinar la empresa';
-      return;
-    }
-
-    const name = this.accessoryName.trim();
-    const description = this.accessoryDescription.trim();
-    this.isSaving = true;
-
-    const markup = toNumber(this.profitPercentage);
-
-    const materialsDetailed: AccessoryMaterialDetail[] = this.selected.map((sel) => {
-      const cost =
-        this.isEditing && sel.cost !== undefined
-          ? toNumber(sel.cost)
-          : this.calculateCost(sel);
-      const price = cost + (markup / 100) * cost;
-      const unit = this.isAreaSel(sel) ? 'm²' : 'unit';
-      const detail: AccessoryMaterialDetail = {
-        material_id: sel.material.id,
-        width: toNumber(sel.width),
-        length: toNumber(sel.length),
-        unit,
-        cost,
-        price,
-        investment: toNumber(sel.investment ?? sel.material.price),
-        description: sel.material.description,
-      };
-
-      if (unit !== 'm²') {
-        detail.quantity = toNumber(sel.quantity);
-      }
-
-      return detail;
-    });
-    const accessoriesDetailed: AccessoryChildDetail[] = this.selectedChildren.map((child) => {
-      return {
-        accessory_id: child.accessory.id,
-        name: child.accessory.name,
-        quantity: toNumber(child.quantity),
-        cost: this.calculateChildCost(child),
-        price: this.calculateChildPrice(child),
-      } as AccessoryChildDetail;
-    });
-
-    const payload: AccessoryCreatePayload = {
-      name,
-      description,
-      owner_id: ownerId,
-      markup_percentage: markup,
-      materials: materialsDetailed,
-      accessories: accessoriesDetailed,
-      total_materials_cost: this.totalCost,
-      total_materials_price: this.totalMaterialPrice,
-      total_accessories_cost: this.totalAccessoryCost,
-      total_accessories_price: this.totalAccessoryPrice,
-      total_cost: this.combinedCost,
-      total_price: this.combinedPrice,
-    };
-
-    const updatePayload = {
-      name,
-      description,
-      owner_id: ownerId,
-      markup_percentage: markup,
-      materials: materialsDetailed,
-      accessories: accessoriesDetailed,
-    } as AccessoryUpdatePayload;
-
-    const save$ =
-      this.isEditing && this.editingId !== null
-        ? this.accessoryService.updateAccessoryDetailed(this.editingId, updatePayload)
-        : this.accessoryService.createAccessoryDetailed(payload);
-
-    save$.subscribe({
-      next: (acc: Accessory) => {
-        const id =
-          this.isEditing && this.editingId !== null ? this.editingId : acc.id;
-        const finalizeSave = () => {
-          this.isSaving = false;
-          if (this.isEditing) {
-            this.formSubmitted = false;
-          } else {
-            this.resetForm();
-            form.resetForm();
-          }
-          this.saveError = '';
-          this.successMessage = 'Accesorio guardado exitosamente';
-          setTimeout(() => (this.successMessage = ''), 3000);
-          this.updateApiTotals(id);
-          this.apiTotals = {
-            total_materials_cost: this.toNumber((acc as any).total_materials_cost),
-            total_materials_price: this.toNumber((acc as any).total_materials_price),
-            total_accessories_cost: this.toNumber((acc as any).total_accessories_cost),
-            total_accessories_price: this.toNumber((acc as any).total_accessories_price),
-            total_cost: this.toNumber((acc as any).total_cost),
-            total_price: this.toNumber((acc as any).total_price),
-          };
-          this.totalsDirty = false;
-        };
-
-        finalizeSave();
-      },
-      error: (err) => {
-        this.isSaving = false;
-        this.saveError = err?.error?.message || 'Error al guardar el accesorio';
-      },
-    });
-  }
-
-  editAccessory(acc: Accessory): void {
-    this.isEditing = true;
-    this.editingId = acc.id;
-    this.activeTab = 'edit';
-    this.loadAccessory(acc.id);
+  // Helper to avoid repetitive checks
+  private isAreaType(typeName: string | undefined): boolean {
+    return typeName === 'area';
   }
 }

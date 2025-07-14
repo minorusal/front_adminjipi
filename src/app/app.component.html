@@ -1,6 +1,6 @@
 <div class="login-container form-container" *ngIf="!isLoggedIn">
   <h1>Iniciar sesión</h1>
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
     <div class="form-group">
       <label for="username">Correo electrónico</label>
       <input
@@ -31,10 +31,10 @@
       </div>
     </div>
     <div class="form-actions">
-      <button type="submit">Continuar</button>
+      <button type="submit" class="continue-btn">Continuar</button>
     </div>
+    <div class="error" *ngIf="loginError">{{ loginError }}</div>
   </form>
-  <div class="error" *ngIf="error">{{ error }}</div>
 </div>
 
 <app-dashboard *ngIf="isLoggedIn" [user]="user" (logout)="logout()"></app-dashboard>

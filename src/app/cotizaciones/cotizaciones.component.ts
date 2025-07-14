@@ -50,9 +50,9 @@ export class CotizacionesComponent implements OnInit {
     }
     this.errorMessage = '';
     this.remissionService
-      .getByOwner(this.ownerId, this.currentPage, this.pageSize, this.searchText)
+      .getRemissions(this.currentPage, this.pageSize)
       .subscribe({
-        next: res => {
+        next: (res: import('../services/remission.service').PaginatedRemissions) => {
           const docs: any[] = Array.isArray((res as any).docs)
             ? (res as any).docs
             : Array.isArray(res)
@@ -94,7 +94,7 @@ export class CotizacionesComponent implements OnInit {
           }
           this.totalPages = Number.isFinite(pages) ? pages : 0;
         },
-        error: err => {
+        error: (err: any) => {
           console.error('Failed to load remissions', err);
           this.errorMessage = 'Error al cargar las cotizaciones';
         }

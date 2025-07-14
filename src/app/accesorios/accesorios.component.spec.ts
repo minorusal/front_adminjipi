@@ -1,13 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { of, throwError } from 'rxjs';
 
 import { AccesoriosComponent } from './accesorios.component';
-import { MaterialService } from '../services/material.service';
+import { MaterialService, Material, MaterialInList } from '../services/material.service';
 import { MaterialTypeService } from '../services/material-type.service';
 import { CookieService } from '../services/cookie.service';
-import { AccessoryService } from '../services/accessory.service';
-import { of } from 'rxjs';
+import { AccessoryService, Accessory, AccessoryComponent, AccessoryTotals, AccessoryCreatePayload, AccessoryUpdatePayload } from '../services/accessory.service';
+
+interface SelectedMaterial {
+  material: Material;
+  quantity: number;
+  width: number;
+  length: number;
+  cost: number;
+  investment: number;
+  _invalid?: boolean;
+  id?: number;
+}
+
+interface SelectedChild {
+  id?: number;
+  accessory: Accessory;
+  quantity: number;
+}
 
 describe('AccesoriosComponent', () => {
   let component: AccesoriosComponent;
@@ -17,19 +34,26 @@ describe('AccesoriosComponent', () => {
   let accessoryServiceSpy: jasmine.SpyObj<AccessoryService>;
 
   beforeEach(() => {
-    materialServiceSpy = jasmine.createSpyObj('MaterialService', ['getMaterials']);
+    materialServiceSpy = jasmine.createSpyObj('MaterialService', ['getMaterials', 'getMaterialById']);
     materialTypeServiceSpy = jasmine.createSpyObj('MaterialTypeService', ['getMaterialTypes']);
     accessoryServiceSpy = jasmine.createSpyObj('AccessoryService', [
-      'addAccessory',
-      'addAccessoryMaterials',
-      'updateAccessoryMaterials',
-      'updateAccessory',
-      'updateAccessoryDetailed',
-      'getAccessory',
+      'getAccessories',
+      'getAccessoryById',
       'getAccessoryMaterials',
       'getAccessoryComponents',
-      'getAccessoryCost'
+      'getAccessoryCost',
+      'createAccessoryDetailed',
+      'updateAccessoryDetailed'
     ]);
+
+    accessoryServiceSpy.getAccessories.and.returnValue(of({ docs: [], totalDocs: 0, limit: 10, totalPages: 1, page: 1 }));
+    accessoryServiceSpy.getAccessoryById.and.returnValue(of({} as Accessory));
+    accessoryServiceSpy.getAccessoryMaterials.and.returnValue(of([]));
+    accessoryServiceSpy.getAccessoryComponents.and.returnValue(of([]));
+    accessoryServiceSpy.getAccessoryCost.and.returnValue(of({} as AccessoryTotals));
+    materialServiceSpy.getMaterials.and.returnValue(of({ docs: [], totalDocs: 0, limit: 10, totalPages: 1, page: 1 }));
+    materialTypeServiceSpy.getMaterialTypes.and.returnValue(of([]));
+
     TestBed.configureTestingModule({
       declarations: [AccesoriosComponent],
       imports: [FormsModule],
@@ -46,197 +70,117 @@ describe('AccesoriosComponent', () => {
     component = fixture.componentInstance;
   });
 
-  it('should add material and clear search', () => {
-    const mat = { id: 1, name: 'Mat', description: 'Desc' } as any;
-    component.results = [mat];
-    component.searchText = 'ma';
-
-    component.addMaterial(mat);
-
-    expect(component.selected).toContain(mat);
-    expect(component.searchText).toBe('');
-    expect(component.results).toEqual([]);
+  it('should create', () => {
+    expect(component).toBeTruthy();
   });
 
-  it('should calculate area cost relative to base size', () => {
-    const mat = {
-      id: 1,
-      name: 'Madera',
-      description: 'Sheet',
-      material_type_id: 2,
-      price: 1001,
-      width_m: 1.22,
-      length_m: 2.44
-    } as any;
-
-    component.materialTypes = [
-      { id: 2, name: 'Area', unit: 'm2', description: '' } as any
-    ];
-
-    const sel: any = { material: mat, width: 1.22, length: 2.44 };
-
-    const cost = component.calculateCost(sel);
-
-    expect(cost).toBeCloseTo(1001, 2);
-  });
-
-  it('should fallback to simple area cost when base is missing', () => {
-    const mat = {
-      id: 2,
-      name: 'Madera',
-      description: 'Sheet',
-      material_type_id: 2,
-      price: 100,
-      width_m: undefined,
-      length_m: undefined
-    } as any;
-
-    component.materialTypes = [
-      { id: 2, name: 'Area', unit: 'm2', description: '' } as any
-    ];
-
-    const sel: any = { material: mat, width: 2, length: 3 };
-
-    const cost = component.calculateCost(sel);
-
-    expect(cost).toBeCloseTo(600, 2);
-  });
-
-  it('should compute area cost using base dimensions when unit is m²', () => {
-    const mat = {
-      id: 3,
-      name: 'MDF',
-      description: 'Board',
-      material_type_id: 2,
-      price: 1000,
-      width_m: 1.22,
-      length_m: 2.44
-    } as any;
-
-    component.materialTypes = [
-      { id: 2, name: 'Area', unit: 'm2', description: '' } as any
-    ];
-
-    const sel: any = { material: mat, width: 0.6, length: 0.3, unit: 'm²' };
-
-    const cost = component.calculateCost(sel);
-
-    expect(cost).toBeCloseTo(60.47, 2);
-  });
-
-  it('should filter accessories by search text', () => {
-    component.accessories = [
-      { id: 1, name: 'Alpha', description: 'Primero' } as any,
-      { id: 2, name: 'Beta', description: 'Segundo' } as any
-    ];
-    component.listSearchText = 'seg';
-
-    const filtered = component.filteredAccessories;
-
-    expect(filtered.length).toBe(1);
-    expect(filtered[0].id).toBe(2);
-  });
-
-  it('should sum accessory cost and price', () => {
-    component.selectedChildren = [
-      {
-        accessory: { id: 1, name: 'A', description: '', cost: 10, price: 15 } as any,
-        quantity: 2
-      },
-      {
-        accessory: { id: 2, name: 'B', description: '', cost: 5, price: 8 } as any,
-        quantity: 1
-      }
-    ] as any;
-
-    expect(component.totalAccessoryCost).toBe(25);
-    expect(component.totalAccessoryPrice).toBe(38);
-  });
-
-  it('should compute material price and total with profit', () => {
-    component.profitPercentage = 40;
+  it('should calculate totals correctly with new logic', () => {
+    component.profitPercentage = 50; // 50% profit
+    
+    const material1: Material = { id: 1, name: 'MDF', purchase_price: '100', sale_price: '150', type_name: 'area' } as any;
+    const material2: Material = { id: 2, name: 'Tornillo', purchase_price: '5', sale_price: '8', type_name: 'piece' } as any;
     component.selected = [
-      {
-        material: { id: 1, name: 'Mat', material_type_id: 1, price: 10 } as any,
-        quantity: 2
-      }
+      { material: material1, width: 2, length: 1, quantity: 0, cost: 100, investment: 200 },
+      { material: material2, width: 0, length: 0, quantity: 10, cost: 5, investment: 50 }
     ] as any;
+
+    const childAccessory: Accessory = { id: 3, name: 'Child Acc', cost: 20, price: 30, total_price: 30 } as any;
     component.selectedChildren = [
-      {
-        accessory: { id: 3, name: 'Child', cost: 5, price: 7 } as any,
-        quantity: 3
-      }
+      { accessory: childAccessory, quantity: 2 }
     ] as any;
 
-    expect(component.totalMaterialPrice).toBeCloseTo(28, 2);
-    expect(component.totalWithProfit).toBeCloseTo(49, 2);
-    expect(component.combinedCost).toBeCloseTo(35, 2);
-    expect(component.combinedPrice).toBeCloseTo(49, 2);
+    component.calculateTotals();
+
+    // 1. Cost of materials
+    expect(component.totalCost).toBe(250); // (100 * 2 * 1) + (5 * 10)
+
+    // 2. Cost of child accessories
+    expect(component.totalAccessoryCost).toBe(40); // 20 * 2
+
+    // 3. Combined Cost
+    expect(component.combinedCost).toBe(290); // 250 + 40
+
+    // 4. Final Price (totalWithProfit)
+    // Materials cost (250) + 50% profit (125) = 375
+    // Price of child accessories (30 * 2) = 60
+    // Total = 375 + 60 = 435
+    expect(component.totalWithProfit).toBe(435);
   });
 
-  it('should not fetch totals when accessory already has cost and price', () => {
-    const acc: any = { id: 3, name: 'C', cost: 7, price: 9 };
-    spyOn<any>(component, 'populateAccessoryTotals');
+  describe('submitAccessory', () => {
+    let form: any;
 
-    component.addChildAccessory(acc);
+    beforeEach(() => {
+      form = { invalid: false, value: {} } as any;
+      component.accessoryName = 'Test';
+      component.accessoryDescription = 'Test Desc';
+    });
 
-    expect((component as any).populateAccessoryTotals).not.toHaveBeenCalled();
-    expect(component.selectedChildren.length).toBe(1);
-    expect(component.selectedChildren[0].accessory.cost).toBe(7);
-    expect(component.selectedChildren[0].accessory.price).toBe(9);
+    it('should not submit if form is invalid', () => {
+      form.invalid = true;
+      component.submitAccessory(form);
+      expect(accessoryServiceSpy.createAccessoryDetailed).not.toHaveBeenCalled();
+      expect(component.saveError).toBe('El formulario no es válido. Revisa los campos marcados.');
+    });
+
+    it('should call createAccessoryDetailed and handle success on create mode', async () => {
+      const newAccessory: Accessory = { id: 10, name: 'New', owner_id: 1, description: '' };
+      accessoryServiceSpy.createAccessoryDetailed.and.returnValue(of(newAccessory));
+      spyOn(component, 'resetForm').and.callThrough();
+      spyOn(component, 'loadAccessories').and.callThrough();
+
+      component.isEditing = false;
+      component.submitAccessory(form);
+      
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(accessoryServiceSpy.createAccessoryDetailed).toHaveBeenCalled();
+    });
+    
+    it('should handle error when creating an accessory', async () => {
+      const errorResponse = { message: 'Creation failed' };
+      accessoryServiceSpy.createAccessoryDetailed.and.returnValue(throwError(() => errorResponse));
+      
+      component.isEditing = false;
+      component.submitAccessory(form);
+
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(component.isSaving).toBe(false);
+      expect(component.saveError).toContain('Creation failed');
+    });
+
+    it('should call updateAccessoryDetailed and handle success on edit mode', async () => {
+      const updatedAccessory: Accessory = { id: 1, name: 'Updated', owner_id: 1, description: '' };
+      accessoryServiceSpy.updateAccessoryDetailed.and.returnValue(of(updatedAccessory));
+      spyOn(component, 'resetForm').and.callThrough();
+      spyOn(component, 'loadAccessories').and.callThrough();
+
+      component.isEditing = true;
+      component.editingId = 1;
+      component.submitAccessory(form);
+
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(accessoryServiceSpy.updateAccessoryDetailed).toHaveBeenCalled();
+    });
+
+    it('should handle error when updating an accessory', async () => {
+      const errorResponse = { message: 'Update failed' };
+      accessoryServiceSpy.updateAccessoryDetailed.and.returnValue(throwError(() => errorResponse));
+      
+      component.isEditing = true;
+      component.editingId = 1;
+      component.submitAccessory(form);
+
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(component.isSaving).toBe(false);
+      expect(component.saveError).toContain('Update failed');
+    });
   });
-
-  it('should load component cost and price from API response', () => {
-    (accessoryServiceSpy.getAccessory as jasmine.Spy).and.returnValue(of({
-      id: 10,
-      name: 'Parent',
-      description: 'P'
-    } as any));
-    (accessoryServiceSpy.getAccessoryMaterials as jasmine.Spy).and.returnValue(
-      of([])
-    );
-    (accessoryServiceSpy.getAccessoryComponents as jasmine.Spy).and.returnValue(
-      of([
-        {
-          id: 1,
-          parent_accessory_id: 10,
-          child_accessory_id: 2,
-          quantity: 5,
-          cost: 7.57,
-          price: 10.6,
-          child: { id: 2, name: 'Child', description: '' }
-        }
-      ])
-    );
-    (accessoryServiceSpy.getAccessoryCost as jasmine.Spy).and.returnValue(
-      of({
-        accessory_id: 10,
-        accessory_name: 'Parent',
-        cost: 0,
-        price: 0,
-        profit_margin: 0,
-        profit_percentage: 0
-      })
-    );
-
-    spyOn<any>(component, 'populateAccessoryTotals');
-
-    (component as any).loadAccessory(10);
-
-    expect(component.selectedChildren.length).toBe(1);
-    const child = component.selectedChildren[0];
-    expect(child.accessory.cost).toBe(7.57);
-    expect(child.accessory.price).toBe(10.6);
-    expect((component as any).populateAccessoryTotals).not.toHaveBeenCalled();
-  });
-
-  it('should convert different numeric formats to numbers', () => {
-    const toNumber = (component as any).toNumber.bind(component);
-
-    expect(toNumber('1,234.56')).toBeCloseTo(1234.56, 2);
-    expect(toNumber('1.234,56')).toBeCloseTo(1234.56, 2);
-    expect(toNumber('$ 1 234,56')).toBeCloseTo(1234.56, 2);
-    expect(toNumber('')).toBe(0);
-    expect(toNumber('abc')).toBe(0);
-  });
-});
+}); 

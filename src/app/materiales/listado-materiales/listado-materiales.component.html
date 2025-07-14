@@ -1,0 +1,192 @@
+<nav class="breadcrumb">Inicio / Listado de materiales</nav>
+<h2>Listado de materiales</h2>
+<div class="error" *ngIf="error$ | async as errorMessage">{{ errorMessage }}</div>
+<div class="button-bar">
+  <button
+    type="button"
+    class="add-material-btn"
+    title="Agregar Material"
+    (click)="openAddModal()"
+  >
+    <span class="material-icons" aria-hidden="true">add</span>
+  </button>
+</div>
+<div class="search-container">
+  <span class="material-icons">search</span>
+  <input
+    type="text"
+    placeholder="Buscar materiales"
+    [(ngModel)]="searchText"
+  (input)="onSearchChange()"
+  />
+</div>
+<ng-container *ngIf="paginatedMaterials$ | async as paginatedMaterials">
+  <table *ngIf="paginatedMaterials.docs?.length">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Tipo</th>
+        <th>Costo</th>
+        <th>Porcentaje (%)</th>
+        <th>Precio de Venta</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of paginatedMaterials.docs">
+        <td>{{ item.id }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.description }}</td>
+        <td>{{ item.type_name }}</td>
+        <td>{{ item.purchase_price | currency:'USD':'symbol':'1.2-2' }}</td>
+        <td>{{ item.profit_percentage_at_creation }}</td>
+        <td>{{ item.sale_price | currency:'USD':'symbol':'1.2-2' }}</td>
+        <td>
+          <button
+            type="button"
+            class="edit-btn"
+            title="Editar Material"
+            (click)="openEditModal(item)"
+          >
+            <span class="material-icons" aria-hidden="true">edit</span>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <nav *ngIf="paginatedMaterials.totalPages > 1" aria-label="Materials pagination" class="mt-3">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" href="#" (click)="goToPage(currentPage - 1); $event.preventDefault()">Anterior</a>
+      </li>
+      <li class="page-item" *ngFor="let p of pages" [class.active]="p === currentPage">
+        <a class="page-link" href="#" (click)="goToPage(p); $event.preventDefault()">{{ p }}</a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === paginatedMaterials.totalPages">
+        <a class="page-link" href="#" (click)="goToPage(currentPage + 1); $event.preventDefault()">Siguiente</a>
+      </li>
+    </ul>
+  </nav>
+</ng-container>
+
+<div class="modal-overlay" *ngIf="showAddModal" (mousedown)="closeAddModal()">
+  <div class="add-modal" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()">
+    <span class="close-icon material-icons" (click)="closeAddModal()">close</span>
+    <h3>Agregar material</h3>
+    <form [formGroup]="materialForm" (ngSubmit)="saveMaterial()">
+      <!-- Common Fields -->
+      <div class="form-group">
+        <label for="mat-name">Nombre</label>
+        <input id="mat-name" type="text" formControlName="name">
+        <div class="error" *ngIf="materialForm.get('name')?.touched && materialForm.get('name')?.invalid">El nombre es requerido.</div>
+      </div>
+      <div class="form-group">
+        <label for="mat-desc">Descripción</label>
+        <textarea id="mat-desc" formControlName="description"></textarea>
+        <div class="error" *ngIf="materialForm.get('description')?.touched && materialForm.get('description')?.invalid">La descripción es requerida.</div>
+      </div>
+      <div class="form-group">
+        <label for="mat-price">Precio de Compra</label>
+        <input id="mat-price" type="number" formControlName="purchase_price">
+        <div class="error" *ngIf="materialForm.get('purchase_price')?.touched && materialForm.get('purchase_price')?.invalid">El precio es requerido.</div>
+      </div>
+      <div class="form-group">
+        <label for="mat-profit">Porcentaje de Ganancia (%)</label>
+        <input id="mat-profit" type="number" formControlName="profit_percentage" readonly>
+        <div class="error" *ngIf="materialForm.get('profit_percentage')?.touched && materialForm.get('profit_percentage')?.invalid">El porcentaje no puede ser negativo.</div>
+      </div>
+      <div class="form-group">
+        <label for="mat-type">Tipo de Material</label>
+        <select id="mat-type" formControlName="material_type_id">
+          <option [ngValue]="null" disabled>Seleccione un tipo</option>
+          <option *ngFor="let type of materialTypes" [ngValue]="type.id">{{ type.name }}</option>
+        </select>
+        <div class="error" *ngIf="materialForm.get('material_type_id')?.touched && materialForm.get('material_type_id')?.invalid">Debe seleccionar un tipo.</div>
+      </div>
+
+      <!-- Dynamic Attributes -->
+      <div formGroupName="attributes">
+        <ng-container *ngFor="let key of getAttributesControls(materialForm)">
+          <div [formGroupName]="key" class="attribute-group">
+            <label>{{ key | titlecase }}</label>
+            <div class="attribute-inputs">
+              <input type="number" formControlName="value" placeholder="Valor">
+              <select formControlName="unit">
+                <option *ngFor="let unit of getUnitsForAttribute(key)" [value]="unit">{{ unit }}</option>
+              </select>
+            </div>
+            <div class="error" *ngIf="materialForm.get('attributes')?.get(key)?.get('value')?.touched && materialForm.get('attributes')?.get(key)?.get('value')?.invalid">El valor es requerido.</div>
+        </div>
+        </ng-container>
+      </div>
+
+      <!-- Actions -->
+      <div class="error" *ngIf="saveError">{{ saveError }}</div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="isSaving || materialForm.invalid">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showEditModal" (mousedown)="closeEditModal()">
+  <div class="add-modal" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()">
+    <span class="close-icon material-icons" (click)="closeEditModal()">close</span>
+    <h3>Editar material</h3>
+    <form [formGroup]="materialForm" (ngSubmit)="updateMaterial()">
+        <!-- Common Fields -->
+      <div class="form-group">
+        <label for="mat-name">Nombre</label>
+        <input id="mat-name" type="text" formControlName="name">
+        <div class="error" *ngIf="materialForm.get('name')?.touched && materialForm.get('name')?.invalid">El nombre es requerido.</div>
+      </div>
+      <div class="form-group">
+        <label for="mat-desc">Descripción</label>
+        <textarea id="mat-desc" formControlName="description"></textarea>
+        <div class="error" *ngIf="materialForm.get('description')?.touched && materialForm.get('description')?.invalid">La descripción es requerida.</div>
+      </div>
+      <div class="form-group">
+        <label for="mat-price">Precio de Compra</label>
+        <input id="mat-price" type="number" formControlName="purchase_price">
+        <div class="error" *ngIf="materialForm.get('purchase_price')?.touched && materialForm.get('purchase_price')?.invalid">El precio es requerido.</div>
+      </div>
+      <div class="form-group">
+        <label for="mat-profit">Porcentaje de Ganancia (%)</label>
+        <input id="mat-profit" type="number" formControlName="profit_percentage" [readonly]="!!editingMaterialId">
+        <div class="error" *ngIf="materialForm.get('profit_percentage')?.touched && materialForm.get('profit_percentage')?.invalid">El porcentaje no puede ser negativo.</div>
+      </div>
+      <div class="form-group">
+        <label for="mat-type">Tipo de Material</label>
+        <select id="mat-type" formControlName="material_type_id">
+          <option [ngValue]="null" disabled>Seleccione un tipo</option>
+          <option *ngFor="let type of materialTypes" [ngValue]="type.id">{{ type.name }}</option>
+        </select>
+        <div class="error" *ngIf="materialForm.get('material_type_id')?.touched && materialForm.get('material_type_id')?.invalid">Debe seleccionar un tipo.</div>
+      </div>
+
+      <!-- Dynamic Attributes -->
+      <div formGroupName="attributes">
+        <ng-container *ngFor="let key of getAttributesControls(materialForm)">
+          <div [formGroupName]="key" class="attribute-group">
+            <label>{{ key | titlecase }}</label>
+            <div class="attribute-inputs">
+              <input type="number" formControlName="value" placeholder="Valor">
+              <select formControlName="unit">
+                <option *ngFor="let unit of getUnitsForAttribute(key)" [value]="unit">{{ unit }}</option>
+              </select>
+            </div>
+            <div class="error" *ngIf="materialForm.get('attributes')?.get(key)?.get('value')?.touched && materialForm.get('attributes')?.get(key)?.get('value')?.invalid">El valor es requerido.</div>
+        </div>
+        </ng-container>
+      </div>
+
+      <!-- Actions -->
+      <div class="error" *ngIf="updateError">{{ updateError }}</div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="isUpdating || materialForm.invalid">Actualizar</button>
+      </div>
+    </form>
+  </div>
+</div>

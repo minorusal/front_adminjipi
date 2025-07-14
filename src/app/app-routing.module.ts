@@ -5,7 +5,6 @@ import { SettingsComponent } from './settings/settings.component';
 import { VentasComponent } from './ventas/ventas.component';
 import { ProductosComponent } from './productos/productos.component';
 import { BodegasComponent } from './bodegas/bodegas.component';
-import { ListadoMaterialesComponent } from './listado-materiales/listado-materiales.component';
 import { CotizacionesComponent } from './cotizaciones/cotizaciones.component';
 import { AccesoriosComponent } from './accesorios/accesorios.component';
 
@@ -15,11 +14,11 @@ const routes: Routes = [
   { path: 'ventas', component: VentasComponent },
   { path: 'inventario/productos', component: ProductosComponent },
   { path: 'inventario/bodegas', component: BodegasComponent },
-  { path: 'materiales', component: ListadoMaterialesComponent },
+  { path: 'materiales', loadChildren: () => import('./materiales/materiales.module').then(m => m.MaterialesModule) },
   { path: 'cotizaciones', component: CotizacionesComponent },
   { path: 'accesorios/editar/:id', component: AccesoriosComponent },
   { path: 'accesorios', component: AccesoriosComponent },
-  { path: 'settings', component: SettingsComponent }
+  { path: 'settings', component: SettingsComponent },
 ];
 
 @NgModule({

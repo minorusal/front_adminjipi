@@ -1,5 +1,5 @@
 <div class="dashboard">
-  <header class="topbar" [style.marginLeft.px]="menuOpen && isDesktop ? 220 : 0">
+  <header class="topbar" [style.marginLeft.px]="menuOpen && isDesktop ? 250 : 0">
     <button
       class="hamburger"
       (click)="toggleMenu()"
@@ -8,7 +8,7 @@
       &#9776;
     </button>
     <div class="userinfo" *ngIf="user">
-      {{ user.name }} - {{ user.company }}
+      {{ user.username }} - {{ user.companyName }}
     </div>
     <button class="logout" (click)="onLogout()">
       <span class="material-icons" aria-hidden="true">logout</span>
@@ -17,7 +17,7 @@
   </header>
   <div class="body">
     <app-sidebar [open]="menuOpen"></app-sidebar>
-    <main class="content" [style.marginLeft.px]="menuOpen && isDesktop ? 220 : 0">
+    <main class="content" [style.marginLeft.px]="menuOpen && isDesktop ? 250 : 0">
       <router-outlet></router-outlet>
     </main>
   </div>
