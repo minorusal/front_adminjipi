@@ -1,0 +1,245 @@
+<nav class="breadcrumb">Inicio / Listado de materiales</nav>
+<h2>Listado de materiales</h2>
+<div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+<div class="button-bar">
+  <button
+    type="button"
+    class="add-material-btn"
+    title="Agregar Material"
+    (click)="openAddModal()"
+  >
+    <span class="material-icons" aria-hidden="true">add</span>
+  </button>
+</div>
+<div class="search-container">
+  <span class="material-icons">search</span>
+  <input
+    type="text"
+    placeholder="Buscar materiales"
+    [(ngModel)]="searchText"
+  (input)="onSearchChange()"
+  />
+</div>
+<table *ngIf="materiales?.length">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Descripción</th>
+      <th>Espesor (mm)</th>
+      <th>Ancho (m)</th>
+      <th>Largo (m)</th>
+      <th>Precio</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of materiales">
+      <td>{{ item.id }}</td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.description }}</td>
+      <td>{{ item.thickness_mm }}</td>
+      <td>{{ item.width_m }}</td>
+      <td>{{ item.length_m }}</td>
+      <td>{{ item.price }}</td>
+      <td>
+        <button
+          type="button"
+          class="edit-btn"
+          title="Editar Material"
+          (click)="editMaterial(item)"
+        >
+          <span class="material-icons" aria-hidden="true">edit</span>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<nav *ngIf="totalPages > 1" aria-label="Materials pagination" class="mt-3">
+  <ul class="pagination justify-content-center">
+    <li class="page-item" [class.disabled]="currentPage === 1">
+      <a class="page-link" href="#" (click)="goToPage(currentPage - 1); $event.preventDefault()">Anterior</a>
+    </li>
+    <li class="page-item" *ngFor="let p of pages" [class.active]="p === currentPage">
+      <a class="page-link" href="#" (click)="goToPage(p); $event.preventDefault()">{{ p }}</a>
+    </li>
+    <li class="page-item" [class.disabled]="currentPage === totalPages">
+      <a class="page-link" href="#" (click)="goToPage(currentPage + 1); $event.preventDefault()">Siguiente</a>
+    </li>
+  </ul>
+</nav>
+
+<div class="modal-overlay" *ngIf="showAddModal" (mousedown)="closeAddModal()">
+  <div class="add-modal" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()">
+    <span class="close-icon material-icons" (click)="closeAddModal()">close</span>
+    <h3>Agregar material</h3>
+    <form (ngSubmit)="saveMaterial(materialForm)" #materialForm="ngForm">
+      <div class="form-group">
+        <label for="mat-name">Nombre</label>
+        <input
+          id="mat-name"
+          type="text"
+          [(ngModel)]="newMaterial.name"
+          name="name"
+          required
+          #nameRef="ngModel"
+        />
+        <div class="error" *ngIf="nameRef.touched && nameRef.hasError('required')">
+          El nombre es requerido
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="mat-desc">Descripción</label>
+        <textarea
+          id="mat-desc"
+          [(ngModel)]="newMaterial.description"
+          name="description"
+          required
+          #descRef="ngModel"
+        ></textarea>
+        <div class="error" *ngIf="descRef.touched && descRef.hasError('required')">
+          La descripción es requerida
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="mat-type">Tipo</label>
+        <input
+          id="mat-type"
+          type="text"
+          list="materialTypeOptions"
+          [ngModel]="newMaterial.material_type_id"
+          (ngModelChange)="newMaterial.material_type_id = parseNumber($event)"
+          name="material_type_id"
+          required
+          #typeRef="ngModel"
+        />
+        <datalist id="materialTypeOptions">
+          <option *ngFor="let t of materialTypes" [value]="t.id">{{ t.name }}</option>
+        </datalist>
+        <div class="error" *ngIf="typeRef.touched && typeRef.hasError('required')">
+          El tipo es requerido
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="mat-thick">Espesor (mm)</label>
+        <input id="mat-thick" type="number" [(ngModel)]="newMaterial.thickness_mm" name="thickness_mm" />
+      </div>
+      <div class="form-group" *ngIf="isAreaType(newMaterial.material_type_id) || newMaterial.width_m !== undefined || newMaterial.length_m !== undefined">
+        <label for="mat-width">Ancho (m)</label>
+        <input id="mat-width" type="number" [(ngModel)]="newMaterial.width_m" name="width_m" />
+      </div>
+      <div class="form-group" *ngIf="isAreaType(newMaterial.material_type_id) || newMaterial.width_m !== undefined || newMaterial.length_m !== undefined">
+        <label for="mat-length">Largo (m)</label>
+        <input id="mat-length" type="number" [(ngModel)]="newMaterial.length_m" name="length_m" />
+      </div>
+      <div class="form-group">
+        <label for="mat-price">Precio</label>
+        <input
+          id="mat-price"
+          type="number"
+          [(ngModel)]="newMaterial.price"
+          name="price"
+          required
+          #priceRef="ngModel"
+        />
+        <div class="error" *ngIf="priceRef.touched && priceRef.hasError('required')">
+          El precio es requerido
+        </div>
+      </div>
+      <div class="error" *ngIf="saveError">{{ saveError }}</div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="isSaving || !materialForm.form.valid">Guardar</button>
+        <div class="loader-overlay" *ngIf="isSaving">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="modal-overlay" *ngIf="showEditModal" (mousedown)="closeEditModal()">
+  <div class="add-modal" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()">
+    <span class="close-icon material-icons" (click)="closeEditModal()">close</span>
+    <h3>Editar material</h3>
+    <form (ngSubmit)="updateMaterial(editForm)" #editForm="ngForm">
+      <div class="form-group">
+        <label for="edit-name">Nombre</label>
+        <input
+          id="edit-name"
+          type="text"
+          [(ngModel)]="editMaterialData.name"
+          name="name"
+          required
+          #editNameRef="ngModel"
+        />
+        <div class="error" *ngIf="editNameRef.touched && editNameRef.hasError('required')">
+          El nombre es requerido
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="edit-desc">Descripción</label>
+        <textarea
+          id="edit-desc"
+          [(ngModel)]="editMaterialData.description"
+          name="description"
+          required
+          #editDescRef="ngModel"
+        ></textarea>
+        <div class="error" *ngIf="editDescRef.touched && editDescRef.hasError('required')">
+          La descripción es requerida
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="edit-type">Tipo</label>
+        <input
+          id="edit-type"
+          type="text"
+          list="editMaterialTypeOptions"
+          [ngModel]="editMaterialData.material_type_id"
+          (ngModelChange)="editMaterialData.material_type_id = parseNumber($event)"
+          name="material_type_id"
+          required
+          #editTypeRef="ngModel"
+        />
+        <datalist id="editMaterialTypeOptions">
+          <option *ngFor="let t of materialTypes" [value]="t.id">{{ t.name }}</option>
+        </datalist>
+        <div class="error" *ngIf="editTypeRef.touched && editTypeRef.hasError('required')">
+          El tipo es requerido
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="edit-thick">Espesor (mm)</label>
+        <input id="edit-thick" type="number" [(ngModel)]="editMaterialData.thickness_mm" name="thickness_mm" />
+      </div>
+      <div class="form-group" *ngIf="isAreaType(editMaterialData.material_type_id) || editMaterialData.width_m !== undefined || editMaterialData.length_m !== undefined">
+        <label for="edit-width">Ancho (m)</label>
+        <input id="edit-width" type="number" [(ngModel)]="editMaterialData.width_m" name="width_m" />
+      </div>
+      <div class="form-group" *ngIf="isAreaType(editMaterialData.material_type_id) || editMaterialData.width_m !== undefined || editMaterialData.length_m !== undefined">
+        <label for="edit-length">Largo (m)</label>
+        <input id="edit-length" type="number" [(ngModel)]="editMaterialData.length_m" name="length_m" />
+      </div>
+      <div class="form-group">
+        <label for="edit-price">Precio</label>
+        <input
+          id="edit-price"
+          type="number"
+          [(ngModel)]="editMaterialData.price"
+          name="price"
+          required
+          #editPriceRef="ngModel"
+        />
+        <div class="error" *ngIf="editPriceRef.touched && editPriceRef.hasError('required')">
+          El precio es requerido
+        </div>
+      </div>
+      <div class="error" *ngIf="updateError">{{ updateError }}</div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="isUpdating || !editForm.form.valid">Guardar</button>
+        <div class="loader-overlay" *ngIf="isUpdating">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

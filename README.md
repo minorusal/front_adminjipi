@@ -16,7 +16,7 @@ Angular environment files (see next section).
 
 ## Accessory endpoints
 
-The following routes are used in `AccesoriosComponent` for creating and
+The following routes are used in `AccessoriesPage` for creating and
 updating accessories and their materials/components:
 
 - `POST /accessories` Crea un accesorio y puede incluir los campos `materials`
@@ -85,3 +85,22 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+## Architecture overview
+
+The codebase follows a simple feature based layout inspired by the
+Feature Shell pattern. Top level folders include:
+
+```
+src/
+  app/
+    core/      // singleton services and shell components
+    shared/    // reusable utils and presentation pieces
+  features/
+    materials/ // domain specific pages
+    accessories/
+    settings/
+```
+
+Pages under `features/**/shell` act as smart components and connect to the core
+services. Future modules should adopt the same folder convention.

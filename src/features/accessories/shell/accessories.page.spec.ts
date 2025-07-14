@@ -3,6 +3,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 
+<<<<<<< HEAD:src/app/accesorios/accesorios.component.spec.ts
 import { AccesoriosComponent } from './accesorios.component';
 import { MaterialService, Material, MaterialInList } from '../services/material.service';
 import { MaterialTypeService } from '../services/material-type.service';
@@ -25,10 +26,18 @@ interface SelectedChild {
   accessory: Accessory;
   quantity: number;
 }
+=======
+import { AccessoriesPage } from './accessories.page';
+import { MaterialService } from '../../../app/core/services/material.service';
+import { MaterialTypeService } from '../../../app/core/services/material-type.service';
+import { CookieService } from '../../../app/core/services/cookie.service';
+import { AccessoryService } from '../../../app/core/services/accessory.service';
+import { of } from 'rxjs';
+>>>>>>> 623efd667937a91c87fbe8fb2a7d690fdba176d9:src/features/accessories/shell/accessories.page.spec.ts
 
-describe('AccesoriosComponent', () => {
-  let component: AccesoriosComponent;
-  let fixture: ComponentFixture<AccesoriosComponent>;
+describe('AccessoriesPage', () => {
+  let component: AccessoriesPage;
+  let fixture: ComponentFixture<AccessoriesPage>;
   let materialServiceSpy: jasmine.SpyObj<MaterialService>;
   let materialTypeServiceSpy: jasmine.SpyObj<MaterialTypeService>;
   let accessoryServiceSpy: jasmine.SpyObj<AccessoryService>;
@@ -55,7 +64,7 @@ describe('AccesoriosComponent', () => {
     materialTypeServiceSpy.getMaterialTypes.and.returnValue(of([]));
 
     TestBed.configureTestingModule({
-      declarations: [AccesoriosComponent],
+      declarations: [AccessoriesPage],
       imports: [FormsModule],
       providers: [
         CookieService,
@@ -66,7 +75,7 @@ describe('AccesoriosComponent', () => {
       schemas: [NO_ERRORS_SCHEMA]
     });
 
-    fixture = TestBed.createComponent(AccesoriosComponent);
+    fixture = TestBed.createComponent(AccessoriesPage);
     component = fixture.componentInstance;
   });
 

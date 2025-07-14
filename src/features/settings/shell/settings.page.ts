@@ -1,13 +1,23 @@
 import { Component, OnInit } from '@angular/core';
+<<<<<<< HEAD:src/app/settings/settings.component.ts
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MenuService, MenuNode, MenuItem } from '../services/menu.service';
+=======
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { CookieService } from '../../../app/core/services/cookie.service';
+import { MenuService, MenuNode } from '../../../app/core/services/menu.service';
+import { NestedTreeControl } from '@angular/cdk/tree';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { environment } from '../../../environments/environment';
+>>>>>>> 623efd667937a91c87fbe8fb2a7d690fdba176d9:src/features/settings/shell/settings.page.ts
 
 @Component({
   selector: 'app-settings',
-  templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.css']
+  templateUrl: './settings.page.html',
+  styleUrls: ['./settings.page.css']
 })
-export class SettingsComponent implements OnInit {
+export class SettingsPage implements OnInit {
   menuForm: FormGroup;
   menuTree: MenuNode[] = [];
   flatMenu: MenuNode[] = [];

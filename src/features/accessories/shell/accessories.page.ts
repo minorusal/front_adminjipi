@@ -1,5 +1,15 @@
 import { Component, OnInit } from '@angular/core';
+<<<<<<< HEAD:src/app/accesorios/accesorios.component.ts
 import { NgForm } from '@angular/forms';
+=======
+import { ActivatedRoute, Router } from '@angular/router';
+import { MaterialService, Material } from '../../../app/core/services/material.service';
+import {
+  MaterialTypeService,
+  MaterialType,
+} from '../../../app/core/services/material-type.service';
+import { CookieService } from '../../../app/core/services/cookie.service';
+>>>>>>> 623efd667937a91c87fbe8fb2a7d690fdba176d9:src/features/accessories/shell/accessories.page.ts
 import {
   AccessoryService,
   Accessory,
@@ -10,11 +20,23 @@ import {
   AccessoryComponent,
   AccessoryMaterialDetail,
   AccessoryChildDetail,
+<<<<<<< HEAD:src/app/accesorios/accesorios.component.ts
 } from '../services/accessory.service';
 import { MaterialService, Material, MaterialInList } from '../services/material.service';
 import { MaterialTypeService, MaterialType } from '../services/material-type.service';
 import { toNumber } from '../utils/number-parse';
 import { CookieService } from '../services/cookie.service';
+=======
+  Accessory,
+} from '../../../app/core/services/accessory.service';
+import { toNumber } from '../../../app/shared/utils/number-parse';
+
+interface SelectedAccessory {
+  accessory: Accessory;
+  quantity: number;
+  component_id?: number;
+}
+>>>>>>> 623efd667937a91c87fbe8fb2a7d690fdba176d9:src/features/accessories/shell/accessories.page.ts
 
 interface SelectedMaterial {
   id?: number; // Will hold the accessory_materials.id for deletion
@@ -33,15 +55,40 @@ interface SelectedChild {
   quantity: number;
 }
 @Component({
-  selector: 'app-accesorios',
-  templateUrl: './accesorios.component.html',
-  styleUrls: ['./accesorios.component.css'],
+  selector: 'app-accessories',
+  templateUrl: './accessories.page.html',
+  styleUrls: ['./accessories.page.css'],
 })
+<<<<<<< HEAD:src/app/accesorios/accesorios.component.ts
 export class AccesoriosComponent implements OnInit {
   // Tab control
   activeTab: 'create' | 'list' | 'edit' = 'list';
 
   // State
+=======
+export class AccessoriesPage implements OnInit {
+  searchText = '';
+  results: Material[] = [];
+  selected: SelectedMaterial[] = [];
+  childSearchText = '';
+  accessoryResults: Accessory[] = [];
+  selectedChildren: SelectedAccessory[] = [];
+  showRemoveChildModal = false;
+  childToRemove: SelectedAccessory | null = null;
+  materialTypes: MaterialType[] = [];
+  searching = false;
+  showRemoveModal = false;
+  materialToRemove: SelectedMaterial | null = null;
+  profitPercentage = 0;
+  accessoryName = '';
+  accessoryDescription = '';
+  saveError = '';
+  successMessage = '';
+  isSaving = false;
+  formSubmitted = false;
+  accessories: Accessory[] = [];
+  ownerId: number | null = null;
+>>>>>>> 623efd667937a91c87fbe8fb2a7d690fdba176d9:src/features/accessories/shell/accessories.page.ts
   isEditing = false;
   editingId: number | null = null;
   isLoading = false;
