@@ -1,0 +1,21 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div>
+    <label>Email</label>
+    <input type="email" formControlName="email" />
+    <div *ngIf="form.controls.email.touched && form.controls.email.invalid">
+      <small *ngIf="form.controls.email.errors?.['required']">El email es requerido.</small>
+      <small *ngIf="form.controls.email.errors?.['email']">El email no es válido.</small>
+    </div>
+  </div>
+
+  <div>
+    <label>Contraseña</label>
+    <input type="password" formControlName="password" />
+    <div *ngIf="form.controls.password.touched && form.controls.password.invalid">
+      <small *ngIf="form.controls.password.errors?.['required']">La contraseña es requerida.</small>
+      <small *ngIf="form.controls.password.errors?.['minlength']">Mínimo 8 caracteres.</small>
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="form.invalid || isLoading">Ingresar</button>
+</form>
