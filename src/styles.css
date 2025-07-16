@@ -1,1 +1,41 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
+
+/* Dark theme inspired by ChatGPT */
+body {
+  background-color: #343541;
+  color: #ececf1;
+}
+
+app-login-form form {
+  background-color: #202123;
+  padding: 1.5rem;
+  border-radius: 8px;
+  max-width: 400px;
+  margin: 2rem auto;
+}
+
+app-login-form label {
+  margin-top: 0.5rem;
+}
+
+app-login-form input {
+  background-color: #40414f;
+  border: 1px solid #565869;
+  color: #ececf1;
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+}
+
+app-login-form button {
+  background-color: #10a37f;
+  border: none;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+app-login-form button:disabled {
+  opacity: 0.5;
+}

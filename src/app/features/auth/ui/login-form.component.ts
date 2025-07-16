@@ -14,11 +14,16 @@ export class LoginFormComponent {
   @Output() login = new EventEmitter<{ email: string; password: string }>();
 
   readonly form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
+    email: [localStorage.getItem('loginEmail') || '', [Validators.required, Validators.email]],
+    password: [localStorage.getItem('loginPassword') || '', [Validators.required, Validators.minLength(8)]],
   });
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder) {
+    this.form.valueChanges.subscribe(({ email, password }) => {
+      localStorage.setItem('loginEmail', email ?? '');
+      localStorage.setItem('loginPassword', password ?? '');
+    });
+  }
 
   onSubmit(): void {
     if (this.form.valid && !this.isLoading) {
