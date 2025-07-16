@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, tap } from 'rxjs';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthFacade {
@@ -9,16 +10,22 @@ export class AuthFacade {
   private readonly errorSubject = new BehaviorSubject<string | null>(null);
   readonly error$ = this.errorSubject.asObservable();
 
-  login(credentials: { email: string; password: string }): void {
+  constructor(private authService: AuthService) {}
+
+  login(credentials: { email: string; password: string }) {
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
-    try {
-      const token = btoa(`${credentials.email}:${credentials.password}`);
-      this.setToken(token);
-    } catch (e) {
-      this.errorSubject.next('Login failed');
-    }
-    this.loadingSubject.next(false);
+    return this.authService.login(credentials).pipe(
+      tap({
+        next: () => {
+          this.loadingSubject.next(false);
+        },
+        error: () => {
+          this.loadingSubject.next(false);
+          this.errorSubject.next('Login failed');
+        },
+      })
+    );
   }
 
   logout(): void {
@@ -27,9 +34,9 @@ export class AuthFacade {
 
   setToken(token: string | null): void {
     if (token) {
-      localStorage.setItem('token', token);
+      localStorage.setItem('sessionToken', token);
     } else {
-      localStorage.removeItem('token');
+      localStorage.removeItem('sessionToken');
     }
   }
 }

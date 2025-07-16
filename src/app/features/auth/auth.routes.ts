@@ -8,9 +8,10 @@ export const authRoutes: Routes = [
     component: AuthShellPage,
     children: [
       {
-        path: '',
+        path: 'login',
         component: AuthLoginPage,
       },
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
     ],
   },
 ];
