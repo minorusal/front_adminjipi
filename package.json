@@ -12,21 +12,21 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "@angular-devkit/build-angular": "*",
-    "@angular/cli": "*",
-    "typescript": "*"
+    "@angular-devkit/build-angular": "^15.2.0",
+    "@angular/cli": "^15.2.0",
+    "typescript": "~4.8.0"
   },
   "dependencies": {
-    "@angular/common": "*",
-    "@angular/core": "*",
-    "@angular/forms": "*",
-    "@angular/router": "*",
-    "@auth0/angular-jwt": "*",
-    "bootstrap": "*",
-    "crypto-js": "*",
-    "ngx-toastr": "*",
-    "rxjs": "*",
-    "socket.io-client": "*",
-    "zone.js": "*"
+    "@angular/common": "^15.2.0",
+    "@angular/core": "^15.2.0",
+    "@angular/forms": "^15.2.0",
+    "@angular/router": "^15.2.0",
+    "@auth0/angular-jwt": "^5.1.0",
+    "bootstrap": "^5.3.0",
+    "crypto-js": "^4.1.1",
+    "ngx-toastr": "^16.1.0",
+    "rxjs": "^7.5.0",
+    "socket.io-client": "^4.7.2",
+    "zone.js": "^0.12.0"
   }
 }
