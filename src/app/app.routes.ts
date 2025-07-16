@@ -7,4 +7,12 @@ export const appRoutes: Routes = [
       import('./features/auth/auth.routes').then((m) => m.authRoutes),
     data: { preload: true },
   },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component').then(
+        (m) => m.DashboardComponent
+      ),
+  },
+  { path: '', redirectTo: 'auth', pathMatch: 'full' },
 ];

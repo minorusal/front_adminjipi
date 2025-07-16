@@ -1,0 +1,13 @@
+{
+  "/api": {
+    "target": "<URL BASE API>",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/socket.io": {
+    "target": "<URL SERVIDOR SOCKET>",
+    "ws": true,
+    "secure": false,
+    "changeOrigin": true
+  }
+}
