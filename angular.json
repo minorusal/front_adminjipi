@@ -4,6 +4,7 @@
   "projects": {
     "front-adminjipi": {
       "projectType": "application",
+      "root": "",
       "sourceRoot": "src",
       "prefix": "app",
       "architect": {
