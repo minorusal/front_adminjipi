@@ -1,4 +1,5 @@
 export const environment = {
   production: false,
-  encryptionKey: '<CLAVE_ENC>'
+  keyCipher: '<KEY_CIPHER>',
+  genericToken: '<GENERIC_TOKEN>'
 };

@@ -29,14 +29,19 @@ export class AuthFacade {
   }
 
   logout(): void {
-    this.setToken(null);
+    const token = localStorage.getItem('sessionToken');
+    if (token) {
+      this.authService.logout(token).subscribe({
+        next: () => this.clearTokens(),
+        error: () => this.clearTokens(),
+      });
+    } else {
+      this.clearTokens();
+    }
   }
 
-  setToken(token: string | null): void {
-    if (token) {
-      localStorage.setItem('sessionToken', token);
-    } else {
-      localStorage.removeItem('sessionToken');
-    }
+  private clearTokens(): void {
+    localStorage.removeItem('sessionToken');
+    localStorage.removeItem('refreshToken');
   }
 }
