@@ -6,8 +6,8 @@ import { EncryptService } from './encrypt.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly loginUrl = '/api/auth/login';
-  private readonly logoutUrl = '/api/auth/logout';
+  private readonly loginUrl = `${environment.apiUrl}/api/auth/login`;
+  private readonly logoutUrl = `${environment.apiUrl}/api/auth/logout`;
 
   constructor(private http: HttpClient, private cipher: EncryptService) {}
 

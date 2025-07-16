@@ -1,11 +1,11 @@
 {
   "/api": {
-    "target": "<URL BASE API>",
+    "target": "http://localhost:3000",
     "secure": false,
     "changeOrigin": true
   },
   "/socket.io": {
-    "target": "<URL SERVIDOR SOCKET>",
+    "target": "http://localhost:3000",
     "ws": true,
     "secure": false,
     "changeOrigin": true

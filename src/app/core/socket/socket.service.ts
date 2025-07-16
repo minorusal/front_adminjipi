@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SocketService {
@@ -10,7 +11,7 @@ export class SocketService {
 
   connect(): void {
     const token = localStorage.getItem('sessionToken');
-    this.socket = io('<URL SERVIDOR SOCKET>', {
+    this.socket = io(environment.socketUrl, {
       auth: { token },
     });
 
