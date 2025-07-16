@@ -1,27 +1,45 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import * as CryptoJS from 'crypto-js';
 import { environment } from '../../../environments/environment';
+import { EncryptService } from './encrypt.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly loginUrl = '/api/auth/login';
-  private readonly encryptionKey = environment.encryptionKey;
+  private readonly logoutUrl = '/api/auth/logout';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cipher: EncryptService) {}
 
   login(credentials: { email: string; password: string }) {
-    return this.http.post<{ data: string }>(this.loginUrl, credentials).pipe(
-      map((resp) => {
-        const bytes = CryptoJS.AES.decrypt(resp.data, this.encryptionKey);
-        const decrypted = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-        localStorage.setItem('sessionToken', decrypted.sessionToken);
-        localStorage.setItem('refreshToken', decrypted.refreshToken);
-        localStorage.setItem('user_id', decrypted.user_id);
-        localStorage.setItem('company_id', decrypted.company_id);
-        return decrypted;
-      })
-    );
+    const encrypted = this.cipher.encrypt(credentials);
+    const headers = new HttpHeaders({
+      'mc-token': `Bearer ${environment.genericToken}`,
+      'Content-Type': 'text/plain',
+    });
+    return this.http
+      .post(this.loginUrl, encrypted, { headers, responseType: 'text' })
+      .pipe(
+        map((resp) => {
+          const decrypted = this.cipher.decrypt(resp);
+          const tokens = decrypted.login?.usu_token || {};
+          if (tokens.sessionToken) {
+            localStorage.setItem('sessionToken', tokens.sessionToken);
+          }
+          if (tokens.refreshToken) {
+            localStorage.setItem('refreshToken', tokens.refreshToken);
+          }
+          return decrypted;
+        })
+      );
+  }
+
+  logout(sessionToken: string) {
+    const headers = new HttpHeaders({
+      'mc-token': `Bearer ${sessionToken}`,
+    });
+    return this.http.delete<{ results: { deleted: boolean } }>(this.logoutUrl, {
+      headers,
+    });
   }
 }
