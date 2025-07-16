@@ -13,3 +13,8 @@ This project targets Angular 15 and can be built using **Node.js 16.13.2**.
 Newer versions of Angular CLI rely on Node 18 features such as
 `os.availableParallelism()`. Pinning the Angular packages to v15 allows the
 project to run with Node 16.
+
+When installing dependencies run `npm install` from the project root. If npm
+reports a peer dependency conflict related to `@angular-devkit/build-angular`,
+remove any globally installed Angular CLI packages and retry with
+`npm install --legacy-peer-deps`.
