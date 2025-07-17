@@ -22,6 +22,7 @@ export class SocketService {
 
   connect(): void {
     const token = localStorage.getItem('sessionToken') || '';
+    console.log('SocketService: connecting to', environment.socketUrl);
     this.socket = io(environment.socketUrl, {
       query: { token },
       extraHeaders: { Authorization: `Bearer ${token}` },
@@ -120,14 +121,17 @@ export class SocketService {
   }
 
   markSeen(uuid: string): void {
+    console.log('SocketService: markSeen', uuid);
     this.socket?.emit('notification:seen', { uuid } as NotificationSeen);
   }
 
   delete(uuid: string): void {
+    console.log('SocketService: delete', uuid);
     this.socket?.emit('notification:delete', { uuid } as NotificationDelete);
   }
 
   createNotification(payload: Notificacion): void {
+    console.log('SocketService: createNotification', payload);
     this.socket?.emit('crea-notificacion', payload);
   }
 
