@@ -66,9 +66,11 @@ test('createNotification emits correct payload', () => {
   const socket = new FakeSocket();
   service.setSocketForTesting(socket as any);
 
+  (globalThis as any).document = { cookie: 'from_company_id=9; from_user_id=8' };
+
   const payload = {
-    from_company_id: 1,
-    from_user_id: 2,
+    from_company_id: 0,
+    from_user_id: 0,
     to_company_id: 3,
     to_user_id: 4,
     title: 't',
@@ -80,7 +82,11 @@ test('createNotification emits correct payload', () => {
   service.createNotification(payload as any);
   assert.deepStrictEqual(socket.emitted[0], {
     event: 'crea-notificacion',
-    payload,
+    payload: {
+      ...payload,
+      from_company_id: 9,
+      from_user_id: 8,
+    },
   });
 });
 
