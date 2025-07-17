@@ -4,21 +4,27 @@ import { Router } from '@angular/router';
 import { SocketService } from '../../core/socket/socket.service';
 import { Notificacion } from '../../core/socket/notification.types';
 import { NotificationBadgeComponent } from '../../shared/components/notification-badge.component';
-import { NotificationListComponent } from '../../shared/components/notification-list.component';
+import { NotificationTableComponent } from '../../shared/components/notification-table.component';
 import { AuthFacade } from '../auth/data-access/auth.facade';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, NotificationBadgeComponent, NotificationListComponent],
+  imports: [
+    CommonModule,
+    NotificationBadgeComponent,
+    NotificationTableComponent,
+  ],
   template: `
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2>Dashboard</h2>
       <button class="btn btn-outline-secondary" (click)="logout()">Logout</button>
     </div>
-    <button class="btn btn-primary mb-3" (click)="createSample()">Crear Notificación</button>
+    <div class="d-flex align-items-start mb-3">
+      <button class="btn btn-primary me-3" (click)="createSample()">Crear Notificación</button>
+      <app-notification-table></app-notification-table>
+    </div>
     <app-notification-badge></app-notification-badge>
-    <app-notification-list></app-notification-list>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
