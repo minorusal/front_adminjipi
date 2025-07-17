@@ -65,6 +65,37 @@ test('createNotification emits correct payload', () => {
   });
 });
 
+test('getNotification emits correct payload', () => {
+  const service = new SocketService();
+  const socket = new FakeSocket();
+  service.setSocketForTesting(socket as any);
+
+  service.getNotification({ uuid: '42' } as any);
+  assert.deepStrictEqual(socket.emitted[0], {
+    event: 'notification:get',
+    payload: { uuid: '42' },
+  });
+});
+
+test('notification:get:ack adds or updates notification', () => {
+  const service = new SocketService();
+  const socket = new FakeSocket();
+  service.setSocketForTesting(socket as any);
+
+  const initial = [{ uuid: '1', title: 'old' }];
+  socket.emit('notification:list', initial);
+
+  const update = { uuid: '1', title: 'new' };
+  socket.emit('notification:get:ack', { data: update });
+  assert.deepStrictEqual(service.notifications$.value[0], update);
+
+  const added = { uuid: '2', title: 'added' };
+  socket.emit('notification:get:ack', { data: added });
+  assert.strictEqual(service.notifications$.value.length, 2);
+  assert.deepStrictEqual(service.notifications$.value[0], added);
+  assert.deepStrictEqual(service.notifications$.value[1], update);
+});
+
 test('logs error on connection failure', () => {
   const service = new SocketService();
   const socket = new FakeSocket();
