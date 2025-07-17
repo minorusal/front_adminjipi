@@ -44,22 +44,31 @@ export class SocketService {
       return;
     }
 
-    this.socket.on('notification:list', (list) => this.notifications$.next(list));
-    this.socket.on('notification:badge', (b) => this.badge$.next(b));
+    this.socket.on('notification:list', (list) => {
+      console.log('SocketService: notification:list', list);
+      this.notifications$.next(list);
+    });
+    this.socket.on('notification:badge', (b) => {
+      console.log('SocketService: notification:badge', b);
+      this.badge$.next(b);
+    });
 
     this.socket.on('notification:list:ack', (resp) => {
+      console.log('SocketService: notification:list:ack', resp);
       if (!resp?.error) {
         this.notifications$.next(resp.data);
       }
     });
 
     this.socket.on('notification:unseen-count:ack', (resp) => {
+      console.log('SocketService: notification:unseen-count:ack', resp);
       if (!resp?.error) {
         this.badge$.next(resp.data);
       }
     });
 
     this.socket.on('notificacion-creada', (resp) => {
+      console.log('SocketService: notificacion-creada', resp);
       if (!resp?.error && resp?.data) {
         this.notifications$.next([resp.data, ...this.notifications$.value]);
         this.badge$.next(this.badge$.value + 1);
@@ -67,6 +76,7 @@ export class SocketService {
     });
 
     this.socket.on('notification:seen:ack', (resp) => {
+      console.log('SocketService: notification:seen:ack', resp);
       if (!resp?.error) {
         const uuid = resp.data;
         this.notifications$.next(
@@ -79,6 +89,7 @@ export class SocketService {
     });
 
     this.socket.on('notification:update-status:ack', (resp) => {
+      console.log('SocketService: notification:update-status:ack', resp);
       if (!resp?.error) {
         this.notifications$.next(
           this.notifications$.value.map((n) =>
@@ -89,6 +100,7 @@ export class SocketService {
     });
 
     this.socket.on('notification:delete:ack', (resp) => {
+      console.log('SocketService: notification:delete:ack', resp);
       if (!resp?.error) {
         const uuid = resp.data;
         this.notifications$.next(
@@ -98,12 +110,14 @@ export class SocketService {
     });
 
     this.socket.on('notification:deleted', (uuid) => {
+      console.log('SocketService: notification:deleted', uuid);
       this.notifications$.next(
         this.notifications$.value.filter((n) => n.uuid !== uuid)
       );
     });
 
     this.socket.on('notification:get:ack', (resp) => {
+      console.log('SocketService: notification:get:ack', resp);
       if (!resp?.error && resp?.data) {
         const n = resp.data;
         const exists = this.notifications$.value.some((x) => x.uuid === n.uuid);
