@@ -41,3 +41,26 @@ test('notification:seen:ack updates badge and notifications', () => {
   assert.strictEqual(service.badge$.value, 0);
   assert.strictEqual(service.notifications$.value[0].seen, true);
 });
+
+test('createNotification emits correct payload', () => {
+  const service = new SocketService();
+  const socket = new FakeSocket();
+  service.setSocketForTesting(socket as any);
+
+  const payload = {
+    from_company_id: 1,
+    from_user_id: 2,
+    to_company_id: 3,
+    to_user_id: 4,
+    title: 't',
+    body: 'b',
+    payload: {},
+    channel: 'email',
+  };
+
+  service.createNotification(payload as any);
+  assert.deepStrictEqual(socket.emitted[0], {
+    event: 'crea-notificacion',
+    payload,
+  });
+});
