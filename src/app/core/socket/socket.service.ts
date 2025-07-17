@@ -51,7 +51,8 @@ export class SocketService {
     });
     this.socket.on('notification:badge', (b) => {
       console.log('SocketService: notification:badge', b);
-      this.badge$.next(b);
+      const count = typeof b === 'number' ? b : b?.data ?? b?.count ?? 0;
+      this.badge$.next(count);
     });
 
     this.socket.on('notification:list:ack', (resp) => {
