@@ -27,6 +27,12 @@ export class SocketService {
       query: { token },
       extraHeaders: { Authorization: `Bearer ${token}` },
     });
+    this.socket.on('connect', () =>
+      console.log('SocketService: connected to socket')
+    );
+    this.socket.on('connect_error', (err) =>
+      console.error('SocketService: connection error', err)
+    );
     this.registerHandlers();
   }
 
@@ -117,6 +123,12 @@ export class SocketService {
    */
   setSocketForTesting(socket: Pick<Socket, 'on' | 'emit'>): void {
     this.socket = socket as Socket;
+    this.socket.on('connect', () =>
+      console.log('SocketService: connected to socket')
+    );
+    this.socket.on('connect_error', (err) =>
+      console.error('SocketService: connection error', err)
+    );
     this.registerHandlers();
   }
 

@@ -64,3 +64,21 @@ test('createNotification emits correct payload', () => {
     payload,
   });
 });
+
+test('logs error on connection failure', () => {
+  const service = new SocketService();
+  const socket = new FakeSocket();
+  service.setSocketForTesting(socket as any);
+
+  let captured: any;
+  const orig = console.error;
+  console.error = (_msg: any, err?: any) => {
+    captured = err ?? _msg;
+  };
+
+  const error = new Error('fail');
+  socket.emit('connect_error', error);
+
+  console.error = orig;
+  assert.strictEqual(captured, error);
+});
