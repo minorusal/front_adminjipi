@@ -70,7 +70,11 @@ export class SocketService {
     this.socket.on('notification:unseen-count:ack', (resp) => {
       console.log('SocketService: notification:unseen-count:ack', resp);
       if (!resp?.error) {
-        this.badge$.next(resp.data);
+        const count =
+          typeof resp.data === 'number'
+            ? resp.data
+            : resp?.data?.data ?? resp?.data?.count ?? 0;
+        this.badge$.next(count);
       }
     });
 

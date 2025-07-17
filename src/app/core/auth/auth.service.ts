@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { EncryptService } from './encrypt.service';
+import { setCookie } from '../../shared/utils/cookies';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -29,6 +30,13 @@ export class AuthService {
           }
           if (tokens.refreshToken) {
             localStorage.setItem('refreshToken', tokens.refreshToken);
+          }
+          const user = decrypted.login?.usuario;
+          if (user?.company_id) {
+            setCookie('from_company_id', String(user.company_id));
+          }
+          if (user?.idDb) {
+            setCookie('from_user_id', String(user.idDb));
           }
           return decrypted;
         })
