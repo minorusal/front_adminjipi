@@ -1,4 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SocketService } from '../../core/socket/socket.service';
@@ -29,7 +34,7 @@ import { AuthFacade } from '../auth/data-access/auth.facade';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   constructor(
     private socketService: SocketService,
     private router: Router,
@@ -60,7 +65,12 @@ export class DashboardComponent implements OnInit {
   }
 
   logout(): void {
+    this.socketService.disconnect();
     this.authFacade.logout();
     this.router.navigate(['/auth/login']);
+  }
+
+  ngOnDestroy(): void {
+    this.socketService.disconnect();
   }
 }

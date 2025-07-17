@@ -9,10 +9,20 @@
     "paths": {
       "socket.io-client": ["tests/stubs/socket.io-client"],
       "rxjs": ["tests/stubs/rxjs"],
-      "@angular/core": ["tests/stubs/angular-core"]
+      "@angular/core": ["tests/stubs/angular-core"],
+      "@angular/common/http": ["tests/stubs/angular-common-http"],
+      "rxjs/operators": ["tests/stubs/rxjs-operators"],
+      "crypto-js": ["tests/stubs/crypto-js"]
     }
   },
-  "include": ["tests/**/*.ts", "src/app/core/socket/**/*.ts", "tests/typings/**/*.d.ts"],
+  "include": [
+    "tests/**/*.ts",
+    "src/app/core/socket/**/*.ts",
+    "src/app/core/auth/auth.service.ts",
+    "src/app/core/auth/encrypt.service.ts",
+    "src/app/shared/utils/cookies.ts",
+    "tests/typings/**/*.d.ts"
+  ],
   "typeAcquisition": {
     "enable": false
   }
