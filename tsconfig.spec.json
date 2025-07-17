@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist/test",
+    "module": "commonjs",
+    "target": "es2020",
+    "importHelpers": false,
+    "skipLibCheck": true,
+    "paths": {
+      "socket.io-client": ["tests/stubs/socket.io-client"],
+      "rxjs": ["tests/stubs/rxjs"],
+      "@angular/core": ["tests/stubs/angular-core"]
+    }
+  },
+  "include": ["tests/**/*.ts", "src/app/core/socket/**/*.ts", "tests/typings/**/*.d.ts"],
+  "typeAcquisition": {
+    "enable": false
+  }
+}

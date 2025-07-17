@@ -18,3 +18,9 @@ When installing dependencies run `npm install` from the project root. If npm
 reports a peer dependency conflict related to `@angular-devkit/build-angular`,
 remove any globally installed Angular CLI packages and retry with
 `npm install --legacy-peer-deps`.
+
+## Socket tests
+
+Run `npm test` to execute a lightweight test suite for the `SocketService`.
+The tests use stubbed versions of Angular and Socket.IO so they work even
+without installing the full dependency tree.

@@ -22,10 +22,21 @@ export class SocketService {
 
   connect(): void {
     const token = localStorage.getItem('sessionToken') || '';
+    console.log('SocketService: connecting to', environment.socketUrl);
     this.socket = io(environment.socketUrl, {
       query: { token },
       extraHeaders: { Authorization: `Bearer ${token}` },
     });
+    this.registerHandlers();
+  }
+
+  /**
+   * Registers all socket listeners. Extracted for easier testing.
+   */
+  private registerHandlers(): void {
+    if (!this.socket) {
+      return;
+    }
 
     this.socket.on('notification:list', (list) => this.notifications$.next(list));
     this.socket.on('notification:badge', (b) => this.badge$.next(b));
@@ -101,15 +112,26 @@ export class SocketService {
     });
   }
 
+  /**
+   * Allows injecting a mock socket when running tests.
+   */
+  setSocketForTesting(socket: Pick<Socket, 'on' | 'emit'>): void {
+    this.socket = socket as Socket;
+    this.registerHandlers();
+  }
+
   markSeen(uuid: string): void {
+    console.log('SocketService: markSeen', uuid);
     this.socket?.emit('notification:seen', { uuid } as NotificationSeen);
   }
 
   delete(uuid: string): void {
+    console.log('SocketService: delete', uuid);
     this.socket?.emit('notification:delete', { uuid } as NotificationDelete);
   }
 
   createNotification(payload: Notificacion): void {
+    console.log('SocketService: createNotification', payload);
     this.socket?.emit('crea-notificacion', payload);
   }
 
