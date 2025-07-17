@@ -47,7 +47,11 @@ export class SocketService {
 
     this.socket.on('notification:list', (list) => {
       console.log('SocketService: notification:list', list);
-      const arr = Array.isArray(list) ? list : list?.data ?? [];
+      const arr = Array.isArray(list)
+        ? list
+        : Array.isArray(list?.data)
+        ? list.data
+        : [];
       this.notifications$.next(arr);
     });
     this.socket.on('notification:badge', (b) => {
