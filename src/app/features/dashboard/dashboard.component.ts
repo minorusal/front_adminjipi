@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SocketService } from '../../core/socket/socket.service';
 import { Notificacion } from '../../core/socket/notification.types';
+import { getCookie } from '../../shared/utils/cookies';
 import { NotificationBadgeComponent } from '../../shared/components/notification-badge.component';
 import { NotificationTableComponent } from '../../shared/components/notification-table.component';
 import { AuthFacade } from '../auth/data-access/auth.facade';
@@ -43,9 +44,11 @@ export class DashboardComponent implements OnInit {
 
   createSample(): void {
     console.log('DashboardComponent: createSample clicked');
+    const fromCompanyId = Number(getCookie('from_company_id')) || 0;
+    const fromUserId = Number(getCookie('from_user_id')) || 0;
     const payload: Notificacion = {
-      from_company_id: 66,
-      from_user_id: 84,
+      from_company_id: fromCompanyId,
+      from_user_id: fromUserId,
       to_company_id: 83,
       to_user_id: 102,
       title: 'Título de la notificación',
