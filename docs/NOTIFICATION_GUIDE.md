@@ -24,6 +24,9 @@ const payload = {
   data: { ... }
 };
 
+// El SocketService añade automáticamente `from_company_id` y `from_user_id`
+// leyendo las cookies con esos nombres cuando se envía la notificación.
+
 this.http.post(`${environment.apiUrl}/api/notifications`, payload).subscribe();
 this.socket.emit('crea-notificacion', payload);
 ```

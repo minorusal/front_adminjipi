@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import io, { Socket } from 'socket.io-client';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { getCookie } from '../../shared/utils/cookies';
 import {
   Notificacion,
   NotificationDelete,
@@ -168,8 +169,13 @@ export class SocketService {
   }
 
   createNotification(payload: Notificacion): void {
-    console.log('SocketService: createNotification', payload);
-    this.socket?.emit('crea-notificacion', payload);
+    const enriched: Notificacion = {
+      ...payload,
+      from_company_id: Number(getCookie('from_company_id')) || 0,
+      from_user_id: Number(getCookie('from_user_id')) || 0,
+    };
+    console.log('SocketService: createNotification', enriched);
+    this.socket?.emit('crea-notificacion', enriched);
   }
 
   requestList(params: NotificationListParams = {}): void {
