@@ -16,8 +16,8 @@ Envíe un `POST` a `/api/notifications` con el mismo cuerpo que se envía por el
 
 ```ts
 const payload = {
-  from_user_id: usuario.idDb,
-  from_company_id: usuario.company_id,
+  from_user_id: usuario.usu_id,
+  from_company_id: usuario.emp_id,
   to_user_id: destinatario,
   to_company_id: null,
   tipo: 10,

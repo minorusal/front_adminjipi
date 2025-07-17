@@ -32,11 +32,11 @@ export class AuthService {
             localStorage.setItem('refreshToken', tokens.refreshToken);
           }
           const user = decrypted.login?.usuario;
-          if (user?.company_id) {
-            setCookie('from_company_id', String(user.company_id));
+          if (user?.emp_id) {
+            setCookie('from_company_id', String(user.emp_id));
           }
-          if (user?.idDb) {
-            setCookie('from_user_id', String(user.idDb));
+          if (user?.usu_id) {
+            setCookie('from_user_id', String(user.usu_id));
           }
           return decrypted;
         })
