@@ -8,6 +8,8 @@ Este documento resume la comunicación por sockets y HTTP necesaria para utiliza
 - **notification:new**: llega cuando el backend genera una notificación externa.
 - **notificacion-creada**: confirma la creación de una nueva notificación.
 - **notification:seen:ack**: respuesta al marcar una notificación como vista.
+- **notification:get:ack**: devuelve la notificación solicitada por `uuid`. El
+  frontend actualiza la tabla de notificaciones al recibir este evento.
 
 ## Crear una notificación
 Envíe un `POST` a `/api/notifications` con el mismo cuerpo que se envía por el evento `crea-notificacion`.
@@ -33,3 +35,10 @@ this.socket.emit('notification:seen', uuid);
 ```
 
 Al recibir `notification:seen:ack` se actualiza el contador local.
+
+## Obtener una notificación individual
+
+```ts
+socket.emit('notification:get', { uuid: '123' });
+// Al recibir `notification:get:ack` el servicio agrega o actualiza la notificación
+```

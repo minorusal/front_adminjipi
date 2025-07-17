@@ -37,6 +37,8 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.socketService.connect();
+    this.socketService.requestList();
+    this.socketService.requestUnseenCount();
   }
 
   createSample(): void {
