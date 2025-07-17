@@ -24,3 +24,7 @@ remove any globally installed Angular CLI packages and retry with
 Run `npm test` to execute a lightweight test suite for the `SocketService`.
 The tests use stubbed versions of Angular and Socket.IO so they work even
 without installing the full dependency tree.
+
+The `SocketService` now logs a message when the connection succeeds and prints
+any socket connection errors to the console. This helps diagnose networking
+issues during development.
