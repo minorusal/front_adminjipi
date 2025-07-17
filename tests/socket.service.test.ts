@@ -42,6 +42,15 @@ test('notification:seen:ack updates badge and notifications', () => {
   assert.strictEqual(service.notifications$.value[0].seen, true);
 });
 
+test('notification:badge handles object payloads', () => {
+  const service = new SocketService();
+  const socket = new FakeSocket();
+  service.setSocketForTesting(socket as any);
+
+  socket.emit('notification:badge', { data: 5 });
+  assert.strictEqual(service.badge$.value, 5);
+});
+
 test('createNotification emits correct payload', () => {
   const service = new SocketService();
   const socket = new FakeSocket();
