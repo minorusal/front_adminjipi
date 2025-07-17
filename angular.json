@@ -44,5 +44,8 @@
       }
     }
   },
-  "defaultProject": "front-adminjipi"
+  "defaultProject": "front-adminjipi",
+  "cli": {
+    "analytics": false
+  }
 }
