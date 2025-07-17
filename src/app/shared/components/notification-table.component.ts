@@ -1,6 +1,12 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  OnInit,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SocketService } from '../../core/socket/socket.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-notification-table',
@@ -29,9 +35,23 @@ import { SocketService } from '../../core/socket/socket.service';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NotificationTableComponent {
+export class NotificationTableComponent implements OnInit, OnDestroy {
   readonly notifications$ = this.socketService.notifications$;
+  private subscription = new Subscription();
+
   constructor(private socketService: SocketService) {}
+
+  ngOnInit(): void {
+    this.subscription.add(
+      this.notifications$.subscribe((list) =>
+        console.log('NotificationTableComponent: notifications', list)
+      )
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 
   markSeen(uuid: string): void {
     this.socketService.markSeen(uuid);
