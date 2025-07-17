@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SocketService } from '../../core/socket/socket.service';
+import { Notificacion } from '../../core/socket/notification.types';
 import { NotificationBadgeComponent } from '../../shared/components/notification-badge.component';
 import { NotificationListComponent } from '../../shared/components/notification-list.component';
 import { AuthFacade } from '../auth/data-access/auth.facade';
@@ -33,13 +34,11 @@ export class DashboardComponent implements OnInit {
   }
 
   createSample(): void {
-    const payload = {
-      from_user_id: 1,
-      from_company_id: null,
-      to_user_id: 1,
-      to_company_id: null,
+    const payload: Notificacion = {
+      origen: null,
+      destino: 1,
       tipo: 10,
-      data: { title: 'Demo', message: 'Prueba de notificacion' },
+      data: 0,
     };
     this.socketService.createNotification(payload);
   }
