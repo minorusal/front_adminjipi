@@ -22,21 +22,20 @@ export class AuthService {
       .post(this.loginUrl, encrypted, { headers, responseType: 'text' })
       .pipe(
         map((resp) => {
-          const decrypted = this.cipher.decrypt(resp)
-          console.log(decrypted)
-          const tokens = decrypted.login?.usu_token || {};
+          const decrypted = JSON.parse(this.cipher.decrypt(resp))
+          const tokens = decrypted.login?.usu_token || {}
           if (tokens.sessionToken) {
-            localStorage.setItem('sessionToken', tokens.sessionToken);
+            localStorage.setItem('sessionToken', tokens.sessionToken)
           }
           if (tokens.refreshToken) {
-            localStorage.setItem('refreshToken', tokens.refreshToken);
+            localStorage.setItem('refreshToken', tokens.refreshToken)
           }
-          const user = decrypted.login?.usuario;
+          const user = decrypted.login?.usu;
           if (user?.emp_id) {
-            setCookie('from_company_id', String(user.emp_id));
+            setCookie('from_company_id', String(user.emp_id))
           }
           if (user?.usu_id) {
-            setCookie('from_user_id', String(user.usu_id));
+            setCookie('from_user_id', String(user.usu_id))
           }
           return decrypted;
         })
