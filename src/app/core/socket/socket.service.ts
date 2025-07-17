@@ -26,6 +26,16 @@ export class SocketService {
       query: { token },
       extraHeaders: { Authorization: `Bearer ${token}` },
     });
+    this.registerHandlers();
+  }
+
+  /**
+   * Registers all socket listeners. Extracted for easier testing.
+   */
+  private registerHandlers(): void {
+    if (!this.socket) {
+      return;
+    }
 
     this.socket.on('notification:list', (list) => this.notifications$.next(list));
     this.socket.on('notification:badge', (b) => this.badge$.next(b));
@@ -99,6 +109,14 @@ export class SocketService {
         }
       }
     });
+  }
+
+  /**
+   * Allows injecting a mock socket when running tests.
+   */
+  setSocketForTesting(socket: Pick<Socket, 'on' | 'emit'>): void {
+    this.socket = socket as Socket;
+    this.registerHandlers();
   }
 
   markSeen(uuid: string): void {
