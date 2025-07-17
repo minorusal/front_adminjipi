@@ -55,9 +55,9 @@ export class SocketService {
       this.badge$.next(count);
     });
 
-    this.socket.on('notification:get:ack', (resp) => {
+    this.socket.on('notification:list:ack', (resp) => {
       if (!resp?.error) {
-        console.log('notification:get:ack', resp)
+        console.log('notification:list:ack', resp)
         const arr = Array.isArray(resp.data)
           ? resp.data
           : Array.isArray(resp?.data?.data)
@@ -190,5 +190,12 @@ export class SocketService {
 
   getNotification(payload: NotificationGet): void {
     this.socket?.emit('notification:get', payload);
+  }
+
+  disconnect(): void {
+    this.socket?.disconnect();
+    this.socket = undefined;
+    this.notifications$.next([]);
+    this.badge$.next(0);
   }
 }
