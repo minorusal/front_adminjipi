@@ -34,6 +34,7 @@ export class DashboardComponent implements OnInit {
   }
 
   createSample(): void {
+    console.log('DashboardComponent: createSample clicked');
     const payload: Notificacion = {
       origen: null,
       destino: 1,
