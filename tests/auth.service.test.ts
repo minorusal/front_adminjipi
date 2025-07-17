@@ -43,7 +43,7 @@ test('login sets user/company cookies', () => {
       this._cookies[name] = decodeURIComponent(v);
     },
   };
-  const payload = { login: { usuario: { company_id: 5, idDb: 9 }, usu_token: {} } };
+  const payload = { login: { usuario: { emp_id: 5, usu_id: 9 }, usu_token: {} } };
   const http = new FakeHttpClient(JSON.stringify(payload));
   const cipher = new FakeCipher();
   const service = new AuthService(http as any, cipher as any);
@@ -53,7 +53,7 @@ test('login sets user/company cookies', () => {
     result = r;
   });
 
-  assert.strictEqual(result.login.usuario.company_id, 5);
+  assert.strictEqual(result.login.usuario.emp_id, 5);
   assert.strictEqual(getCookie('from_company_id'), '5');
   assert.strictEqual(getCookie('from_user_id'), '9');
 });
