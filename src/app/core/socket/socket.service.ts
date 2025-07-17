@@ -55,9 +55,9 @@ export class SocketService {
       this.badge$.next(count);
     });
 
-    this.socket.on('notification:list:ack', (resp) => {
-      console.log('SocketService: notification:list:ack', resp);
+    this.socket.on('notification:get:ack', (resp) => {
       if (!resp?.error) {
+        console.log('notification:get:ack', resp)
         const arr = Array.isArray(resp.data)
           ? resp.data
           : Array.isArray(resp?.data?.data)
@@ -107,7 +107,7 @@ export class SocketService {
     });
 
     this.socket.on('notification:delete:ack', (resp) => {
-      console.log('SocketService: notification:delete:ack', resp);
+      console.log('SocketService: notification:delete:ack', resp)
       if (!resp?.error) {
         const uuid = resp.data;
         this.notifications$.next(
