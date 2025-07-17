@@ -58,7 +58,12 @@ export class SocketService {
     this.socket.on('notification:list:ack', (resp) => {
       console.log('SocketService: notification:list:ack', resp);
       if (!resp?.error) {
-        this.notifications$.next(resp.data);
+        const arr = Array.isArray(resp.data)
+          ? resp.data
+          : Array.isArray(resp?.data?.data)
+          ? resp.data.data
+          : [];
+        this.notifications$.next(arr);
       }
     });
 
