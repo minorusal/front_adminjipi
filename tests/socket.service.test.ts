@@ -132,3 +132,12 @@ test('logs error on connection failure', () => {
   console.error = orig;
   assert.strictEqual(captured, error);
 });
+
+test('notification:unseen-count:ack handles nested payloads', () => {
+  const service = new SocketService();
+  const socket = new FakeSocket();
+  service.setSocketForTesting(socket as any);
+
+  socket.emit('notification:unseen-count:ack', { data: { count: 3 } });
+  assert.strictEqual(service.badge$.value, 3);
+});
