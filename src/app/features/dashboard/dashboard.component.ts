@@ -36,10 +36,14 @@ export class DashboardComponent implements OnInit {
   createSample(): void {
     console.log('DashboardComponent: createSample clicked');
     const payload: Notificacion = {
-      origen: null,
-      destino: 1,
-      tipo: 10,
-      data: 0,
+      from_company_id: 66,
+      from_user_id: 84,
+      to_company_id: 83,
+      to_user_id: 102,
+      title: 'Título de la notificación',
+      body: 'Cuerpo del mensaje',
+      payload: {},
+      channel: 'email',
     };
     this.socketService.createNotification(payload);
   }

@@ -1,8 +1,12 @@
 export interface Notificacion {
-  origen: number | null;
-  destino: number;
-  tipo: number;
-  data: number;
+  from_company_id: number;
+  from_user_id: number;
+  to_company_id: number;
+  to_user_id: number;
+  title: string;
+  body: string;
+  payload: any;
+  channel: string;
 }
 
 export interface NotificationSeen {
