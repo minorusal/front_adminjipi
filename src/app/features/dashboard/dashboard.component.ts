@@ -15,6 +15,7 @@ import { AuthFacade } from '../auth/data-access/auth.facade';
       <h2>Dashboard</h2>
       <button class="btn btn-outline-secondary" (click)="logout()">Logout</button>
     </div>
+    <button class="btn btn-primary mb-3" (click)="createSample()">Crear Notificación</button>
     <app-notification-badge></app-notification-badge>
     <app-notification-list></app-notification-list>
   `,
@@ -29,6 +30,18 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.socketService.connect();
+  }
+
+  createSample(): void {
+    const payload = {
+      from_user_id: 1,
+      from_company_id: null,
+      to_user_id: 1,
+      to_company_id: null,
+      tipo: 10,
+      data: { title: 'Demo', message: 'Prueba de notificacion' },
+    };
+    this.socketService.createNotification(payload);
   }
 
   logout(): void {

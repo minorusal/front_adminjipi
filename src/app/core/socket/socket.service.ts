@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -8,6 +9,8 @@ export class SocketService {
   private socket?: Socket;
   notifications$ = new BehaviorSubject<any[]>([]);
   badge$ = new BehaviorSubject<number>(0);
+
+  constructor(private http: HttpClient) {}
 
   connect(): void {
     const token = localStorage.getItem('sessionToken');
@@ -18,6 +21,12 @@ export class SocketService {
     this.socket.on('notification:list', (list) => this.notifications$.next(list));
     this.socket.on('notification:new', (n) => {
       this.notifications$.next([n, ...this.notifications$.value]);
+    });
+    this.socket.on('notificacion-creada', (resp) => {
+      if (!resp?.error && resp?.data) {
+        this.notifications$.next([resp.data, ...this.notifications$.value]);
+        this.badge$.next(this.badge$.value + 1);
+      }
     });
     this.socket.on('notification:badge', (b) => this.badge$.next(b));
     this.socket.on('notification:seen:ack', (uuid) => {
@@ -41,5 +50,10 @@ export class SocketService {
 
   delete(uuid: string): void {
     this.socket?.emit('notification:delete', uuid);
+  }
+
+  createNotification(payload: any): void {
+    this.http.post(`${environment.apiUrl}/api/notifications`, payload).subscribe();
+    this.socket?.emit('crea-notificacion', payload);
   }
 }
