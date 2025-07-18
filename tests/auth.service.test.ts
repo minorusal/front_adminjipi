@@ -1,7 +1,6 @@
 import { test } from 'node:test';
 import * as assert from 'node:assert';
 import { AuthService } from '../src/app/core/auth/auth.service';
-import { getCookie } from '../src/app/shared/utils/cookies';
 
 class FakeObservable<T> {
   constructor(private value: T) {}
@@ -29,21 +28,20 @@ class FakeCipher {
   }
 }
 
-test('login sets user/company cookies', () => {
-  (globalThis as any).document = {
-    _cookies: {} as Record<string, string>,
-    get cookie() {
-      return Object.entries(this._cookies)
-        .map(([k, v]) => `${k}=${v}`)
-        .join('; ');
+test('login stores session and refresh tokens', () => {
+  (globalThis as any).localStorage = {
+    _data: {} as Record<string, string>,
+    getItem(k: string) {
+      return this._data[k] || null;
     },
-    set cookie(val: string) {
-      const [pair] = val.split(';');
-      const [name, v] = pair.split('=');
-      this._cookies[name] = decodeURIComponent(v);
+    setItem(k: string, v: string) {
+      this._data[k] = v;
+    },
+    removeItem(k: string) {
+      delete this._data[k];
     },
   };
-  const payload = { login: { usu: { emp_id: 5, usu_id: 9 }, usu_token: {} } };
+  const payload = { login: { usu: { emp_id: 5, usu_id: 9 }, usu_token: { sessionToken: 'a', refreshToken: 'b' } } };
   const http = new FakeHttpClient(JSON.stringify(payload));
   const cipher = new FakeCipher();
   const service = new AuthService(http as any, cipher as any);
@@ -54,6 +52,6 @@ test('login sets user/company cookies', () => {
   });
 
   assert.strictEqual(result.login.usu.emp_id, 5);
-  assert.strictEqual(getCookie('from_company_id'), '5');
-  assert.strictEqual(getCookie('from_user_id'), '9');
+  assert.strictEqual(localStorage.getItem('sessionToken'), 'a');
+  assert.strictEqual(localStorage.getItem('refreshToken'), 'b');
 });

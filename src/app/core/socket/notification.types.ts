@@ -1,6 +1,4 @@
 export interface Notificacion {
-  from_company_id: number;
-  from_user_id: number;
   to_company_id: number;
   to_user_id: number;
   title: string;

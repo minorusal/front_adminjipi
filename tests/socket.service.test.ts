@@ -61,16 +61,22 @@ test('notification:badge handles object payloads', () => {
   assert.strictEqual(service.badge$.value, 5);
 });
 
+test('notification:new adds notification and increases badge', () => {
+  const service = new SocketService();
+  const socket = new FakeSocket();
+  service.setSocketForTesting(socket as any);
+
+  socket.emit('notification:new', { data: { uuid: 'n1' } });
+  assert.strictEqual(service.notifications$.value[0].uuid, 'n1');
+  assert.strictEqual(service.badge$.value, 1);
+});
+
 test('createNotification emits correct payload', () => {
   const service = new SocketService();
   const socket = new FakeSocket();
   service.setSocketForTesting(socket as any);
 
-  (globalThis as any).document = { cookie: 'from_company_id=9; from_user_id=8' };
-
   const payload = {
-    from_company_id: 0,
-    from_user_id: 0,
     to_company_id: 3,
     to_user_id: 4,
     title: 't',
@@ -82,11 +88,7 @@ test('createNotification emits correct payload', () => {
   service.createNotification(payload as any);
   assert.deepStrictEqual(socket.emitted[0], {
     event: 'crea-notificacion',
-    payload: {
-      ...payload,
-      from_company_id: 9,
-      from_user_id: 8,
-    },
+    payload,
   });
 });
 
@@ -153,11 +155,7 @@ test('requestUnseenCount forwards passed to_user_id', () => {
   const socket = new FakeSocket();
   service.setSocketForTesting(socket as any);
 
-  (globalThis as any).document = { cookie: 'from_company_id=9; from_user_id=8' };
-
   const payload = {
-    from_company_id: 0,
-    from_user_id: 0,
     to_company_id: 1,
     to_user_id: 7,
     title: 't',
@@ -173,4 +171,15 @@ test('requestUnseenCount forwards passed to_user_id', () => {
     event: 'notification:unseen-count',
     payload: { to_user_id: 7 },
   });
+});
+
+test('getCurrentIds parses mcId and compId', () => {
+  const service = new SocketService();
+  (globalThis as any).localStorage = {
+    getItem: () =>
+      'eyJhbGciOiJIUzI1NiJ9.eyJtY0lkIjoxMjMsImNvbXBJZCI6NDU2fQ.sig',
+  } as any;
+  const ids = service.getCurrentIds();
+  assert.strictEqual(ids.user_id, 123);
+  assert.strictEqual(ids.company_id, 456);
 });

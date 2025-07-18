@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import io, { Socket } from 'socket.io-client';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { getCookie } from '../../shared/utils/cookies';
 import {
   Notificacion,
   NotificationDelete,
@@ -12,12 +11,18 @@ import {
   NotificationSeen,
   NotificationUpdateStatus,
 } from './notification.types';
+import { getIdsFromToken } from '../../shared/utils/token';
 
 @Injectable({ providedIn: 'root' })
 export class SocketService {
   private socket?: Socket;
   notifications$ = new BehaviorSubject<any[]>([]);
   badge$ = new BehaviorSubject<number>(0);
+
+  getCurrentIds() {
+    const token = localStorage.getItem('sessionToken') || '';
+    return getIdsFromToken(token);
+  }
 
   constructor() {}
 
@@ -83,8 +88,8 @@ export class SocketService {
       }
     });
 
-    this.socket.on('notificacion-creada', (resp) => {
-      console.log('SocketService: notificacion-creada', resp);
+    this.socket.on('notification:new', (resp) => {
+      console.log('SocketService: notification:new', resp);
       if (!resp?.error && resp?.data) {
         this.notifications$.next([resp.data, ...this.notifications$.value]);
         this.badge$.next(this.badge$.value + 1);
@@ -173,13 +178,8 @@ export class SocketService {
   }
 
   createNotification(payload: Notificacion): void {
-    const enriched: Notificacion = {
-      ...payload,
-      from_company_id: Number(getCookie('from_company_id')) || 0,
-      from_user_id: Number(getCookie('from_user_id')) || 0,
-    };
-    console.log('SocketService: createNotification', enriched);
-    this.socket?.emit('crea-notificacion', enriched);
+    console.log('SocketService: createNotification', payload);
+    this.socket?.emit('crea-notificacion', payload);
   }
 
   requestList(params: NotificationListParams = {}): void {
