@@ -12,4 +12,7 @@ export class HttpClient {
   delete<T>(_url: string, _opts: any) {
     return null as any;
   }
+  get<T>(_url: string, _opts?: any) {
+    return null as any;
+  }
 }

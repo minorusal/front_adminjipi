@@ -8,12 +8,14 @@ export class NotificationService {
   private readonly badgeUrl = `${environment.apiUrl}/api/notifications/unseen-count`;
 
   constructor(private http: HttpClient) {}
-
-  fetchList() {
-    return this.http.get<any[]>(this.listUrl, { params: { page: 1, limit: 20 } });
+  
+  fetchList(page = 1, limit = 10) {
+    return this.http.get<any[]>(this.listUrl, {
+      params: { page, limit },
+    });
   }
 
   fetchBadge() {
-    return this.http.get<any>(this.badgeUrl);
+    return this.http.get<number>(this.badgeUrl);
   }
 }
