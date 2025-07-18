@@ -60,3 +60,7 @@ are:
 - `notification:badge`
 - `notification:seen:ack`
 - `notification:deleted`
+
+## Manual QA checklist
+
+See `docs/QA_CHECKLIST.md` for a step-by-step guide to verify login and notification features using a running backend and socket server.
