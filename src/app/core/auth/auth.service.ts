@@ -11,7 +11,7 @@ export class AuthService {
   private readonly loginUrl = `${environment.apiUrl}/api/auth/login`;
   private readonly logoutUrl = `${environment.apiUrl}/api/auth/logout`;
 
-  constructor(private http: HttpClient, private cipher: EncryptService) {}
+  constructor(private http: HttpClient, private cipher: EncryptService) { }
 
   login(credentials: { email: string; password: string }) {
     const encrypted = this.cipher.encrypt(credentials);
@@ -23,7 +23,7 @@ export class AuthService {
       .post(this.loginUrl, encrypted, { headers, responseType: 'text' })
       .pipe(
         map((resp) => {
-          const decrypted = this.cipher.decrypt(resp)
+          const decrypted = JSON.parse(this.cipher.decrypt(resp))
           const tokens = decrypted.login?.usu_token || {};
           if (tokens.sessionToken) {
             localStorage.setItem('sessionToken', tokens.sessionToken)

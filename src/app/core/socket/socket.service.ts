@@ -223,7 +223,6 @@ export class SocketService {
   }
 
   createNotification(payload: Notificacion): void {
-    const ids = this.getCurrentIds();
     const fullPayload = {
       ...payload,
       from_company_id: Number(getCookie('from_company_id')),
@@ -238,6 +237,7 @@ export class SocketService {
       from_company_id: Number(getCookie('from_company_id')),
       from_user_id: Number(getCookie('from_user_id')),
     };
+    console.log('AQUI SE  MANDAN LOS PARAMETROS', params)
     this.socket?.emit('notification:list', { ...defaults, ...params });
   }
 
