@@ -42,7 +42,8 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.socketService.requestList();
-    this.socketService.requestUnseenCount();
+    const to_user_id = 102;
+    this.socketService.requestUnseenCount(to_user_id);
   }
 
   createSample(): void {
@@ -53,7 +54,7 @@ export class DashboardComponent implements OnInit {
       from_company_id: fromCompanyId,
       from_user_id: fromUserId,
       to_company_id: 83,
-      to_user_id: 102,
+      to_user_id,
       title: 'Título de la notificación',
       body: 'Cuerpo del mensaje',
       payload: {},
