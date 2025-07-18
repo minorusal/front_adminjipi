@@ -186,8 +186,8 @@ export class SocketService {
     this.socket?.emit('notification:list', params);
   }
 
-  requestUnseenCount(): void {
-    this.socket?.emit('notification:unseen-count');
+  requestUnseenCount(to_user_id: number): void {
+    this.socket?.emit('notification:unseen-count', { to_user_id });
   }
 
   updateStatus(payload: NotificationUpdateStatus): void {

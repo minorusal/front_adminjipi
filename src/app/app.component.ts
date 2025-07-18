@@ -14,7 +14,8 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.socketService.connect();
     this.socketService.requestList();
-    this.socketService.requestUnseenCount();
+    const to_user_id = 102;
+    this.socketService.requestUnseenCount(to_user_id);
   }
 
   ngOnDestroy(): void {

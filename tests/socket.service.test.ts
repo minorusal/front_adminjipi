@@ -147,3 +147,30 @@ test('notification:unseen-count:ack handles nested payloads', () => {
   socket.emit('notification:unseen-count:ack', { data: { count: 3 } });
   assert.strictEqual(service.badge$.value, 3);
 });
+
+test('requestUnseenCount forwards passed to_user_id', () => {
+  const service = new SocketService();
+  const socket = new FakeSocket();
+  service.setSocketForTesting(socket as any);
+
+  (globalThis as any).document = { cookie: 'from_company_id=9; from_user_id=8' };
+
+  const payload = {
+    from_company_id: 0,
+    from_user_id: 0,
+    to_company_id: 1,
+    to_user_id: 7,
+    title: 't',
+    body: 'b',
+    payload: {},
+    channel: 'email',
+  };
+
+  service.createNotification(payload as any);
+  service.requestUnseenCount(payload.to_user_id);
+
+  assert.deepStrictEqual(socket.emitted[1], {
+    event: 'notification:unseen-count',
+    payload: { to_user_id: 7 },
+  });
+});
