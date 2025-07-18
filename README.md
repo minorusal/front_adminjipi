@@ -19,6 +19,26 @@ reports a peer dependency conflict related to `@angular-devkit/build-angular`,
 remove any globally installed Angular CLI packages and retry with
 `npm install --legacy-peer-deps`.
 
+## 0. Preparativos
+
+1. Instala las dependencias base:
+
+   ```bash
+   npm i @auth0/angular-jwt socket.io-client ngx-toastr bootstrap
+   ```
+
+2. Verifica que `proxy.conf.json` incluya las rutas:
+
+   ```json
+   {
+     "/api": { "target": "http://localhost:3000" },
+     "/socket.io": { "target": "http://localhost:8000", "ws": true }
+   }
+   ```
+   El script `npm start` ya ejecuta `ng serve` con esta configuración.
+
+3. Importa Bootstrap en `src/styles.css` para contar con estilos rápidos.
+
 ## Socket tests
 
 Run `npm test` to execute a lightweight test suite for the `SocketService`.
@@ -40,3 +60,7 @@ are:
 - `notification:badge`
 - `notification:seen:ack`
 - `notification:deleted`
+
+## Manual QA checklist
+
+See `docs/QA_CHECKLIST.md` for a step-by-step guide to verify login and notification features using a running backend and socket server.

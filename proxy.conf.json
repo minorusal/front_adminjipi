@@ -5,7 +5,7 @@
     "changeOrigin": true
   },
   "/socket.io": {
-    "target": "http://localhost:3000",
+    "target": "http://localhost:8000",
     "ws": true,
     "secure": false,
     "changeOrigin": true

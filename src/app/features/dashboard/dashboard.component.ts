@@ -8,7 +8,8 @@ import { Router } from '@angular/router';
 import { SocketService } from '../../core/socket/socket.service';
 import { Notificacion } from '../../core/socket/notification.types';
 import { NotificationBadgeComponent } from '../../shared/components/notification-badge.component';
-import { NotificationTableComponent } from '../../shared/components/notification-table.component';
+import { NotificationListComponent } from '../../shared/components/notification-list.component';
+import { NotificationService } from '../../core/notifications/notification.service';
 import { AuthFacade } from '../auth/data-access/auth.facade';
 
 @Component({
@@ -17,7 +18,7 @@ import { AuthFacade } from '../auth/data-access/auth.facade';
   imports: [
     CommonModule,
     NotificationBadgeComponent,
-    NotificationTableComponent,
+    NotificationListComponent,
   ],
   template: `
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -26,7 +27,7 @@ import { AuthFacade } from '../auth/data-access/auth.facade';
     </div>
     <div class="d-flex align-items-start mb-3">
       <button class="btn btn-primary me-3" (click)="createSample()">Crear Notificación</button>
-      <app-notification-table></app-notification-table>
+      <app-notification-list class="flex-grow-1"></app-notification-list>
     </div>
     <app-notification-badge></app-notification-badge>
   `,
@@ -37,13 +38,23 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private socketService: SocketService,
+    private notificationService: NotificationService,
     private router: Router,
     private authFacade: AuthFacade
   ) {}
 
   ngOnInit(): void {
-    this.socketService.requestList();
-    this.socketService.requestUnseenCount(this.to_user_id);
+    this.socketService.connect();
+    if (this.socketService.notifications$.value.length === 0) {
+      this.notificationService
+        .fetchList()
+        .subscribe((list) => this.socketService.notifications$.next(list));
+      this.notificationService
+        .fetchBadge()
+        .subscribe((resp) =>
+          this.socketService.badge$.next(resp?.count ?? resp ?? 0)
+        );
+    }
   }
 
   createSample(): void {
