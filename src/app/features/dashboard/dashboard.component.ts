@@ -11,6 +11,7 @@ import { NotificationBadgeComponent } from '../../shared/components/notification
 import { NotificationListComponent } from '../../shared/components/notification-list.component';
 import { NotificationService } from '../../core/notifications/notification.service';
 import { AuthFacade } from '../auth/data-access/auth.facade';
+import { getCookie } from '../../shared/utils/cookies';
 
 @Component({
   selector: 'app-dashboard',
@@ -41,7 +42,7 @@ export class DashboardComponent implements OnInit {
     private notificationService: NotificationService,
     private router: Router,
     private authFacade: AuthFacade
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.socketService.connect();
@@ -58,10 +59,10 @@ export class DashboardComponent implements OnInit {
   }
 
   createSample(): void {
-    console.log('DashboardComponent: createSample clicked');
+    console.log('DashboardComponent: createSample clicked')
     const payload: Notificacion = {
-      to_company_id: 83,
-      to_user_id: this.to_user_id,
+      to_company_id: 636,
+      to_user_id: 699,
       title: 'Título de la notificación',
       body: 'Cuerpo del mensaje',
       payload: {},

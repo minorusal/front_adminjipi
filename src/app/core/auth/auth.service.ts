@@ -23,16 +23,18 @@ export class AuthService {
       .post(this.loginUrl, encrypted, { headers, responseType: 'text' })
       .pipe(
         map((resp) => {
-          const decrypted = this.cipher.decrypt(resp);
+          const decrypted = JSON.parse(this.cipher.decrypt(resp))
           const tokens = decrypted.login?.usu_token || {};
           if (tokens.sessionToken) {
-            localStorage.setItem('sessionToken', tokens.sessionToken);
-            const ids = getIdsFromToken(tokens.sessionToken);
-            localStorage.setItem('payload', JSON.stringify(ids));
-            setCookie('payload', JSON.stringify(ids));
+            localStorage.setItem('sessionToken', tokens.sessionToken)
+            const ids = getIdsFromToken(tokens.sessionToken)
+            setCookie('from_company_id', JSON.stringify(ids.company_id))
+            setCookie('from_user_id', JSON.stringify(ids.user_id))
+            localStorage.setItem('payload', JSON.stringify(ids))
+            setCookie('payload', JSON.stringify(ids))
           }
           if (tokens.refreshToken) {
-            localStorage.setItem('refreshToken', tokens.refreshToken);
+            localStorage.setItem('refreshToken', tokens.refreshToken)
           }
           return decrypted;
         })

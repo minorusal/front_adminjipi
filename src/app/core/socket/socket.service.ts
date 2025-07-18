@@ -25,6 +25,7 @@ export class SocketService {
     const cookie = getCookie('payload');
     if (cookie) {
       try {
+        console.log(cookie)
         return JSON.parse(cookie);
       } catch {
         // ignore parse errors
@@ -68,7 +69,7 @@ export class SocketService {
     }
 
     this.socket.on('notification:list', (payload) => {
-      console.log('SocketService: notification:list', payload);
+      console.log('SocketService Payload: notification:list', payload);
       const arr = Array.isArray(payload)
         ? payload
         : Array.isArray(payload?.data?.list)
@@ -225,8 +226,8 @@ export class SocketService {
     const ids = this.getCurrentIds();
     const fullPayload = {
       ...payload,
-      from_user_id: ids.user_id,
-      from_company_id: ids.company_id,
+      from_company_id: Number(getCookie('from_company_id')),
+      from_user_id: Number(getCookie('from_user_id')),
     };
     console.log('SocketService: createNotification', fullPayload);
     this.socket?.emit('crea-notificacion', fullPayload);
