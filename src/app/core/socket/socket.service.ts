@@ -234,7 +234,11 @@ export class SocketService {
   }
 
   requestList(params: NotificationListParams = {}): void {
-    this.socket?.emit('notification:list', params);
+    const defaults: NotificationListParams = {
+      from_company_id: Number(getCookie('from_company_id')),
+      from_user_id: Number(getCookie('from_user_id')),
+    };
+    this.socket?.emit('notification:list', { ...defaults, ...params });
   }
 
   requestUnseenCount(to_user_id: number): void {
@@ -257,9 +261,11 @@ export class SocketService {
     if (!this.notificationService) {
       return;
     }
-    this.notificationService.fetchList(1, 10).subscribe((list) => {
-      this.notifications$.next(list as any[]);
-    });
+    this.notificationService
+      .fetchList()
+      .subscribe((list) => {
+        this.notifications$.next(list as any[]);
+      });
     this.notificationService
       .fetchBadge()
       .subscribe((count) => this.badge$.next(Number(count)));

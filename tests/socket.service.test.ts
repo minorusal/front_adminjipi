@@ -116,6 +116,7 @@ test('createNotification emits correct payload', () => {
     getItem: (k: string) =>
       k === 'payload' ? JSON.stringify({ user_id: 9, company_id: 8 }) : null,
   } as any;
+  (globalThis as any).document = { cookie: 'from_user_id=9; from_company_id=8' } as any;
 
   const payload = {
     to_company_id: 3,
@@ -200,6 +201,7 @@ test('requestUnseenCount forwards passed to_user_id', () => {
     getItem: (k: string) =>
       k === 'payload' ? JSON.stringify({ user_id: 1, company_id: 2 }) : null,
   } as any;
+  (globalThis as any).document = { cookie: 'from_user_id=1; from_company_id=2' } as any;
 
   const payload = {
     to_company_id: 1,
@@ -221,6 +223,21 @@ test('requestUnseenCount forwards passed to_user_id', () => {
   assert.deepStrictEqual(socket.emitted[1], {
     event: 'notification:unseen-count',
     payload: { to_user_id: 7 },
+  });
+});
+
+test('requestList emits default sender ids', () => {
+  const service = new SocketService();
+  const socket = new FakeSocket();
+  service.setSocketForTesting(socket as any);
+
+  (globalThis as any).document = { cookie: 'from_user_id=5; from_company_id=6' } as any;
+
+  service.requestList({ page: 2, limit: 5 });
+
+  assert.deepStrictEqual(socket.emitted[0], {
+    event: 'notification:list',
+    payload: { page: 2, limit: 5, from_user_id: 5, from_company_id: 6 },
   });
 });
 
