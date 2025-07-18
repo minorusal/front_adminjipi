@@ -11,6 +11,7 @@
       "rxjs": ["tests/stubs/rxjs"],
       "@angular/core": ["tests/stubs/angular-core"],
       "@angular/common/http": ["tests/stubs/angular-common-http"],
+      "@angular/common": ["tests/node_modules/@angular/common"],
       "rxjs/operators": ["tests/stubs/rxjs-operators"],
       "crypto-js": ["tests/stubs/crypto-js"]
     }
@@ -21,6 +22,7 @@
     "src/app/core/auth/auth.service.ts",
     "src/app/core/auth/encrypt.service.ts",
     "src/app/shared/utils/cookies.ts",
+    "src/app/shared/components/notification-list.component.ts",
     "tests/typings/**/*.d.ts"
   ],
   "typeAcquisition": {
