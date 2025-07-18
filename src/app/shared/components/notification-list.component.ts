@@ -7,13 +7,20 @@ import { SocketService } from '../../core/socket/socket.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <ul>
-      <li *ngFor="let n of notifications$ | async">
-        <span [class.fw-bold]="!n.seen">{{ n.title }} - {{ n.date }}</span>
-        <button (click)="markSeen(n.uuid)" class="btn btn-sm btn-link">Marcar vista</button>
+    <div *ngFor="let n of notifications$ | async" class="card mb-2">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <h5 class="card-title mb-1">
+            {{ n.title }}
+            <span *ngIf="!n.seen" class="badge text-bg-secondary ms-2">no vista</span>
+          </h5>
+          <small>{{ n.date }}</small>
+        </div>
+        <p class="card-text">{{ n.body }}</p>
+        <button (click)="markSeen(n.uuid)" class="btn btn-sm btn-link me-2">Marcar vista</button>
         <button (click)="delete(n.uuid)" class="btn btn-sm btn-link text-danger">Eliminar</button>
-      </li>
-    </ul>
+      </div>
+    </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
