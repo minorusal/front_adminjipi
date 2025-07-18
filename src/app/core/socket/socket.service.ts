@@ -29,8 +29,8 @@ export class SocketService {
 
   connect(): void {
     const token = localStorage.getItem('sessionToken') || '';
-    console.log('SocketService: connecting to http://localhost:4000');
-    this.socket = io('http://localhost:4000', {
+    console.log('SocketService: connecting to', environment.socketUrl);
+    this.socket = io(environment.socketUrl, {
       auth: { sessionToken: token },
     });
     this.socket.on('connect', () =>
