@@ -71,6 +71,22 @@ test('notification:new adds notification and increases badge', () => {
   assert.strictEqual(service.badge$.value, 1);
 });
 
+test('registers listener for notification:new and updates badge', () => {
+  const service = new SocketService();
+  const socket = new FakeSocket();
+  const events: string[] = [];
+  const origOn = socket.on;
+  socket.on = function (event: string, listener: any) {
+    events.push(event);
+    return origOn.call(this, event, listener);
+  };
+  service.setSocketForTesting(socket as any);
+
+  assert.ok(events.includes('notification:new'));
+  socket.emit('notification:new', { data: { uuid: 'x' } });
+  assert.strictEqual(service.badge$.value, 1);
+});
+
 test('createNotification emits correct payload', () => {
   const service = new SocketService();
   const socket = new FakeSocket();

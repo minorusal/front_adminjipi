@@ -4,7 +4,7 @@
   "description": "This repository has been cleaned to serve as the starting point for a new project. Feel free to add your own files and configurations.",
   "main": "index.js",
   "scripts": {
-    "test": "tsc -p tsconfig.spec.json && NODE_PATH=tests/node_modules:tests/stubs node dist/test/tests/socket.service.test.js && NODE_PATH=tests/node_modules:tests/stubs node dist/test/tests/auth.service.test.js",
+    "test": "tsc -p tsconfig.spec.json && NODE_PATH=tests/node_modules:tests/stubs node dist/test/tests/socket.service.test.js && NODE_PATH=tests/node_modules:tests/stubs node dist/test/tests/auth.service.test.js && NODE_PATH=tests/node_modules:tests/stubs node dist/test/tests/notification-list.component.test.js",
     "start": "ng serve --proxy-config proxy.conf.json --open"
   },
   "keywords": [],

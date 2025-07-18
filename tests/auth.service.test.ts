@@ -55,3 +55,12 @@ test('login stores session and refresh tokens', () => {
   assert.strictEqual(localStorage.getItem('sessionToken'), 'a');
   assert.strictEqual(localStorage.getItem('refreshToken'), 'b');
 });
+
+import { getIdsFromToken } from '../src/app/shared/utils/token';
+
+test('getIdsFromToken extracts ids from JWT', () => {
+  const token =
+    'eyJhbGciOiJIUzI1NiJ9.eyJtY0lkIjoxMjMsImNvbXBJZCI6NDU2fQ.sig';
+  const ids = getIdsFromToken(token);
+  assert.deepStrictEqual(ids, { user_id: 123, company_id: 456 });
+});
