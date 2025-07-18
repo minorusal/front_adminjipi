@@ -1,6 +1,10 @@
 export interface Notificacion {
   to_company_id: number;
   to_user_id: number;
+  /** Company ID of the sender */
+  from_company_id?: number;
+  /** User ID of the sender */
+  from_user_id?: number;
   title: string;
   body: string;
   payload: any;

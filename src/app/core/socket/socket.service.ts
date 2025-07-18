@@ -12,6 +12,7 @@ import {
   NotificationUpdateStatus,
 } from './notification.types';
 import { getIdsFromToken } from '../../shared/utils/token';
+import { getCookie } from '../../shared/utils/cookies';
 import { NotificationService } from '../notifications/notification.service';
 
 @Injectable({ providedIn: 'root' })
@@ -21,6 +22,22 @@ export class SocketService {
   badge$ = new BehaviorSubject<number>(0);
 
   getCurrentIds() {
+    const cookie = getCookie('payload');
+    if (cookie) {
+      try {
+        return JSON.parse(cookie);
+      } catch {
+        // ignore parse errors
+      }
+    }
+    const stored = localStorage.getItem('payload');
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        // ignore
+      }
+    }
     const token = localStorage.getItem('sessionToken') || '';
     return getIdsFromToken(token);
   }
@@ -205,8 +222,14 @@ export class SocketService {
   }
 
   createNotification(payload: Notificacion): void {
-    console.log('SocketService: createNotification', payload);
-    this.socket?.emit('crea-notificacion', payload);
+    const ids = this.getCurrentIds();
+    const fullPayload = {
+      ...payload,
+      from_user_id: ids.user_id,
+      from_company_id: ids.company_id,
+    };
+    console.log('SocketService: createNotification', fullPayload);
+    this.socket?.emit('crea-notificacion', fullPayload);
   }
 
   requestList(params: NotificationListParams = {}): void {

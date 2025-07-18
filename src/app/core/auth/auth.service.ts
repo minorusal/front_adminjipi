@@ -4,6 +4,7 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { EncryptService } from './encrypt.service';
 import { getIdsFromToken } from '../../shared/utils/token';
+import { setCookie } from '../../shared/utils/cookies';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -28,6 +29,7 @@ export class AuthService {
             localStorage.setItem('sessionToken', tokens.sessionToken);
             const ids = getIdsFromToken(tokens.sessionToken);
             localStorage.setItem('payload', JSON.stringify(ids));
+            setCookie('payload', JSON.stringify(ids));
           }
           if (tokens.refreshToken) {
             localStorage.setItem('refreshToken', tokens.refreshToken);

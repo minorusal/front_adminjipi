@@ -112,6 +112,11 @@ test('createNotification emits correct payload', () => {
   const socket = new FakeSocket();
   service.setSocketForTesting(socket as any);
 
+  (globalThis as any).localStorage = {
+    getItem: (k: string) =>
+      k === 'payload' ? JSON.stringify({ user_id: 9, company_id: 8 }) : null,
+  } as any;
+
   const payload = {
     to_company_id: 3,
     to_user_id: 4,
@@ -124,7 +129,7 @@ test('createNotification emits correct payload', () => {
   service.createNotification(payload as any);
   assert.deepStrictEqual(socket.emitted[0], {
     event: 'crea-notificacion',
-    payload,
+    payload: { ...payload, from_user_id: 9, from_company_id: 8 },
   });
 });
 
@@ -191,6 +196,11 @@ test('requestUnseenCount forwards passed to_user_id', () => {
   const socket = new FakeSocket();
   service.setSocketForTesting(socket as any);
 
+  (globalThis as any).localStorage = {
+    getItem: (k: string) =>
+      k === 'payload' ? JSON.stringify({ user_id: 1, company_id: 2 }) : null,
+  } as any;
+
   const payload = {
     to_company_id: 1,
     to_user_id: 7,
@@ -202,6 +212,11 @@ test('requestUnseenCount forwards passed to_user_id', () => {
 
   service.createNotification(payload as any);
   service.requestUnseenCount(payload.to_user_id);
+
+  assert.deepStrictEqual(socket.emitted[0], {
+    event: 'crea-notificacion',
+    payload: { ...payload, from_user_id: 1, from_company_id: 2 },
+  });
 
   assert.deepStrictEqual(socket.emitted[1], {
     event: 'notification:unseen-count',
