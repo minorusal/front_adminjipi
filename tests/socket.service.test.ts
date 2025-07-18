@@ -31,6 +31,26 @@ test('notification:list:ack handles object payloads', () => {
   assert.deepStrictEqual(service.notifications$.value, list);
 });
 
+test('notification:list:ack supports results property', () => {
+  const service = new SocketService();
+  const socket = new FakeSocket();
+  service.setSocketForTesting(socket as any);
+
+  const list = [{ uuid: 'b' }];
+  socket.emit('notification:list:ack', { data: { results: list } });
+  assert.deepStrictEqual(service.notifications$.value, list);
+});
+
+test('notification:list handles results property', () => {
+  const service = new SocketService();
+  const socket = new FakeSocket();
+  service.setSocketForTesting(socket as any);
+
+  const list = [{ uuid: 'r1' }];
+  socket.emit('notification:list', { results: list });
+  assert.deepStrictEqual(service.notifications$.value, list);
+});
+
 test('markSeen emits correct payload', () => {
   const service = new SocketService();
   const socket = new FakeSocket();
