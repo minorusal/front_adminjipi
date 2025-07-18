@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { getCookie } from '../../shared/utils/cookies';
+import { NotificationListParams } from '../socket/notification.types';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
@@ -10,9 +12,15 @@ export class NotificationService {
 
   constructor(private http: HttpClient) {}
   
-  fetchList(page = 1, limit = 10) {
+  fetchList(params: NotificationListParams = {}) {
+    const defaults: NotificationListParams = {
+      page: 1,
+      limit: 10,
+      from_company_id: Number(getCookie('from_company_id')),
+      from_user_id: Number(getCookie('from_user_id')),
+    };
     return this.http.get<any>(this.listUrl, {
-      params: { page, limit },
+      params: { ...defaults, ...params },
     }).pipe(
       // The API may return either an array directly or wrap it under
       // properties like `list`, `data.list` or `results`. Normalize the

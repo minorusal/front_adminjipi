@@ -31,6 +31,8 @@ export interface NotificationGet {
 export interface NotificationListParams {
   page?: number;
   limit?: number;
+  from_company_id?: number;
+  from_user_id?: number;
 }
 
 export interface NotificationHistory {

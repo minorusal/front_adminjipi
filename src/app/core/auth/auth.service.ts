@@ -23,7 +23,7 @@ export class AuthService {
       .post(this.loginUrl, encrypted, { headers, responseType: 'text' })
       .pipe(
         map((resp) => {
-          const decrypted = JSON.parse(this.cipher.decrypt(resp))
+          const decrypted = this.cipher.decrypt(resp)
           const tokens = decrypted.login?.usu_token || {};
           if (tokens.sessionToken) {
             localStorage.setItem('sessionToken', tokens.sessionToken)
