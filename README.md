@@ -28,3 +28,15 @@ without installing the full dependency tree.
 The `SocketService` now logs a message when the connection succeeds and prints
 any socket connection errors to the console. This helps diagnose networking
 issues during development.
+
+## Notifications overview
+
+The frontend reads `mcId` and `compId` from the `sessionToken` JWT stored in
+`localStorage`. No cookies are required. Socket events used by the application
+are:
+
+- `notification:list`
+- `notification:new`
+- `notification:badge`
+- `notification:seen:ack`
+- `notification:deleted`

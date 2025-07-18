@@ -7,7 +7,6 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SocketService } from '../../core/socket/socket.service';
 import { Notificacion } from '../../core/socket/notification.types';
-import { getCookie } from '../../shared/utils/cookies';
 import { NotificationBadgeComponent } from '../../shared/components/notification-badge.component';
 import { NotificationTableComponent } from '../../shared/components/notification-table.component';
 import { AuthFacade } from '../auth/data-access/auth.facade';
@@ -34,6 +33,8 @@ import { AuthFacade } from '../auth/data-access/auth.facade';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent implements OnInit {
+  private readonly to_user_id = 102;
+
   constructor(
     private socketService: SocketService,
     private router: Router,
@@ -42,19 +43,14 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.socketService.requestList();
-    const to_user_id = 102;
-    this.socketService.requestUnseenCount(to_user_id);
+    this.socketService.requestUnseenCount(this.to_user_id);
   }
 
   createSample(): void {
     console.log('DashboardComponent: createSample clicked');
-    const fromCompanyId = Number(getCookie('from_company_id')) || 0;
-    const fromUserId = Number(getCookie('from_user_id')) || 0;
     const payload: Notificacion = {
-      from_company_id: fromCompanyId,
-      from_user_id: fromUserId,
       to_company_id: 83,
-      to_user_id,
+      to_user_id: this.to_user_id,
       title: 'Título de la notificación',
       body: 'Cuerpo del mensaje',
       payload: {},

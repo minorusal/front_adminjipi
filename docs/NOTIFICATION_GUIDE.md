@@ -5,8 +5,7 @@ Este documento resume la comunicación por sockets y HTTP necesaria para utiliza
 ## Eventos de socket
 - **notification:list**: se emite al conectarse y contiene la lista inicial.
 - **notification:badge**: indica cuántas notificaciones no vistas tiene el usuario.
-- **notification:new**: llega cuando el backend genera una notificación externa.
-- **notificacion-creada**: confirma la creación de una nueva notificación.
+- **notification:new**: llega cuando el backend genera o confirma una nueva notificación.
 - **notification:seen:ack**: respuesta al marcar una notificación como vista.
 - **notification:get:ack**: devuelve la notificación solicitada por `uuid`. El
   frontend actualiza la tabla de notificaciones al recibir este evento.
@@ -16,16 +15,14 @@ Envíe un `POST` a `/api/notifications` con el mismo cuerpo que se envía por el
 
 ```ts
 const payload = {
-  from_user_id: usuario.usu_id,
-  from_company_id: usuario.emp_id,
   to_user_id: destinatario,
   to_company_id: null,
   tipo: 10,
   data: { ... }
 };
 
-// El SocketService añade automáticamente `from_company_id` y `from_user_id`
-// leyendo las cookies con esos nombres cuando se envía la notificación.
+// El backend identifica al emisor usando el token de la conexión,
+// por lo que no es necesario enviar IDs del remitente.
 
 this.http.post(`${environment.apiUrl}/api/notifications`, payload).subscribe();
 this.socket.emit('crea-notificacion', payload);
