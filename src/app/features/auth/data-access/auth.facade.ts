@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, tap } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
+import { removeCookie } from '../../../shared/utils/cookies';
 
 @Injectable({ providedIn: 'root' })
 export class AuthFacade {
@@ -44,5 +45,6 @@ export class AuthFacade {
     localStorage.removeItem('sessionToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('payload');
+    removeCookie('payload');
   }
 }
