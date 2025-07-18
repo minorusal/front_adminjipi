@@ -51,8 +51,8 @@ export class DashboardComponent implements OnInit {
         .subscribe((list) => this.socketService.notifications$.next(list));
       this.notificationService
         .fetchBadge()
-        .subscribe((resp) =>
-          this.socketService.badge$.next(resp?.count ?? resp ?? 0)
+        .subscribe((count) =>
+          this.socketService.badge$.next(Number(count))
         );
     }
   }
