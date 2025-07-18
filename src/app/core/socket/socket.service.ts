@@ -58,6 +58,10 @@ export class SocketService {
         ? payload.data.list
         : Array.isArray(payload?.list)
         ? payload.list
+        : Array.isArray(payload?.results)
+        ? payload.results
+        : Array.isArray(payload?.data?.results)
+        ? payload.data.results
         : Array.isArray(payload?.data)
         ? payload.data
         : [];
@@ -85,6 +89,14 @@ export class SocketService {
           ? resp.data
           : Array.isArray(resp?.data?.data)
           ? resp.data.data
+          : Array.isArray(resp?.data?.results)
+          ? resp.data.results
+          : Array.isArray(resp?.data?.list)
+          ? resp.data.list
+          : Array.isArray(resp?.results)
+          ? resp.results
+          : Array.isArray(resp?.list)
+          ? resp.list
           : [];
         this.notifications$.next(arr);
       }

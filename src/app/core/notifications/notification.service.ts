@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -10,9 +11,28 @@ export class NotificationService {
   constructor(private http: HttpClient) {}
   
   fetchList(page = 1, limit = 10) {
-    return this.http.get<any[]>(this.listUrl, {
+    return this.http.get<any>(this.listUrl, {
       params: { page, limit },
-    });
+    }).pipe(
+      // The API may return either an array directly or wrap it under
+      // properties like `list`, `data.list` or `results`. Normalize the
+      // response so consumers always receive an array.
+      map((resp: any) =>
+        Array.isArray(resp)
+          ? resp
+          : Array.isArray(resp?.list)
+          ? resp.list
+          : Array.isArray(resp?.data?.list)
+          ? resp.data.list
+          : Array.isArray(resp?.results)
+          ? resp.results
+          : Array.isArray(resp?.data?.results)
+          ? resp.data.results
+          : Array.isArray(resp?.data)
+          ? resp.data
+          : []
+      )
+    );
   }
 
   fetchBadge() {
