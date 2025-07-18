@@ -43,5 +43,6 @@ export class AuthFacade {
   private clearTokens(): void {
     localStorage.removeItem('sessionToken');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('payload');
   }
 }

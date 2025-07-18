@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { EncryptService } from './encrypt.service';
+import { getIdsFromToken } from '../../shared/utils/token';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -21,13 +22,15 @@ export class AuthService {
       .post(this.loginUrl, encrypted, { headers, responseType: 'text' })
       .pipe(
         map((resp) => {
-          const decrypted = this.cipher.decrypt(resp)
-          const tokens = decrypted.login?.usu_token || {}
+          const decrypted = this.cipher.decrypt(resp);
+          const tokens = decrypted.login?.usu_token || {};
           if (tokens.sessionToken) {
-            localStorage.setItem('sessionToken', tokens.sessionToken)
+            localStorage.setItem('sessionToken', tokens.sessionToken);
+            const ids = getIdsFromToken(tokens.sessionToken);
+            localStorage.setItem('payload', JSON.stringify(ids));
           }
           if (tokens.refreshToken) {
-            localStorage.setItem('refreshToken', tokens.refreshToken)
+            localStorage.setItem('refreshToken', tokens.refreshToken);
           }
           return decrypted;
         })
