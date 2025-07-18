@@ -12,6 +12,7 @@ import {
   NotificationUpdateStatus,
 } from './notification.types';
 import { getIdsFromToken } from '../../shared/utils/token';
+import { NotificationService } from '../notifications/notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class SocketService {
@@ -24,14 +25,13 @@ export class SocketService {
     return getIdsFromToken(token);
   }
 
-  constructor() {}
+  constructor(private notificationService?: NotificationService) {}
 
   connect(): void {
     const token = localStorage.getItem('sessionToken') || '';
-    console.log('SocketService: connecting to', environment.socketUrl);
-    this.socket = io(environment.socketUrl, {
-      query: { token },
-      extraHeaders: { Authorization: `Bearer ${token}` },
+    console.log('SocketService: connecting to http://localhost:4000');
+    this.socket = io('http://localhost:4000', {
+      auth: { sessionToken: token },
     });
     this.socket.on('connect', () =>
       console.log('SocketService: connected to socket')
@@ -50,14 +50,27 @@ export class SocketService {
       return;
     }
 
-    this.socket.on('notification:list', (list) => {
-      console.log('SocketService: notification:list', list);
-      const arr = Array.isArray(list)
-        ? list
-        : Array.isArray(list?.data)
-        ? list.data
+    this.socket.on('notification:list', (payload) => {
+      console.log('SocketService: notification:list', payload);
+      const arr = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload?.data?.list)
+        ? payload.data.list
+        : Array.isArray(payload?.list)
+        ? payload.list
+        : Array.isArray(payload?.data)
+        ? payload.data
         : [];
       this.notifications$.next(arr);
+      const badge =
+        typeof payload?.badge === 'number'
+          ? payload.badge
+          : typeof payload?.data?.badge === 'number'
+          ? payload.data.badge
+          : undefined;
+      if (typeof badge === 'number') {
+        this.badge$.next(badge);
+      }
     });
     this.socket.on('notification:badge', (b) => {
       console.log('SocketService: notification:badge', b);
@@ -107,6 +120,7 @@ export class SocketService {
         );
         this.badge$.next(Math.max(this.badge$.value - 1, 0));
       }
+      this.refresh();
     });
 
     this.socket.on('notification:update-status:ack', (resp) => {
@@ -135,6 +149,7 @@ export class SocketService {
       this.notifications$.next(
         this.notifications$.value.filter((n) => n.uuid !== uuid)
       );
+      this.refresh();
     });
 
     this.socket.on('notification:get:ack', (resp) => {
@@ -200,6 +215,18 @@ export class SocketService {
 
   getNotification(payload: NotificationGet): void {
     this.socket?.emit('notification:get', payload);
+  }
+
+  private refresh(): void {
+    if (!this.notificationService) {
+      return;
+    }
+    this.notificationService.fetchList(1, 10).subscribe((list) => {
+      this.notifications$.next(list as any[]);
+    });
+    this.notificationService
+      .fetchBadge()
+      .subscribe((count) => this.badge$.next(Number(count)));
   }
 
   disconnect(): void {

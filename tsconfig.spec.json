@@ -18,6 +18,7 @@
   "include": [
     "tests/**/*.ts",
     "src/app/core/socket/**/*.ts",
+    "src/app/core/notifications/**/*.ts",
     "src/app/core/auth/auth.service.ts",
     "src/app/core/auth/encrypt.service.ts",
     "src/app/shared/utils/cookies.ts",
