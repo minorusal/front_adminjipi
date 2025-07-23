@@ -33,6 +33,8 @@ export interface NotificationListParams {
   limit?: number;
   from_company_id?: number;
   from_user_id?: number;
+  to_company_id?: number;
+  to_user_id?: number;
 }
 
 export interface NotificationHistory {

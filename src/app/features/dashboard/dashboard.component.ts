@@ -22,17 +22,30 @@ import { getCookie } from '../../shared/utils/cookies';
     NotificationListComponent,
   ],
   template: `
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2>Dashboard</h2>
-      <button class="btn btn-outline-secondary" (click)="logout()">Logout</button>
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Dashboard</h2>
+        <div class="d-flex align-items-center gap-3">
+          <app-notification-badge></app-notification-badge>
+          <button class="btn btn-outline-secondary" (click)="logout()">
+            <i class="fas fa-sign-out-alt me-2"></i>Logout
+          </button>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex align-items-center mb-3">
+            <button class="btn btn-success" (click)="createSample()">
+              <i class="fas fa-plus me-2"></i>Crear Notificación
+            </button>
+          </div>
+          <app-notification-list></app-notification-list>
+        </div>
+      </div>
     </div>
-    <div class="d-flex align-items-start mb-3">
-      <button class="btn btn-primary me-3" (click)="createSample()">Crear Notificación</button>
-      <app-notification-list class="flex-grow-1"></app-notification-list>
-    </div>
-    <app-notification-badge></app-notification-badge>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class DashboardComponent implements OnInit {
   private readonly to_user_id = 102;
@@ -46,16 +59,28 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.socketService.connect();
-    if (this.socketService.notifications$.value.length === 0) {
-      this.notificationService
-        .fetchList()
-        .subscribe((list) => this.socketService.notifications$.next(list));
-      this.notificationService
-        .fetchBadge()
-        .subscribe((count) =>
-          this.socketService.badge$.next(Number(count))
-        );
-    }
+    
+    // Dar tiempo para que se establezca la conexión
+    setTimeout(() => {
+      // NUEVO SISTEMA: Solicitar notificaciones personalizadas por usuario
+      console.log('🚀 DASHBOARD: Iniciando con NUEVO SISTEMA de notificaciones');
+      this.socketService.requestUserNotifications(); // Usa IDs actuales automáticamente
+      
+      // COMPATIBILIDAD: Mantener sistema antiguo también
+      const currentIds = this.socketService.getCurrentIds();
+      const currentUserId = currentIds?.user_id;
+      if (currentUserId) {
+        const currentCompanyId = currentIds?.company_id;
+        console.log('⚠️ DASHBOARD: También ejecutando sistema antiguo para compatibilidad');
+        this.socketService.requestList({ 
+          to_user_id: currentUserId,
+          to_company_id: currentCompanyId,
+          page: 1,
+          limit: 10
+        });
+        this.socketService.requestUnseenCount(currentUserId);
+      }
+    }, 500);
   }
 
   createSample(): void {
