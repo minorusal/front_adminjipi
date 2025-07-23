@@ -218,12 +218,16 @@ export class SocketService {
     });
 
     // ❌ SISTEMA ANTIGUO ELIMINADO - Ya no usamos notification:list
-    this.socket.on('notification:badge', (b) => {
-      console.log('🔢 BADGE RECIBIDO - notification:badge:', b);
-      console.log('🔢 TIPO DE B:', typeof b);
-      console.log('🔢 ESTRUCTURA COMPLETA:', JSON.stringify(b, null, 2));
-      const count = typeof b === 'number' ? b : b?.data ?? b?.count ?? 0;
-      console.log('🔢 COUNT CALCULADO:', count);
+    // Escuchar actualización automática del contador
+    this.socket.on('notification:badge', (unseenData) => {
+      console.log('🔔 Contador actualizado:', unseenData);
+      // Actualizar el badge de notificaciones no vistas
+      // unseenData contiene la información del contador
+      
+      const count = typeof unseenData === 'number' 
+        ? unseenData 
+        : unseenData?.data?.not_seen ?? unseenData?.data ?? unseenData?.count ?? 0;
+      
       this.badge$.next(count);
     });
 
@@ -294,52 +298,51 @@ export class SocketService {
 
     this.socket.on('notification:new', (resp) => {
       console.log('🆕 NUEVA NOTIFICACIÓN RECIBIDA:', resp);
-      console.log('🆕 TIPO DE RESPUESTA:', typeof resp);
-      console.log('🆕 TIENE ERROR?:', resp?.error);
-      console.log('🆕 TIENE DATA?:', !!resp?.data);
+      console.log('🆕 ESTRUCTURA COMPLETA:', JSON.stringify(resp, null, 2));
       
       if (!resp?.error && resp?.data) {
         console.log('🆕 AGREGANDO NUEVA NOTIFICACIÓN AL INICIO DE LA LISTA');
         const currentNotifications = this.notifications$.value;
         
-        // Completar datos faltantes en la nueva notificación
+        // IMPORTANTE: Solo usar UUID temporal si NO viene UUID del backend
+        const finalUuid = resp.data.uuid && resp.data.uuid !== '' 
+          ? resp.data.uuid 
+          : `temp_${Date.now()}`;
+          
         const enhancedNotification = {
           ...resp.data,
-          uuid: resp.data.uuid || `temp_${Date.now()}`, // UUID temporal si no existe
+          uuid: finalUuid,
           created_at: resp.data.created_at || new Date().toISOString(),
           updated_at: resp.data.updated_at || new Date().toISOString(),
-          visto: resp.data.visto !== undefined ? resp.data.visto : 0, // Sistema antiguo
-          is_read: resp.data.is_read !== undefined ? resp.data.is_read : false, // Sistema nuevo
+          visto: resp.data.visto !== undefined ? resp.data.visto : 0,
+          is_read: resp.data.is_read !== undefined ? resp.data.is_read : false,
           status: resp.data.status || 'received'
         };
         
-        console.log('🆕 UUID DE LA NOTIFICACIÓN:', enhancedNotification.uuid);
-        console.log('🆕 ¿ES TEMPORAL?:', enhancedNotification.uuid.startsWith('temp_'));
+        console.log('🆕 UUID FINAL:', finalUuid);
+        console.log('🆕 ¿ES TEMPORAL?:', finalUuid.startsWith('temp_'));
+        console.log('🆕 UUID DEL BACKEND:', resp.data.uuid);
+        
+        // Si es temporal, intentar actualizar después
+        if (finalUuid.startsWith('temp_')) {
+          console.log('⚠️ NOTIFICACIÓN CON UUID TEMPORAL - Se actualizará cuando llegue la confirmación');
+          
+          // Esperar 3 segundos y re-solicitar la lista para obtener el UUID real
+          setTimeout(() => {
+            console.log('🔄 SOLICITANDO ACTUALIZACIÓN DESPUÉS DE UUID TEMPORAL');
+            this.requestUserNotifications();
+          }, 3000);
+        }
         
         const newNotifications = [enhancedNotification, ...currentNotifications];
-        console.log('🆕 LISTA ANTERIOR LONGITUD:', currentNotifications.length);
-        console.log('🆕 LISTA NUEVA LONGITUD:', newNotifications.length);
-        console.log('🆕 NUEVA NOTIFICACIÓN (datos completados):', enhancedNotification);
-        console.log('🆕 CAMPOS COMPLETADOS:', Object.keys(enhancedNotification));
-        
         this.notifications$.next(newNotifications);
+        
         const currentBadge = typeof this.badge$.value === 'number' ? this.badge$.value : 0;
         this.badge$.next(currentBadge + 1);
         
-        // Marcar timestamp de última notificación recibida
         this.lastNotificationReceived = Date.now();
         
-        console.log('🆕 BEHAVIORSUBJECT ACTUALIZADO CON NUEVA NOTIFICACIÓN');
-        console.log('🆕 VALOR ACTUAL DEL BEHAVIORSUBJECT:', this.notifications$.value);
-        console.log('🆕 TIMESTAMP NOTIFICACIÓN:', this.lastNotificationReceived);
-        
-        // Verificar en 2 segundos si la lista sigue intacta
-        setTimeout(() => {
-          console.log('🆕 VERIFICACIÓN 2s DESPUÉS - LISTA ACTUAL:', this.notifications$.value.length);
-          if (this.notifications$.value.length === 0) {
-            console.error('🆕 ❌ LA LISTA SE VACIÓ DESPUÉS DE AGREGAR NOTIFICACIÓN!');
-          }
-        }, 2000);
+        console.log('🆕 NOTIFICACIÓN AGREGADA CON UUID:', finalUuid);
       } else {
         console.log('🆕 NO SE AGREGÓ LA NOTIFICACIÓN - ERROR O SIN DATA');
       }
@@ -358,13 +361,24 @@ export class SocketService {
       }
     });
 
-    this.socket.on('notification:delete:ack', (resp) => {
-      console.log('SocketService: notification:delete:ack', resp)
-      if (!resp?.error) {
-        const uuid = resp.data;
-        this.notifications$.next(
-          this.notifications$.value.filter((n) => n.uuid !== uuid)
-        );
+    // 3. Configurar listener para confirmación de eliminación
+    this.socket.on('notification:delete:ack', (response) => {
+      console.log('📨 Respuesta de eliminación:', response);
+      
+      if (!response.error) {
+        console.log('✅ Notificación eliminada exitosamente:', response.data);
+        // response.data = UUID de la notificación eliminada
+        
+        // Actualizar la UI, remover la notificación de la lista
+        const uuid = response.data;
+        const currentNotifications = this.notifications$.value;
+        const updatedNotifications = currentNotifications.filter(n => n.uuid !== uuid);
+        this.notifications$.next(updatedNotifications);
+        
+        console.log('✅ Notificación removida de la lista local');
+      } else {
+        console.error('❌ Error al eliminar notificación:', response);
+        // Mostrar mensaje de error al usuario
       }
     });
 
@@ -404,16 +418,23 @@ export class SocketService {
       console.log('📤 ESTRUCTURA:', JSON.stringify(data, null, 2));
     });
 
-    // LISTENER para errores de eventos no reconocidos
+    // Escuchar errores generales
     this.socket.on('error', (error) => {
-      console.log('❌ ERROR DEL SOCKET:', error);
-      console.log('❌ TIPO DE ERROR:', typeof error);
-      console.log('❌ ESTRUCTURA COMPLETA:', JSON.stringify(error, null, 2));
+      console.error('🚨 Error del socket:', error);
+      if (error.message === 'Token no encontrado') {
+        console.error('❌ Token no válido - reautenticar usuario');
+      }
     });
 
     this.socket.on('connect_error', (error) => {
       console.log('❌ CONNECT ERROR:', error);
       console.log('❌ TIPO DE CONNECT ERROR:', typeof error);
+    });
+
+    // Listener para errores específicos de eliminación
+    this.socket.on('notification:delete:error', (error) => {
+      console.log('❌ ERROR ESPECÍFICO DE DELETE:', error);
+      console.log('❌ ESTRUCTURA COMPLETA DEL ERROR:', JSON.stringify(error, null, 2));
     });
   }
 
@@ -436,12 +457,23 @@ export class SocketService {
     const currentIds = this.getCurrentIds();
     const finalUserId = userId || currentIds?.user_id;
     
+    // VALIDAR UUID TEMPORAL
+    if (notificationUuid.startsWith('temp_')) {
+      console.warn('⚠️ NO SE PUEDE MARCAR COMO LEÍDA - UUID TEMPORAL:', notificationUuid);
+      console.warn('⚠️ ESPERA A QUE EL BACKEND ASIGNE EL UUID REAL');
+      
+      // Re-solicitar lista para obtener UUIDs reales
+      console.log('🔄 RE-SOLICITANDO LISTA PARA OBTENER UUIDS REALES...');
+      this.requestUserNotifications();
+      
+      return;
+    }
+    
     console.log('✅ NUEVO SISTEMA: Marcando como leída:', {
       notificationUuid,
       userId: finalUserId
     });
     
-    // SOLO usar el nuevo sistema - payload simplificado
     this.socket?.emit('mark-notification-read', {
       notificationUuid,
       userId: finalUserId
@@ -472,9 +504,36 @@ export class SocketService {
     this.markNotificationRead(uuid);
   }
 
-  delete(uuid: string): void {
-    console.log('SocketService: delete', uuid);
-    this.socket?.emit('notification:delete', { uuid } as NotificationDelete);
+  // Función para eliminar notificación según especificaciones
+  delete(notificationUuid: string): void {
+    console.log('🗑️ Eliminando notificación:', notificationUuid);
+    
+    // 1. Verificar estado de conexión
+    if (!this.socket?.connected) {
+      console.error('❌ Socket no conectado');
+      return;
+    }
+    console.log('✅ Socket conectado, ID:', this.socket.id);
+    
+    // Verificar UUID temporal
+    if (notificationUuid.startsWith('temp_')) {
+      console.warn('⚠️ NO SE PUEDE ELIMINAR - UUID TEMPORAL');
+      return;
+    }
+
+    // Obtener userId del payload
+    const currentIds = this.getCurrentIds();
+    const userId = currentIds?.user_id;
+    
+    console.log('🗑️ Eliminando notificación:', notificationUuid, 'por usuario:', userId);
+    
+    // 2. Emitir evento al socket
+    this.socket.emit('notification:delete', {
+      uuid: notificationUuid,        // UUID de la notificación (REQUERIDO)
+      changed_by: userId             // ID del usuario que elimina (OPCIONAL)
+    });
+    
+    console.log('📤 Evento notification:delete enviado');
   }
 
   createNotification(payload: Notificacion): void {
@@ -557,6 +616,12 @@ export class SocketService {
     });
   }
 
+  // Método helper para obtener el userId actual
+  getCurrentUserId(): number | undefined {
+    const currentIds = this.getCurrentIds();
+    return currentIds?.user_id;
+  }
+
   // MÉTODO: Solicitar al socket que incluya is_read en todas las notificaciones
   requestReadStatusInNotifications(): void {
     const currentIds = this.getCurrentIds();
@@ -591,6 +656,22 @@ export class SocketService {
       console.log('🔐 RESPUESTA test-auth:', response);
       console.log('🔐 ESTRUCTURA:', JSON.stringify(response, null, 2));
     });
+  }
+
+  // MÉTODO DEBUG: Para prueba manual desde consola
+  debugDelete(testUuid: string = 'test-uuid-123'): void {
+    console.log('🧪 EJECUTANDO PRUEBA MANUAL DE DELETE');
+    console.log('🧪 UUID de prueba:', testUuid);
+    
+    const userId = this.getCurrentUserId();
+    console.log('🧪 UserId:', userId);
+    
+    this.socket?.emit('notification:delete', {
+      uuid: testUuid,
+      changed_by: userId || 699
+    });
+    
+    console.log('🧪 Evento enviado - Revisa los logs para ver la respuesta');
   }
 
   private refresh(): void {

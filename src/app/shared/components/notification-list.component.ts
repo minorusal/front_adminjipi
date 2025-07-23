@@ -74,8 +74,10 @@ import { Subscription } from 'rxjs';
                     <button *ngIf="!isRead(n)" 
                             (click)="markSeen(n.uuid)" 
                             class="btn btn-sm btn-outline-success" 
-                            title="Marcar como leída">
-                      <i class="fas fa-check"></i>
+                            [disabled]="isTemporaryUuid(n.uuid)"
+                            [title]="isTemporaryUuid(n.uuid) ? 'Esperando UUID del servidor...' : 'Marcar como leída'">
+                      <i class="fas fa-check" *ngIf="!isTemporaryUuid(n.uuid)"></i>
+                      <i class="fas fa-spinner fa-spin" *ngIf="isTemporaryUuid(n.uuid)"></i>
                     </button>
                     <button (click)="debugReadStatus(n.uuid)" 
                             class="btn btn-sm btn-outline-info" 
@@ -89,8 +91,10 @@ import { Subscription } from 'rxjs';
                     </button>
                     <button (click)="delete(n.uuid)" 
                             class="btn btn-sm btn-outline-danger" 
-                            title="Eliminar">
-                      <i class="fas fa-trash"></i>
+                            [disabled]="isTemporaryUuid(n.uuid)"
+                            [title]="isTemporaryUuid(n.uuid) ? 'No se puede eliminar UUID temporal' : 'Eliminar'">
+                      <i class="fas fa-trash" *ngIf="!isTemporaryUuid(n.uuid)"></i>
+                      <i class="fas fa-ban" *ngIf="isTemporaryUuid(n.uuid)"></i>
                     </button>
                   </div>
                 </td>
@@ -204,8 +208,29 @@ export class NotificationListComponent implements OnInit, OnDestroy {
     */
   }
 
-  delete(uuid: string): void {
-    this.socketService.delete(uuid);
+  // Método para eliminar notificación con confirmación
+  delete(notificationUuid: string): void {
+    // Buscar la notificación para obtener información
+    const notification = this.notifications.find(n => n.uuid === notificationUuid);
+    const notificationTitle = notification?.title || notification?.titulo || 'Sin título';
+    
+    // Confirmación opcional
+    if (confirm(`¿Estás seguro de que quieres eliminar esta notificación: "${notificationTitle}"?`)) {
+      console.log(`🗑️ Usuario confirmó eliminar notificación ${notificationUuid}`);
+      
+      // Obtener userId actual
+      const currentUserId = this.socketService.getCurrentUserId();
+      
+      if (!currentUserId) {
+        console.error('❌ No se pudo obtener el userId actual');
+        return;
+      }
+      
+      // Llamar al método de eliminación
+      this.socketService.delete(notificationUuid);
+    } else {
+      console.log('❌ Usuario canceló la eliminación');
+    }
   }
 
   debugReadStatus(uuid: string): void {
@@ -318,6 +343,24 @@ export class NotificationListComponent implements OnInit, OnDestroy {
   testAuth(): void {
     console.log('🔐 PROBANDO AUTENTICACIÓN...');
     this.socketService.testSocketAuth();
+  }
+
+
+  // Verificar si el UUID es temporal
+  isTemporaryUuid(uuid: string): boolean {
+    return uuid && uuid.startsWith('temp_');
+  }
+
+  // Método para mostrar mensaje de éxito (puedes personalizar según tu UI)
+  private showSuccessMessage(message: string): void {
+    console.log('✅', message);
+    // Aquí puedes agregar tu lógica de notificaciones UI (toast, alert, etc.)
+  }
+
+  // Método para mostrar mensaje de error (puedes personalizar según tu UI)
+  private showErrorMessage(message: string): void {
+    console.error('❌', message);
+    // Aquí puedes agregar tu lógica de notificaciones UI (toast, alert, etc.)
   }
 
   // MÉTODO TEMPORAL: Simular respuesta exitosa para testing
