@@ -18,6 +18,9 @@ import { Subscription } from 'rxjs';
           <button class="btn btn-sm btn-outline-light" (click)="forceRefresh()">
             <i class="fas fa-sync-alt"></i> Refrescar
           </button>
+          <button class="btn btn-sm btn-outline-light" (click)="testAuth()">
+            <i class="fas fa-key"></i> Test Auth
+          </button>
           <button class="btn btn-sm btn-outline-light" (click)="markAllAsRead()" 
                   *ngIf="hasUnreadNotifications()">
             <i class="fas fa-check-double"></i> Marcar todas
@@ -73,6 +76,16 @@ import { Subscription } from 'rxjs';
                             class="btn btn-sm btn-outline-success" 
                             title="Marcar como leída">
                       <i class="fas fa-check"></i>
+                    </button>
+                    <button (click)="debugReadStatus(n.uuid)" 
+                            class="btn btn-sm btn-outline-info" 
+                            title="Debug estado de lectura">
+                      <i class="fas fa-search"></i>
+                    </button>
+                    <button (click)="simulateSuccess(n.uuid)" 
+                            class="btn btn-sm btn-outline-warning" 
+                            title="Simular éxito (testing)">
+                      <i class="fas fa-magic"></i>
                     </button>
                     <button (click)="delete(n.uuid)" 
                             class="btn btn-sm btn-outline-danger" 
@@ -153,20 +166,33 @@ export class NotificationListComponent implements OnInit, OnDestroy {
         uuid: notification.uuid,
         title: notification.title || notification.titulo,
         is_read: notification.is_read,
-        visto: notification.visto
+        visto: notification.visto,
+        to_user_id: notification.to_user_id,
+        from_user_id: notification.from_user_id,
+        to_company_id: notification.to_company_id,
+        from_company_id: notification.from_company_id,
+        todos_los_campos: Object.keys(notification)
+      });
+      
+      // Comparar con el usuario actual
+      const currentIds = this.socketService.getCurrentIds();
+      console.log('📋 COMPARACIÓN DE OWNERSHIP:', {
+        currentUserId: currentIds?.user_id,
+        currentCompanyId: currentIds?.company_id,
+        notificationToUserId: notification.to_user_id,
+        notificationToCompanyId: notification.to_company_id,
+        userMatch: currentIds?.user_id === notification.to_user_id,
+        companyMatch: currentIds?.company_id === notification.to_company_id
       });
     } else {
       console.warn('📋 ⚠️ NOTIFICACIÓN NO ENCONTRADA EN LISTA LOCAL');
     }
     
-    // NUEVO SISTEMA: Usar método específico para marcar como leída
-    console.log('📋 EJECUTANDO NUEVO SISTEMA...');
+    // SOLO NUEVO SISTEMA: Usar método específico para marcar como leída
+    console.log('📋 EJECUTANDO SOLO NUEVO SISTEMA...');
     this.socketService.markNotificationRead(uuid);
     
-    // COMPATIBILIDAD: Deshabilitar sistema antiguo temporalmente
-    // TODO: Habilitar cuando el backend implemente estados individuales por usuario
-    console.log('📋 SISTEMA ANTIGUO DESHABILITADO - Solo usando nuevo sistema');
-    console.log('📋 ========== PROCESO INICIADO - ESPERANDO RESPUESTA ==========');
+    console.log('📋 ========== PROCESO INICIADO - ESPERANDO RESPUESTA notification-read-success ==========');
     
     /* 
     if (!uuid.startsWith('temp_')) {
@@ -180,6 +206,40 @@ export class NotificationListComponent implements OnInit, OnDestroy {
 
   delete(uuid: string): void {
     this.socketService.delete(uuid);
+  }
+
+  debugReadStatus(uuid: string): void {
+    console.log('🔍 ========== INICIANDO DEBUG COMPLETO ==========');
+    console.log('🔍 UUID:', uuid);
+    
+    // 1. Buscar en la lista local
+    const localNotification = this.notifications.find(n => n.uuid === uuid);
+    if (localNotification) {
+      console.log('🔍 NOTIFICACIÓN EN LISTA LOCAL:', {
+        uuid: localNotification.uuid,
+        title: localNotification.title || localNotification.titulo,
+        is_read: localNotification.is_read,
+        visto: localNotification.visto,
+        read_at: localNotification.read_at,
+        campos_completos: Object.keys(localNotification)
+      });
+    } else {
+      console.log('🔍 ❌ NOTIFICACIÓN NO ENCONTRADA EN LISTA LOCAL');
+    }
+    
+    // 2. Solicitar estado específico (nuevo método)
+    console.log('🔍 SOLICITANDO ESTADO DE LECTURA...');
+    this.socketService.debugNotificationReadStatus(uuid);
+    
+    // 3. Usar método existente getNotification
+    console.log('🔍 SOLICITANDO VÍA getNotification...');
+    this.socketService.getNotification({ uuid });
+    
+    // 4. Mostrar configuración actual del usuario
+    const currentIds = this.socketService.getCurrentIds();
+    console.log('🔍 IDS DEL USUARIO ACTUAL:', currentIds);
+    
+    console.log('🔍 ========== FIN DEBUG - ESPERANDO RESPUESTAS ==========');
   }
 
   trackByUuid(index: number, item: any): string {
@@ -250,23 +310,44 @@ export class NotificationListComponent implements OnInit, OnDestroy {
     console.log('🔄 LONGITUD:', this.socketService.notifications$.value.length);
     this.cdr.detectChanges();
     
-    // NUEVO SISTEMA: Re-solicitar notificaciones personalizadas
+    // SOLO NUEVO SISTEMA: Re-solicitar notificaciones personalizadas
     console.log('🔄 NUEVO SISTEMA: Re-solicitando notificaciones personalizadas');
     this.socketService.requestUserNotifications();
+  }
+
+  testAuth(): void {
+    console.log('🔐 PROBANDO AUTENTICACIÓN...');
+    this.socketService.testSocketAuth();
+  }
+
+  // MÉTODO TEMPORAL: Simular respuesta exitosa para testing
+  simulateSuccess(uuid: string): void {
+    console.log('🎭 SIMULANDO RESPUESTA EXITOSA PARA:', uuid);
     
-    // COMPATIBILIDAD: También sistema antiguo
-    const currentIds = this.socketService.getCurrentIds();
-    const currentUserId = currentIds?.user_id;
-    const currentCompanyId = currentIds?.company_id;
+    // Simular respuesta del nuevo sistema
+    const mockResponse = {
+      success: true,
+      notificationUuid: uuid,
+      userId: 699,
+      timestamp: new Date().toISOString()
+    };
     
-    if (currentUserId) {
-      console.log('🔄 SISTEMA ANTIGUO: Re-solicitando para:', currentUserId);
-      this.socketService.requestList({ 
-        to_user_id: currentUserId,
-        to_company_id: currentCompanyId,
-        page: 1,
-        limit: 10
-      });
-    }
+    console.log('🎭 SIMULANDO notification-read-success:', mockResponse);
+    
+    // Actualizar manualmente como si hubiera llegado la respuesta
+    const currentNotifications = this.notifications;
+    const updatedNotifications = currentNotifications.map(n => {
+      if (n.uuid === uuid) {
+        console.log('🎭 ACTUALIZANDO NOTIFICACIÓN SIMULADA:', n.uuid);
+        return { ...n, is_read: true, visto: 1, read_at: new Date().toISOString() };
+      }
+      return n;
+    });
+    
+    // Forzar actualización
+    this.notifications = updatedNotifications;
+    this.cdr.detectChanges();
+    
+    console.log('🎭 SIMULACIÓN COMPLETADA - La interfaz debería actualizarse');
   }
 }

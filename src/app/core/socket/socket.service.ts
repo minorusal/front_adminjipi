@@ -51,8 +51,18 @@ export class SocketService {
     const currentIds = this.getCurrentIds();
     console.log('SocketService: connecting to', environment.socketUrl);
     console.log('SocketService: usuario conectándose:', currentIds);
+    console.log('🔑 TOKEN AL CONECTAR:', {
+      hasToken: !!token,
+      tokenLength: token?.length || 0,
+      tokenStart: token ? token.substring(0, 20) + '...' : 'NO TOKEN'
+    });
+    
     this.socket = io(environment.socketUrl, {
       query: { token },
+      auth: { token }, // ← AGREGAR TAMBIÉN EN AUTH
+      extraHeaders: {
+        'Authorization': `Bearer ${token}` // ← Y EN HEADERS
+      }
     });
     this.socket.on('connect', () => {
       console.log('SocketService: connected to socket');
@@ -64,9 +74,20 @@ export class SocketService {
         console.log('🔧 NUEVO SISTEMA: Configurando usuario con:', currentIds);
         this.socket?.emit('configurar-usuario', {
           usuarioId: currentIds.user_id,
-          company_id: currentIds.company_id  // ← OBLIGATORIO para company room
+          company_id: currentIds.company_id,  // ← OBLIGATORIO para company room
+          // Agregar token también aquí
+          token: token,
+          sessionToken: token,
+          auth: token
         }, (response: any) => {
           console.log('✅ Usuario configurado en company room:', response);
+          console.log('✅ ESTRUCTURA RESPUESTA CONFIGURAR-USUARIO:', JSON.stringify(response, null, 2));
+          
+          // SOLICITAR FORMATO EXTENDIDO DE NOTIFICACIONES
+          setTimeout(() => {
+            console.log('🔧 SOLICITANDO FORMATO EXTENDIDO DE NOTIFICACIONES...');
+            this.requestReadStatusInNotifications();
+          }, 1000); // Esperar 1 segundo después de configurar usuario
         });
       } else {
         console.error('❌ No se pudo configurar usuario - IDs no disponibles:', currentIds);
@@ -118,7 +139,31 @@ export class SocketService {
       console.log('📋 No vistas:', data?.notSeen || 0);
       
       const notifications = Array.isArray(data?.notifications) ? data.notifications : [];
-      this.notifications$.next(notifications);
+      
+      // VERIFICAR ESTRUCTURA DE NOTIFICACIONES
+      if (notifications.length > 0) {
+        console.log('📋 ESTRUCTURA DE LA PRIMERA NOTIFICACIÓN:', notifications[0]);
+        console.log('📋 CAMPOS DISPONIBLES:', Object.keys(notifications[0]));
+        console.log('📋 TIENE is_read?:', 'is_read' in notifications[0]);
+        console.log('📋 TIENE visto?:', 'visto' in notifications[0]);
+        console.log('📋 VALOR is_read:', notifications[0].is_read);
+        console.log('📋 VALOR visto:', notifications[0].visto);
+      }
+      
+      // NORMALIZAR ESTADO DE LECTURA: convertir 'visto' a 'is_read' si no existe
+      const normalizedNotifications = notifications.map(notification => {
+        if (notification.is_read === undefined && notification.visto !== undefined) {
+          console.log('📋 NORMALIZANDO is_read para:', notification.uuid, 'visto:', notification.visto);
+          return {
+            ...notification,
+            is_read: notification.visto === 1 || notification.visto === true
+          };
+        }
+        return notification;
+      });
+      
+      console.log('📋 NOTIFICACIONES NORMALIZADAS (primera):', normalizedNotifications[0]);
+      this.notifications$.next(normalizedNotifications);
       
       if (typeof data?.notSeen === 'number') {
         this.badge$.next(data.notSeen);
@@ -128,31 +173,34 @@ export class SocketService {
     // 4. Confirmación de marcado como leída
     this.socket.on('notification-read-success', (data) => {
       console.log('✅ NOTIFICACIÓN MARCADA COMO LEÍDA:', data);
-      console.log('✅ TIPO DE DATA:', typeof data);
-      console.log('✅ ESTRUCTURA COMPLETA DE LA RESPUESTA:', JSON.stringify(data, null, 2));
-      console.log('✅ UUID DE LA NOTIFICACIÓN MARCADA:', data?.notificationUuid);
-      console.log('✅ USUARIO QUE LA MARCÓ:', data?.userId);
-      console.log('✅ TIMESTAMP:', data?.timestamp || new Date().toISOString());
+      console.log('✅ ESTRUCTURA COMPLETA:', JSON.stringify(data, null, 2));
       
       // Actualizar la notificación en la lista local
       const currentNotifications = this.notifications$.value;
-      console.log('✅ NOTIFICACIONES ANTES DE ACTUALIZAR:', currentNotifications.length);
-      
       const updatedNotifications = currentNotifications.map(n => {
         if (n.uuid === data.notificationUuid) {
-          console.log('✅ ENCONTRADA NOTIFICACIÓN A ACTUALIZAR:', n.uuid);
-          return { ...n, is_read: true, read_at: new Date().toISOString() };
+          console.log('✅ ACTUALIZANDO NOTIFICACIÓN:', n.uuid);
+          return { 
+            ...n, 
+            is_read: true, 
+            visto: 1, // También mantener compatibilidad
+            read_at: data.readAt || new Date().toISOString() 
+          };
         }
         return n;
       });
       
-      console.log('✅ NOTIFICACIONES DESPUÉS DE ACTUALIZAR:', updatedNotifications.length);
       this.notifications$.next(updatedNotifications);
+    });
+
+    // 5. Actualización del contador de no leídas
+    this.socket.on('unseen-count-updated', (data) => {
+      console.log('🔢 CONTADOR ACTUALIZADO:', data);
+      console.log('🔢 NUEVO CONTADOR:', data.notSeenCount);
       
-      // Actualizar badge
-      const unseenCount = updatedNotifications.filter(n => !n.is_read).length;
-      console.log('✅ NUEVO CONTADOR DE NO LEÍDAS:', unseenCount);
-      this.badge$.next(unseenCount);
+      if (typeof data.notSeenCount === 'number') {
+        this.badge$.next(data.notSeenCount);
+      }
     });
 
     // 5. Confirmación de marcar todas como leídas
@@ -169,46 +217,7 @@ export class SocketService {
       this.badge$.next(0);
     });
 
-    // COMPATIBILIDAD: Mantener listeners antiguos por si acaso
-    this.socket.on('notification:list', (payload) => {
-      console.log('🔔 RESPUESTA notification:list RECIBIDA:', payload);
-      console.log('🔔 TIPO DE PAYLOAD:', typeof payload);
-      console.log('🔔 ES ARRAY?:', Array.isArray(payload));
-      if (payload && typeof payload === 'object') {
-        console.log('🔔 KEYS DEL PAYLOAD:', Object.keys(payload));
-      }
-      
-      const arr = Array.isArray(payload)
-        ? payload
-        : Array.isArray(payload?.data?.list)
-        ? payload.data.list
-        : Array.isArray(payload?.list)
-        ? payload.list
-        : Array.isArray(payload?.results)
-        ? payload.results
-        : Array.isArray(payload?.data?.results)
-        ? payload.data.results
-        : Array.isArray(payload?.data)
-        ? payload.data
-        : [];
-        
-      console.log('🔔 ARRAY EXTRAÍDO:', arr);
-      console.log('🔔 LONGITUD DEL ARRAY:', arr.length);
-      
-      this.notifications$.next(arr);
-      console.log('🔔 BEHAVIORSUBJECT ACTUALIZADO. VALOR ACTUAL:', this.notifications$.value);
-      console.log('🔔 ⚠️ ATENCIÓN: notification:list SOBRESCRIBIÓ LA LISTA CON', arr.length, 'elementos');
-      const badge =
-        typeof payload?.badge === 'number'
-          ? payload.badge
-          : typeof payload?.data?.badge === 'number'
-          ? payload.data.badge
-          : undefined;
-      if (typeof badge === 'number') {
-        console.log('🔔 BADGE ACTUALIZADO A:', badge);
-        this.badge$.next(badge);
-      }
-    });
+    // ❌ SISTEMA ANTIGUO ELIMINADO - Ya no usamos notification:list
     this.socket.on('notification:badge', (b) => {
       console.log('🔢 BADGE RECIBIDO - notification:badge:', b);
       console.log('🔢 TIPO DE B:', typeof b);
@@ -336,23 +345,7 @@ export class SocketService {
       }
     });
 
-    this.socket.on('notification:seen:ack', (resp) => {
-      console.log('📤 SISTEMA ANTIGUO notification:seen:ack:', resp);
-      if (!resp?.error) {
-        console.log('✅ SISTEMA ANTIGUO: Notificación marcada como vista exitosamente');
-        const uuid = resp.data;
-        this.notifications$.next(
-          this.notifications$.value.map((n) =>
-            n.uuid === uuid ? { ...n, seen: true, visto: 1 } : n
-          )
-        );
-        const currentBadge = typeof this.badge$.value === 'number' ? this.badge$.value : 0;
-        this.badge$.next(Math.max(currentBadge - 1, 0));
-      } else {
-        console.warn('⚠️ SISTEMA ANTIGUO: Error al marcar como vista:', resp.error);
-        console.warn('⚠️ Esto es normal para notificaciones temporales o del nuevo sistema');
-      }
-    });
+    // ❌ SISTEMA ANTIGUO ELIMINADO - Ya no usamos notification:seen:ack
 
     this.socket.on('notification:update-status:ack', (resp) => {
       console.log('SocketService: notification:update-status:ack', resp);
@@ -388,6 +381,40 @@ export class SocketService {
       // DESHABILITADO: Este evento está causando problemas de duplicados
       // Las notificaciones nuevas llegarán via notification:new y las existentes via notification:list:ack
     });
+
+    // LISTENER GENÉRICO para capturar respuestas de estado de lectura
+    this.socket.on('get-notification-read-status-response', (data) => {
+      console.log('🔍 RESPUESTA get-notification-read-status-response:', data);
+      console.log('🔍 ESTRUCTURA:', JSON.stringify(data, null, 2));
+    });
+    
+    this.socket.on('notification-read-status', (data) => {
+      console.log('🔍 RESPUESTA notification-read-status:', data);
+      console.log('🔍 ESTRUCTURA:', JSON.stringify(data, null, 2));
+    });
+
+    // LISTENER para respuesta de marcar como leída (posibles nombres)
+    this.socket.on('mark-notification-read-response', (data) => {
+      console.log('📤 RESPUESTA mark-notification-read-response:', data);
+      console.log('📤 ESTRUCTURA:', JSON.stringify(data, null, 2));
+    });
+    
+    this.socket.on('mark-notification-read-ack', (data) => {
+      console.log('📤 RESPUESTA mark-notification-read-ack:', data);
+      console.log('📤 ESTRUCTURA:', JSON.stringify(data, null, 2));
+    });
+
+    // LISTENER para errores de eventos no reconocidos
+    this.socket.on('error', (error) => {
+      console.log('❌ ERROR DEL SOCKET:', error);
+      console.log('❌ TIPO DE ERROR:', typeof error);
+      console.log('❌ ESTRUCTURA COMPLETA:', JSON.stringify(error, null, 2));
+    });
+
+    this.socket.on('connect_error', (error) => {
+      console.log('❌ CONNECT ERROR:', error);
+      console.log('❌ TIPO DE CONNECT ERROR:', typeof error);
+    });
   }
 
   /**
@@ -414,14 +441,10 @@ export class SocketService {
       userId: finalUserId
     });
     
-    // Agregar callback para capturar respuesta inmediata si existe
+    // SOLO usar el nuevo sistema - payload simplificado
     this.socket?.emit('mark-notification-read', {
       notificationUuid,
       userId: finalUserId
-    }, (response: any) => {
-      console.log('📤 RESPUESTA INMEDIATA al marcar como leída:', response);
-      console.log('📤 TIPO DE RESPUESTA:', typeof response);
-      console.log('📤 ESTRUCTURA COMPLETA:', JSON.stringify(response, null, 2));
     });
   }
 
@@ -442,10 +465,11 @@ export class SocketService {
     });
   }
 
-  // COMPATIBILIDAD: Mantener método antiguo
+  // ❌ MÉTODO DEPRECADO - Redirige al nuevo sistema por compatibilidad  
+  /** @deprecated Use markNotificationRead() instead */
   markSeen(uuid: string): void {
-    console.log('⚠️ SISTEMA ANTIGUO: markSeen', uuid);
-    this.socket?.emit('notification:seen', { uuid } as NotificationSeen);
+    console.warn('⚠️ MÉTODO DEPRECADO: markSeen() - Use markNotificationRead() en su lugar');
+    this.markNotificationRead(uuid);
   }
 
   delete(uuid: string): void {
@@ -473,26 +497,28 @@ export class SocketService {
       userId: finalUserId,
       companyId: finalCompanyId,
       page,
-      limit
+      limit,
+      includeReadStatus: true // ← PEDIMOS EXPLÍCITAMENTE EL ESTADO DE LECTURA
     });
     
     this.socket?.emit('get-notifications-for-user', {
       userId: finalUserId,
       companyId: finalCompanyId,
       page,
-      limit
+      limit,
+      includeReadStatus: true // ← NUEVO PARÁMETRO
+    }, (response: any) => {
+      console.log('📋 RESPUESTA get-notifications-for-user:', response);
+      console.log('📋 TIPO DE RESPUESTA:', typeof response);
+      console.log('📋 ESTRUCTURA COMPLETA:', JSON.stringify(response, null, 2));
     });
   }
 
-  // COMPATIBILIDAD: Mantener método antiguo
-  requestList(params: NotificationListParams = {}): void {
-    const defaults: NotificationListParams = {
-      from_company_id: Number(getCookie('from_company_id')),
-      from_user_id: Number(getCookie('from_user_id')),
-    };
-    const finalParams = { ...defaults, ...params };
-    console.log('⚠️ SISTEMA ANTIGUO: notification:list con:', finalParams);
-    this.socket?.emit('notification:list', finalParams);
+  // ❌ MÉTODO DEPRECADO - Redirige al nuevo sistema por compatibilidad
+  /** @deprecated Use requestUserNotifications() instead */
+  requestList(params: any = {}): void {
+    console.warn('⚠️ MÉTODO DEPRECADO: requestList() - Use requestUserNotifications() en su lugar');
+    this.requestUserNotifications();
   }
 
   requestUnseenCount(to_user_id: number): void {
@@ -510,6 +536,61 @@ export class SocketService {
 
   getNotification(payload: NotificationGet): void {
     this.socket?.emit('notification:get', payload);
+  }
+
+  // MÉTODO DEBUG: Solicitar estado de lectura específico de una notificación
+  debugNotificationReadStatus(notificationUuid: string, userId?: number): void {
+    const currentIds = this.getCurrentIds();
+    const finalUserId = userId || currentIds?.user_id;
+    
+    console.log('🔍 DEBUG: Solicitando estado de lectura para:', {
+      notificationUuid,
+      userId: finalUserId
+    });
+    
+    this.socket?.emit('get-notification-read-status', {
+      notificationUuid,
+      userId: finalUserId
+    }, (response: any) => {
+      console.log('🔍 DEBUG: Respuesta estado de lectura:', response);
+      console.log('🔍 DEBUG: Estructura completa:', JSON.stringify(response, null, 2));
+    });
+  }
+
+  // MÉTODO: Solicitar al socket que incluya is_read en todas las notificaciones
+  requestReadStatusInNotifications(): void {
+    const currentIds = this.getCurrentIds();
+    
+    console.log('🔧 SOLICITANDO AL SOCKET INCLUIR is_read EN NOTIFICACIONES');
+    
+    this.socket?.emit('configure-notification-format', {
+      userId: currentIds?.user_id,
+      companyId: currentIds?.company_id,
+      includeReadStatus: true,
+      includeFields: ['is_read', 'read_at', 'visto']
+    }, (response: any) => {
+      console.log('🔧 RESPUESTA configure-notification-format:', response);
+      console.log('🔧 ESTRUCTURA:', JSON.stringify(response, null, 2));
+    });
+  }
+
+  // MÉTODO DEBUG: Probar autenticación del socket
+  testSocketAuth(): void {
+    const currentIds = this.getCurrentIds();
+    const token = localStorage.getItem('sessionToken') || '';
+    
+    console.log('🔐 PROBANDO AUTENTICACIÓN DEL SOCKET...');
+    
+    this.socket?.emit('test-auth', {
+      userId: currentIds?.user_id,
+      companyId: currentIds?.company_id,
+      token: token,
+      sessionToken: token,
+      auth: token
+    }, (response: any) => {
+      console.log('🔐 RESPUESTA test-auth:', response);
+      console.log('🔐 ESTRUCTURA:', JSON.stringify(response, null, 2));
+    });
   }
 
   private refresh(): void {

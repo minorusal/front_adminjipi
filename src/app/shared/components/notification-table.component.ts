@@ -54,7 +54,7 @@ export class NotificationTableComponent implements OnInit, OnDestroy {
   }
 
   markSeen(uuid: string): void {
-    this.socketService.markSeen(uuid);
+    this.socketService.markNotificationRead(uuid);
   }
 
   delete(uuid: string): void {

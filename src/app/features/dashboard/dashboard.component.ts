@@ -62,24 +62,9 @@ export class DashboardComponent implements OnInit {
     
     // Dar tiempo para que se establezca la conexión
     setTimeout(() => {
-      // NUEVO SISTEMA: Solicitar notificaciones personalizadas por usuario
+      // SOLO NUEVO SISTEMA: Solicitar notificaciones personalizadas por usuario
       console.log('🚀 DASHBOARD: Iniciando con NUEVO SISTEMA de notificaciones');
       this.socketService.requestUserNotifications(); // Usa IDs actuales automáticamente
-      
-      // COMPATIBILIDAD: Mantener sistema antiguo también
-      const currentIds = this.socketService.getCurrentIds();
-      const currentUserId = currentIds?.user_id;
-      if (currentUserId) {
-        const currentCompanyId = currentIds?.company_id;
-        console.log('⚠️ DASHBOARD: También ejecutando sistema antiguo para compatibilidad');
-        this.socketService.requestList({ 
-          to_user_id: currentUserId,
-          to_company_id: currentCompanyId,
-          page: 1,
-          limit: 10
-        });
-        this.socketService.requestUnseenCount(currentUserId);
-      }
     }, 500);
   }
 
