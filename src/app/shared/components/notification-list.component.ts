@@ -1,12 +1,13 @@
 import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { SocketService } from '../../core/socket/socket.service';
 import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-notification-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="card shadow-sm">
       <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -15,6 +16,9 @@ import { Subscription } from 'rxjs';
           Notificaciones ({{ notifications ? notifications.length : 0 }})
         </h6>
         <div class="btn-group">
+          <button class="btn btn-sm btn-outline-light" (click)="openSelfNotificationModal()">
+            <i class="fas fa-user-plus"></i> Autonotificación
+          </button>
           <button class="btn btn-sm btn-outline-light" (click)="forceRefresh()">
             <i class="fas fa-sync-alt"></i> Refrescar
           </button>
@@ -60,6 +64,9 @@ import { Subscription } from 'rxjs';
                 </td>
                 <td>
                   <strong>{{ getStringValue(n.title || n.titulo) || 'Sin título' }}</strong>
+                  <span *ngIf="isSelfNotification(n)" class="badge bg-info text-white ms-2" title="Autonotificación">
+                    <i class="fas fa-user"></i> YO
+                  </span>
                   <br><small class="text-muted">UUID: {{ getStringValue(n.uuid) || 'Sin UUID' }}</small>
                 </td>
                 <td>
@@ -104,6 +111,81 @@ import { Subscription } from 'rxjs';
         </div>
       </div>
     </div>
+
+    <!-- Modal para crear autonotificación -->
+    <div class="modal fade" 
+         [class.show]="showSelfNotificationModal" 
+         [style.display]="showSelfNotificationModal ? 'block' : 'none'"
+         *ngIf="showSelfNotificationModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="fas fa-user-plus me-2"></i>
+              Crear Autonotificación
+            </h5>
+            <button type="button" class="btn-close" (click)="closeSelfNotificationModal()"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="selfNotificationTitle" class="form-label">Título *</label>
+                <input type="text" 
+                       class="form-control" 
+                       id="selfNotificationTitle"
+                       placeholder="Ingresa el título de tu notificación"
+                       [(ngModel)]="selfNotificationForm.title"
+                       name="title"
+                       required>
+              </div>
+              <div class="mb-3">
+                <label for="selfNotificationBody" class="form-label">Mensaje *</label>
+                <textarea class="form-control" 
+                          id="selfNotificationBody"
+                          rows="3"
+                          placeholder="Ingresa el mensaje de tu notificación"
+                          [(ngModel)]="selfNotificationForm.body"
+                          name="body"
+                          required></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="selfNotificationChannel" class="form-label">Canal</label>
+                <select class="form-select" 
+                        id="selfNotificationChannel"
+                        [(ngModel)]="selfNotificationForm.channel"
+                        name="channel">
+                  <option value="personal">Personal</option>
+                  <option value="recordatorio">Recordatorio</option>
+                  <option value="tarea">Tarea</option>
+                  <option value="otro">Otro</option>
+                </select>
+              </div>
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Esta notificación será visible solo para ti y aparecerá marcada con un distintivo "YO".
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeSelfNotificationModal()">
+              Cancelar
+            </button>
+            <button type="button" 
+                    class="btn btn-primary" 
+                    (click)="createSelfNotification()"
+                    [disabled]="!canCreateSelfNotification()">
+              <i class="fas fa-plus me-2"></i>
+              Crear Autonotificación
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Backdrop del modal -->
+    <div class="modal-backdrop fade show" 
+         *ngIf="showSelfNotificationModal"
+         (click)="closeSelfNotificationModal()"></div>
   `,
 })
 export class NotificationListComponent implements OnInit, OnDestroy {
@@ -111,8 +193,19 @@ export class NotificationListComponent implements OnInit, OnDestroy {
   hasService: boolean = false;
   private subscription?: Subscription;
   
+  // Propiedades para autonotificaciones
+  showSelfNotificationModal = false;
+  selfNotificationForm = {
+    title: '',
+    body: '',
+    channel: 'personal'
+  };
+  
   constructor(private socketService: SocketService, private cdr: ChangeDetectorRef) {
     this.notifications = []; // Inicializar siempre
+    
+    // Hacer el componente accesible para debugging
+    (window as any).notificationListComponent = this;
   }
 
   ngOnInit() {
@@ -138,6 +231,23 @@ export class NotificationListComponent implements OnInit, OnDestroy {
         
         if (this.notifications.length > 0) {
           console.log('📋 KEYS DE LA PRIMERA NOTIFICACIÓN:', Object.keys(this.notifications[0]));
+          
+          // VERIFICAR AUTONOTIFICACIONES EN LA LISTA
+          const currentIds = this.socketService.getCurrentIds();
+          const selfNotifications = this.notifications.filter(n => 
+            n.from_user_id === currentIds?.user_id && n.to_user_id === currentIds?.user_id
+          );
+          console.log('🔍 AUTONOTIFICACIONES DETECTADAS EN LA LISTA:', selfNotifications.length);
+          
+          if (selfNotifications.length > 0) {
+            console.log('🔍 PRIMERA AUTONOTIFICACIÓN:', {
+              uuid: selfNotifications[0].uuid,
+              title: selfNotifications[0].title || selfNotifications[0].titulo,
+              from_user_id: selfNotifications[0].from_user_id,
+              to_user_id: selfNotifications[0].to_user_id,
+              payload: selfNotifications[0].payload
+            });
+          }
         }
         
         // FORZAR DETECCIÓN DE CAMBIOS
@@ -392,5 +502,155 @@ export class NotificationListComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
     
     console.log('🎭 SIMULACIÓN COMPLETADA - La interfaz debería actualizarse');
+  }
+
+  // MÉTODOS PARA AUTONOTIFICACIONES
+  
+  openSelfNotificationModal(): void {
+    console.log('📝 Abriendo modal de autonotificación');
+    this.showSelfNotificationModal = true;
+    this.resetSelfNotificationForm();
+  }
+
+  closeSelfNotificationModal(): void {
+    console.log('📝 Cerrando modal de autonotificación');
+    this.showSelfNotificationModal = false;
+    this.resetSelfNotificationForm();
+  }
+
+  resetSelfNotificationForm(): void {
+    this.selfNotificationForm = {
+      title: '',
+      body: '',
+      channel: 'personal'
+    };
+  }
+
+  canCreateSelfNotification(): boolean {
+    return this.selfNotificationForm.title.trim() !== '' && 
+           this.selfNotificationForm.body.trim() !== '';
+  }
+
+  createSelfNotification(): void {
+    console.log('🚀 ========== INICIANDO CREACIÓN DE AUTONOTIFICACIÓN ==========');
+    
+    if (!this.canCreateSelfNotification()) {
+      console.error('❌ No se puede crear autonotificación - faltan datos');
+      console.log('❌ Form actual:', this.selfNotificationForm);
+      return;
+    }
+
+    const currentIds = this.socketService.getCurrentIds();
+    console.log('🔍 IDs del usuario actual:', currentIds);
+    
+    if (!currentIds?.user_id || !currentIds?.company_id) {
+      console.error('❌ No se pudieron obtener los IDs del usuario actual');
+      return;
+    }
+
+    console.log('📝 Datos del formulario:', this.selfNotificationForm);
+
+    const autoNotificacion = {
+      to_company_id: currentIds.company_id,
+      to_user_id: currentIds.user_id,
+      from_company_id: currentIds.company_id,
+      from_user_id: currentIds.user_id, // Mismo usuario que envía y recibe
+      title: this.selfNotificationForm.title.trim(),
+      body: this.selfNotificationForm.body.trim(),
+      channel: 'in-app',
+      payload: {
+        type: 'self_notification',
+        created_by: currentIds.user_id,
+        is_self: true
+      }
+    };
+
+    console.log('📝 AUTONOTIFICACIÓN CONSTRUIDA:', JSON.stringify(autoNotificacion, null, 2));
+    console.log('📝 ¿Es autonotificación? from_user_id === to_user_id:', autoNotificacion.from_user_id === autoNotificacion.to_user_id);
+    
+    // Verificar estado del socket antes de enviar
+    console.log('🔌 Estado del socket conectado:', this.socketService['socket']?.connected);
+    console.log('🔌 ID del socket:', this.socketService['socket']?.id);
+    
+    console.log('📤 ENVIANDO autonotificación vía socketService.createNotification...');
+    this.socketService.createNotification(autoNotificacion);
+    
+    console.log('📤 LLAMADA A createNotification COMPLETADA');
+    
+    this.closeSelfNotificationModal();
+    
+    console.log('✅ Modal cerrado - Autonotificación enviada');
+    console.log('👀 Observa los logs del socket para ver si llega notification:new');
+    console.log('🚀 ========== FIN CREACIÓN DE AUTONOTIFICACIÓN ==========');
+  }
+
+  isSelfNotification(notification: any): boolean {
+    const currentIds = this.socketService.getCurrentIds();
+    const currentUserId = currentIds?.user_id;
+    
+    const isSelf = notification.from_user_id === currentUserId && 
+                   notification.to_user_id === currentUserId;
+    
+    // Debug solo para las primeras 3 notificaciones para no llenar el log
+    if (this.notifications.indexOf(notification) < 3) {
+      console.log('🔍 VERIFICANDO SI ES AUTONOTIFICACIÓN:', {
+        uuid: notification.uuid,
+        title: notification.title || notification.titulo,
+        from_user_id: notification.from_user_id,
+        to_user_id: notification.to_user_id,
+        currentUserId: currentUserId,
+        isSelf: isSelf,
+        payload_type: notification.payload?.type,
+        payload_is_self: notification.payload?.is_self
+      });
+    }
+    
+    return isSelf;
+  }
+
+  // MÉTODO DEBUG para llamar desde consola del navegador
+  debugAutoNotifications(): void {
+    console.log('🐛 ========== DEBUG AUTONOTIFICACIONES ==========');
+    console.log('🐛 Total notificaciones en la lista:', this.notifications.length);
+    
+    const currentIds = this.socketService.getCurrentIds();
+    console.log('🐛 Usuario actual:', currentIds);
+    
+    const selfNotifications = this.notifications.filter(n => 
+      n.from_user_id === currentIds?.user_id && n.to_user_id === currentIds?.user_id
+    );
+    
+    console.log('🐛 Autonotificaciones encontradas:', selfNotifications.length);
+    
+    selfNotifications.forEach((notification, index) => {
+      console.log(`🐛 Autonotificación ${index + 1}:`, {
+        uuid: notification.uuid,
+        title: notification.title || notification.titulo,
+        body: notification.body || notification.mensaje,
+        from_user_id: notification.from_user_id,
+        to_user_id: notification.to_user_id,
+        channel: notification.channel,
+        payload: notification.payload,
+        created_at: notification.created_at,
+        is_read: notification.is_read,
+        visto: notification.visto
+      });
+    });
+    
+    // Verificar todas las notificaciones para ver diferencias
+    console.log('🐛 TODAS LAS NOTIFICACIONES:');
+    this.notifications.forEach((notification, index) => {
+      const isSelf = notification.from_user_id === currentIds?.user_id && 
+                     notification.to_user_id === currentIds?.user_id;
+      console.log(`🐛 Notificación ${index + 1} (isSelf: ${isSelf}):`, {
+        uuid: notification.uuid,
+        title: notification.title || notification.titulo,
+        from_user_id: notification.from_user_id,
+        to_user_id: notification.to_user_id,
+        currentUserId: currentIds?.user_id
+      });
+    });
+    
+    console.log('🐛 ========== FIN DEBUG AUTONOTIFICACIONES ==========');
   }
 }
