@@ -14,8 +14,16 @@ export class AuthLoginPage {
   constructor(private readonly authFacade: AuthFacade, private router: Router) {}
 
   login(credentials: { email: string; password: string }): void {
+    console.log('Attempting login with:', credentials);
     this.authFacade.login(credentials).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+      next: (response) => {
+        console.log('Login response received:', response);
+        console.log('Navigating to dashboard...');
+        this.router.navigate(['/dashboard']);
+      },
+      error: (error) => {
+        console.error('Login error in page:', error);
+      }
     });
   }
 }

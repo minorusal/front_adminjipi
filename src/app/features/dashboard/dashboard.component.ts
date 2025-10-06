@@ -1,90 +1,154 @@
-import {
-  Component,
-  OnInit,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { SocketService } from '../../core/socket/socket.service';
-import { Notificacion } from '../../core/socket/notification.types';
-import { NotificationBadgeComponent } from '../../shared/components/notification-badge.component';
-import { NotificationListComponent } from '../../shared/components/notification-list.component';
-import { NotificationService } from '../../core/notifications/notification.service';
-import { AuthFacade } from '../auth/data-access/auth.facade';
-import { getCookie } from '../../shared/utils/cookies';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    CommonModule,
-    NotificationBadgeComponent,
-    NotificationListComponent,
-  ],
+  imports: [CommonModule],
   template: `
-    <div class="container-fluid">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Dashboard</h2>
-        <div class="d-flex align-items-center gap-3">
-          <app-notification-badge></app-notification-badge>
-          <button class="btn btn-outline-secondary" (click)="logout()">
-            <i class="fas fa-sign-out-alt me-2"></i>Logout
-          </button>
+    <div class="container-fluid p-4">
+      <div class="row mb-4">
+        <div class="col-12">
+          <h1 class="mb-0">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Dashboard Principal
+          </h1>
+          <p class="text-muted">Bienvenido al panel de administración</p>
         </div>
       </div>
       
       <div class="row">
-        <div class="col-12">
-          <div class="d-flex align-items-center mb-3">
-            <button class="btn btn-success" (click)="createSample()">
-              <i class="fas fa-plus me-2"></i>Crear Notificación
-            </button>
+        <div class="col-md-3 mb-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <i class="fas fa-chart-line fa-2x text-primary mb-3"></i>
+              <h5 class="card-title">Monitoreo</h5>
+              <p class="card-text">Supervisa el rendimiento del sistema</p>
+              <button (click)="navigateTo('/monitoring')" class="btn btn-primary">
+                <i class="fas fa-eye me-1"></i>
+                Ver Monitoreo
+              </button>
+            </div>
           </div>
-          <app-notification-list></app-notification-list>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <i class="fas fa-users fa-2x text-success mb-3"></i>
+              <h5 class="card-title">Administración</h5>
+              <p class="card-text">Gestiona usuarios y configuraciones</p>
+              <button (click)="navigateTo('/admin')" class="btn btn-success">
+                <i class="fas fa-cog me-1"></i>
+                Ver Admin
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <i class="fas fa-file-alt fa-2x text-info mb-3"></i>
+              <h5 class="card-title">Reportes</h5>
+              <p class="card-text">Genera reportes y analíticas</p>
+              <button (click)="navigateTo('/reports')" class="btn btn-info">
+                <i class="fas fa-chart-bar me-1"></i>
+                Ver Reportes
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <i class="fas fa-calculator fa-2x text-warning mb-3"></i>
+              <h5 class="card-title">Algoritmo</h5>
+              <p class="card-text">Configura parámetros del algoritmo</p>
+              <button (click)="navigateTo('/algoritmo')" class="btn btn-warning">
+                <i class="fas fa-sliders-h me-1"></i>
+                Ver Algoritmo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                Estado del Sistema
+              </h5>
+            </div>
+            <div class="card-body">
+              <p>✅ Login exitoso - Token de sesión guardado correctamente</p>
+              <p><strong>Usuario:</strong> {{ getUserInfo() }}</p>
+              <p><strong>Último acceso:</strong> {{ getCurrentTime() }}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   `,
+  styles: [`
+    .card {
+      border: none;
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      transition: transform 0.2s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .btn {
+      transition: all 0.2s ease;
+    }
+    
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.Default,
 })
 export class DashboardComponent implements OnInit {
-  private readonly to_user_id = 102;
+  
+  constructor(private router: Router) {}
 
-  constructor(
-    private socketService: SocketService,
-    private notificationService: NotificationService,
-    private router: Router,
-    private authFacade: AuthFacade
-  ) { }
-
-  ngOnInit(): void {
-    this.socketService.connect();
-    
-    // Dar tiempo para que se establezca la conexión
-    setTimeout(() => {
-      // SOLO NUEVO SISTEMA: Solicitar notificaciones personalizadas por usuario
-      console.log('🚀 DASHBOARD: Iniciando con NUEVO SISTEMA de notificaciones');
-      this.socketService.requestUserNotifications(); // Usa IDs actuales automáticamente
-    }, 500);
+  ngOnInit() {
+    console.log('Dashboard component loaded successfully');
+    console.log('Session token:', localStorage.getItem('sessionToken'));
   }
 
-  createSample(): void {
-    console.log('DashboardComponent: createSample clicked')
-    const payload: Notificacion = {
-      to_company_id: 636,
-      to_user_id: 699,
-      title: 'Título de la notificación',
-      body: 'Cuerpo del mensaje',
-      payload: {},
-      channel: 'email',
-    };
-    this.socketService.createNotification(payload);
+  navigateTo(route: string) {
+    this.router.navigate([route]);
   }
 
-  logout(): void {
-    this.socketService.disconnect();
-    this.authFacade.logout();
-    this.router.navigate(['/auth/login']);
+  getUserInfo(): string {
+    try {
+      const payload = localStorage.getItem('payload');
+      if (payload) {
+        const user = JSON.parse(payload);
+        return `ID: ${user.user_id || 'N/A'}, Empresa: ${user.company_id || 'N/A'}`;
+      }
+      return 'Información no disponible';
+    } catch {
+      return 'Error al obtener información';
+    }
   }
 
+  getCurrentTime(): string {
+    return new Date().toLocaleString();
+  }
 }

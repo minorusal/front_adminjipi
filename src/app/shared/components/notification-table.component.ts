@@ -26,8 +26,16 @@ import { Subscription } from 'rxjs';
           <td [class.fw-bold]="!n.seen">{{ n.title }}</td>
           <td>{{ n.date }}</td>
           <td>
-            <button (click)="markSeen(n.uuid)" class="btn btn-sm btn-link">Marcar vista</button>
-            <button (click)="delete(n.uuid)" class="btn btn-sm btn-link text-danger">Eliminar</button>
+            <div class="d-flex gap-1">
+              <button (click)="markSeen(n.uuid)" class="btn btn-sm btn-outline-success" title="Marcar como vista">
+                <i class="fas fa-check me-1"></i>
+                Marcar Vista
+              </button>
+              <button (click)="delete(n.uuid)" class="btn btn-sm btn-outline-danger" title="Eliminar notificación">
+                <i class="fas fa-trash me-1"></i>
+                Eliminar
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>

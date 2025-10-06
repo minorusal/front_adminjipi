@@ -41,12 +41,17 @@ export class AuthService {
       );
   }
 
-  logout(sessionToken: string) {
+  logout() {
+    return this.http.delete<{ results: { deleted: boolean } }>(this.logoutUrl);
+  }
+
+  logoutUserSession(sessionToken: string, customBaseUrl?: string) {
+    const baseUrl = customBaseUrl || environment.apiUrl;
+    const logoutEndpoint = `${baseUrl}/api/auth/logout`;
+    
     const headers = new HttpHeaders({
-      'mc-token': `Bearer ${sessionToken}`,
+      'mc-token': `Bearer ${sessionToken}`
     });
-    return this.http.delete<{ results: { deleted: boolean } }>(this.logoutUrl, {
-      headers,
-    });
+    return this.http.delete<{ results: { deleted:boolean } }>(logoutEndpoint, { headers });
   }
 }

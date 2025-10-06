@@ -18,27 +18,24 @@ export class AuthFacade {
     this.errorSubject.next(null);
     return this.authService.login(credentials).pipe(
       tap({
-        next: () => {
+        next: (response) => {
           this.loadingSubject.next(false);
+          console.log('Login successful:', response);
         },
-        error: () => {
+        error: (error) => {
           this.loadingSubject.next(false);
           this.errorSubject.next('Login failed');
+          console.error('Login error:', error);
         },
       })
     );
   }
 
   logout(): void {
-    const token = localStorage.getItem('sessionToken');
-    if (token) {
-      this.authService.logout(token).subscribe({
-        next: () => this.clearTokens(),
-        error: () => this.clearTokens(),
-      });
-    } else {
-      this.clearTokens();
-    }
+    this.authService.logout().subscribe({
+      next: () => this.clearTokens(),
+      error: () => this.clearTokens(), // Limpiar tokens incluso si el logout falla
+    });
   }
 
   private clearTokens(): void {

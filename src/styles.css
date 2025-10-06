@@ -1,27 +1,519 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
 
-/* Dark theme inspired by ChatGPT */
-body {
-  background-color: #343541;
-  color: #ececf1;
+/* COMPACT UI SCALING - Reduce overall interface size by 25% */
+html {
+  font-size: 0.75rem; /* Base font size reduced from 1rem to 0.75rem */
 }
 
+body {
+  font-size: 0.875rem; /* Body text slightly larger for readability */
+  line-height: 1.35; /* Tighter line height */
+}
+
+/* Reduce Bootstrap component sizes */
+.container,
+.container-sm,
+.container-md,
+.container-lg,
+.container-xl,
+.container-xxl {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.container-fluid {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+/* Compact spacing utilities */
+.p-1 { padding: 0.1875rem !important; }
+.p-2 { padding: 0.375rem !important; }
+.p-3 { padding: 0.75rem !important; }
+.p-4 { padding: 1.125rem !important; }
+.p-5 { padding: 1.875rem !important; }
+
+.m-1 { margin: 0.1875rem !important; }
+.m-2 { margin: 0.375rem !important; }
+.m-3 { margin: 0.75rem !important; }
+.m-4 { margin: 1.125rem !important; }
+.m-5 { margin: 1.875rem !important; }
+
+.mb-1 { margin-bottom: 0.1875rem !important; }
+.mb-2 { margin-bottom: 0.375rem !important; }
+.mb-3 { margin-bottom: 0.75rem !important; }
+.mb-4 { margin-bottom: 1.125rem !important; }
+.mb-5 { margin-bottom: 1.875rem !important; }
+
+.mt-1 { margin-top: 0.1875rem !important; }
+.mt-2 { margin-top: 0.375rem !important; }
+.mt-3 { margin-top: 0.75rem !important; }
+.mt-4 { margin-top: 1.125rem !important; }
+.mt-5 { margin-top: 1.875rem !important; }
+
+/* Compact typography */
+h1 { font-size: 1.875rem !important; line-height: 1.2 !important; }
+h2 { font-size: 1.5rem !important; line-height: 1.2 !important; }
+h3 { font-size: 1.3125rem !important; line-height: 1.2 !important; }
+h4 { font-size: 1.125rem !important; line-height: 1.2 !important; }
+h5 { font-size: 1rem !important; line-height: 1.2 !important; }
+h6 { font-size: 0.875rem !important; line-height: 1.2 !important; }
+
+/* Compact buttons */
+.btn {
+  padding: 0.28125rem 0.5625rem !important;
+  font-size: 0.75rem !important;
+  line-height: 1.35 !important;
+  border-radius: 0.1875rem !important;
+}
+
+.btn-sm {
+  padding: 0.1875rem 0.375rem !important;
+  font-size: 0.65625rem !important;
+  line-height: 1.3 !important;
+  border-radius: 0.125rem !important;
+}
+
+.btn-lg {
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.9375rem !important;
+  line-height: 1.35 !important;
+  border-radius: 0.28125rem !important;
+}
+
+/* Compact form controls */
+.form-control,
+.form-select {
+  padding: 0.28125rem 0.5625rem !important;
+  font-size: 0.75rem !important;
+  line-height: 1.35 !important;
+  border-radius: 0.1875rem !important;
+}
+
+.form-control-sm,
+.form-select-sm {
+  padding: 0.1875rem 0.375rem !important;
+  font-size: 0.65625rem !important;
+  line-height: 1.3 !important;
+  border-radius: 0.125rem !important;
+}
+
+.form-control-lg,
+.form-select-lg {
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.9375rem !important;
+  line-height: 1.4 !important;
+  border-radius: 0.28125rem !important;
+}
+
+/* Compact input groups */
+.input-group-text {
+  padding: 0.28125rem 0.5625rem !important;
+  font-size: 0.75rem !important;
+  line-height: 1.35 !important;
+}
+
+/* Compact cards */
+.card {
+  border-radius: 0.28125rem !important;
+}
+
+.card-body {
+  padding: 0.75rem !important;
+}
+
+.card-header,
+.card-footer {
+  padding: 0.5625rem 0.75rem !important;
+}
+
+/* Compact tables */
+.table th,
+.table td {
+  padding: 0.5625rem 0.5625rem !important;
+  font-size: 0.75rem !important;
+  line-height: 1.3 !important;
+}
+
+.table-sm th,
+.table-sm td {
+  padding: 0.375rem 0.375rem !important;
+  font-size: 0.6875rem !important;
+}
+
+/* Compact badges */
+.badge {
+  padding: 0.21875rem 0.4375rem !important;
+  font-size: 0.65625rem !important;
+  line-height: 1 !important;
+  border-radius: 0.125rem !important;
+}
+
+/* Compact pagination */
+.page-link {
+  padding: 0.28125rem 0.5625rem !important;
+  font-size: 0.75rem !important;
+  line-height: 1.35 !important;
+}
+
+/* Compact modal */
+.modal-header,
+.modal-footer {
+  padding: 0.75rem !important;
+}
+
+.modal-body {
+  padding: 0.75rem !important;
+}
+
+/* Compact navigation */
+.nav-link {
+  padding: 0.375rem 0.5625rem !important;
+  font-size: 0.75rem !important;
+}
+
+.nav-tabs .nav-link {
+  padding: 0.375rem 0.75rem !important;
+}
+
+/* Compact alerts */
+.alert {
+  padding: 0.5625rem 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+  border-radius: 0.1875rem !important;
+  font-size: 0.75rem !important;
+}
+
+/* Compact list groups */
+.list-group-item {
+  padding: 0.5625rem 0.75rem !important;
+  font-size: 0.75rem !important;
+}
+
+/* Compact breadcrumbs */
+.breadcrumb {
+  padding: 0.5625rem 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+  font-size: 0.75rem !important;
+}
+
+/* Dark theme variables */
+:root {
+  --bs-body-bg: #1a1a1a;
+  --bs-body-color: #e9ecef;
+  --bs-emphasis-color: #ffffff;
+  --bs-secondary-color: #adb5bd;
+  --bs-tertiary-color: #6c757d;
+  --bs-border-color: #495057;
+  --bs-border-color-translucent: rgba(255, 255, 255, 0.175);
+  --bs-heading-color: #ffffff;
+  --bs-link-color: #6ea8fe;
+  --bs-link-hover-color: #9ec5fe;
+  --bs-primary: #0d6efd;
+  --bs-secondary: #6c757d;
+  --bs-success: #198754;
+  --bs-info: #0dcaf0;
+  --bs-warning: #ffc107;
+  --bs-danger: #dc3545;
+  --bs-light: #495057;
+  --bs-dark: #212529;
+}
+
+/* Global dark theme */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #495057 #212529;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #212529;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #495057;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #6c757d;
+}
+
+body {
+  background-color: #1a1a1a !important;
+  color: #e9ecef !important;
+}
+
+/* Bootstrap component overrides */
+.card {
+  background-color: #212529 !important;
+  border-color: #495057 !important;
+  color: #e9ecef !important;
+}
+
+.card-header {
+  background-color: #2c3034 !important;
+  border-bottom-color: #495057 !important;
+}
+
+.card-footer {
+  background-color: #2c3034 !important;
+  border-top-color: #495057 !important;
+}
+
+.table {
+  --bs-table-bg: #212529;
+  --bs-table-striped-bg: #2c3034;
+  --bs-table-hover-bg: #343a40;
+  --bs-table-border-color: #495057;
+  color: #e9ecef !important;
+}
+
+.table-dark {
+  --bs-table-bg: #212529;
+  --bs-table-striped-bg: #2c3034;
+  --bs-table-hover-bg: #343a40;
+}
+
+/* Form controls */
+.form-control,
+.form-select {
+  background-color: #2c3034 !important;
+  border-color: #495057 !important;
+  color: #e9ecef !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: #2c3034 !important;
+  border-color: #6ea8fe !important;
+  box-shadow: 0 0 0 0.25rem rgba(110, 168, 254, 0.25) !important;
+  color: #e9ecef !important;
+}
+
+.form-control::placeholder {
+  color: #adb5bd !important;
+}
+
+.form-check-input {
+  background-color: #2c3034 !important;
+  border-color: #495057 !important;
+}
+
+.form-check-input:checked {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+/* Buttons */
+.btn-outline-primary {
+  color: #6ea8fe !important;
+  border-color: #6ea8fe !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: #6ea8fe !important;
+  border-color: #6ea8fe !important;
+  color: #000 !important;
+}
+
+.btn-outline-secondary {
+  color: #adb5bd !important;
+  border-color: #6c757d !important;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+  color: #fff !important;
+}
+
+.btn-outline-success {
+  color: #75b798 !important;
+  border-color: #75b798 !important;
+}
+
+.btn-outline-success:hover {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  color: #fff !important;
+}
+
+.btn-outline-danger {
+  color: #ea868f !important;
+  border-color: #ea868f !important;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: #fff !important;
+}
+
+/* Navigation */
+.nav-tabs {
+  border-bottom-color: #495057 !important;
+}
+
+.nav-tabs .nav-link {
+  color: #adb5bd !important;
+  border-color: transparent !important;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #e9ecef !important;
+  border-color: #495057 #495057 transparent !important;
+}
+
+.nav-tabs .nav-link.active {
+  color: #e9ecef !important;
+  background-color: #212529 !important;
+  border-color: #495057 #495057 #212529 !important;
+}
+
+/* Modals */
+.modal-content {
+  background-color: #212529 !important;
+  border-color: #495057 !important;
+}
+
+.modal-header {
+  border-bottom-color: #495057 !important;
+}
+
+.modal-footer {
+  border-top-color: #495057 !important;
+}
+
+/* Dropdown */
+.dropdown-menu {
+  background-color: #212529 !important;
+  border-color: #495057 !important;
+}
+
+.dropdown-item {
+  color: #e9ecef !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #343a40 !important;
+  color: #e9ecef !important;
+}
+
+.dropdown-divider {
+  border-top-color: #495057 !important;
+}
+
+/* Alerts */
+.alert-primary {
+  background-color: #031633 !important;
+  border-color: #084298 !important;
+  color: #6ea8fe !important;
+}
+
+.alert-success {
+  background-color: #051b11 !important;
+  border-color: #0f5132 !important;
+  color: #75b798 !important;
+}
+
+.alert-danger {
+  background-color: #2c0b0e !important;
+  border-color: #842029 !important;
+  color: #ea868f !important;
+}
+
+.alert-warning {
+  background-color: #332701 !important;
+  border-color: #997404 !important;
+  color: #ffda6a !important;
+}
+
+.alert-info {
+  background-color: #055160 !important;
+  border-color: #087990 !important;
+  color: #6edff6 !important;
+}
+
+/* Badges */
+.badge {
+  color: #000 !important;
+}
+
+.badge.bg-secondary {
+  background-color: #6c757d !important;
+  color: #fff !important;
+}
+
+.badge.bg-light {
+  background-color: #495057 !important;
+  color: #fff !important;
+}
+
+/* Borders */
+.border {
+  border-color: #495057 !important;
+}
+
+.border-top {
+  border-top-color: #495057 !important;
+}
+
+.border-bottom {
+  border-bottom-color: #495057 !important;
+}
+
+.border-left {
+  border-left-color: #495057 !important;
+}
+
+.border-right {
+  border-right-color: #495057 !important;
+}
+
+/* Background utilities */
+.bg-light {
+  background-color: #495057 !important;
+  color: #e9ecef !important;
+}
+
+.bg-white {
+  background-color: #212529 !important;
+  color: #e9ecef !important;
+}
+
+.text-muted {
+  color: #adb5bd !important;
+}
+
+.text-dark {
+  color: #e9ecef !important;
+}
+
+/* Login form specific */
 app-login-form form {
-  background-color: #202123;
+  background-color: #212529 !important;
   padding: 1.5rem;
   border-radius: 8px;
   max-width: 400px;
   margin: 2rem auto;
+  border: 1px solid #495057;
 }
 
 app-login-form label {
   margin-top: 0.5rem;
+  color: #e9ecef !important;
 }
 
 app-login-form input {
-  background-color: #40414f;
-  border: 1px solid #565869;
-  color: #ececf1;
+  background-color: #2c3034 !important;
+  border: 1px solid #495057 !important;
+  color: #e9ecef !important;
   width: 100%;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
@@ -29,13 +521,722 @@ app-login-form input {
 }
 
 app-login-form button {
-  background-color: #10a37f;
+  background-color: #0d6efd !important;
   border: none;
-  color: #fff;
+  color: #fff !important;
   padding: 0.5rem 1rem;
   border-radius: 4px;
 }
 
 app-login-form button:disabled {
   opacity: 0.5;
+}
+
+/* Custom components styling */
+.container-fluid {
+  background-color: #1a1a1a !important;
+}
+
+/* Pagination */
+.page-link {
+  background-color: #212529 !important;
+  border-color: #495057 !important;
+  color: #6ea8fe !important;
+}
+
+.page-link:hover {
+  background-color: #343a40 !important;
+  border-color: #6ea8fe !important;
+  color: #9ec5fe !important;
+}
+
+.page-item.active .page-link {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+.page-item.disabled .page-link {
+  background-color: #212529 !important;
+  border-color: #495057 !important;
+  color: #6c757d !important;
+}
+
+/* List groups */
+.list-group-item {
+  background-color: #212529 !important;
+  border-color: #495057 !important;
+  color: #e9ecef !important;
+}
+
+.list-group-item:hover {
+  background-color: #343a40 !important;
+}
+
+.list-group-item.active {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+/* Progress bars */
+.progress {
+  background-color: #495057 !important;
+}
+
+/* Tooltips and popovers */
+.tooltip-inner {
+  background-color: #495057 !important;
+  color: #e9ecef !important;
+}
+
+.popover {
+  background-color: #212529 !important;
+  border-color: #495057 !important;
+}
+
+.popover-header {
+  background-color: #2c3034 !important;
+  border-bottom-color: #495057 !important;
+  color: #e9ecef !important;
+}
+
+.popover-body {
+  color: #e9ecef !important;
+}
+
+/* Additional dark theme fixes */
+.spinner-border {
+  color: #6ea8fe !important;
+}
+
+.spinner-grow {
+  color: #6ea8fe !important;
+}
+
+/* Code and pre elements */
+code {
+  background-color: #495057 !important;
+  color: #f8f9fa !important;
+}
+
+pre {
+  background-color: #212529 !important;
+  color: #e9ecef !important;
+  border: 1px solid #495057 !important;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  background-color: transparent !important;
+}
+
+.breadcrumb-item > a {
+  color: #6ea8fe !important;
+}
+
+.breadcrumb-item.active {
+  color: #adb5bd !important;
+}
+
+/* Accordion */
+.accordion-item {
+  background-color: #212529 !important;
+  border-color: #495057 !important;
+}
+
+.accordion-button {
+  background-color: #2c3034 !important;
+  color: #e9ecef !important;
+  border-bottom-color: #495057 !important;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #343a40 !important;
+  color: #e9ecef !important;
+}
+
+.accordion-button:focus {
+  border-color: #6ea8fe !important;
+  box-shadow: 0 0 0 0.25rem rgba(110, 168, 254, 0.25) !important;
+}
+
+.accordion-body {
+  background-color: #212529 !important;
+  color: #e9ecef !important;
+}
+
+/* Toast notifications */
+.toast {
+  background-color: #212529 !important;
+  border-color: #495057 !important;
+  color: #e9ecef !important;
+}
+
+.toast-header {
+  background-color: #2c3034 !important;
+  border-bottom-color: #495057 !important;
+  color: #e9ecef !important;
+}
+
+/* Offcanvas */
+.offcanvas {
+  background-color: #212529 !important;
+  color: #e9ecef !important;
+}
+
+.offcanvas-header {
+  border-bottom-color: #495057 !important;
+}
+
+/* Dark theme for FontAwesome icons */
+.fas, .far, .fab, .fal {
+  color: inherit !important;
+}
+
+/* Custom scrollbars for webkit browsers */
+html {
+  scrollbar-color: #495057 #212529;
+}
+
+/* Selection highlight */
+::selection {
+  background-color: #6ea8fe !important;
+  color: #000 !important;
+}
+
+::-moz-selection {
+  background-color: #6ea8fe !important;
+  color: #000 !important;
+}
+
+/* Input group styling */
+.input-group-text {
+  background-color: #495057 !important;
+  border-color: #495057 !important;
+  color: #e9ecef !important;
+}
+
+/* Tab content */
+.tab-content {
+  background-color: transparent !important;
+}
+
+/* Ensure all text elements inherit dark colors */
+h1, h2, h3, h4, h5, h6 {
+  color: #ffffff !important;
+}
+
+p, span, div {
+  color: inherit !important;
+}
+
+/* Fix any remaining white backgrounds */
+.bg-white, .bg-light {
+  background-color: #212529 !important;
+  color: #e9ecef !important;
+}
+
+/* Enhanced table action buttons */
+table .btn-sm {
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.75rem !important;
+  line-height: 1.4 !important;
+  border-radius: 0.25rem !important;
+  font-weight: 500 !important;
+  min-width: fit-content !important;
+  white-space: nowrap !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+table .btn-sm:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+table .btn-sm .fas, 
+table .btn-sm .far, 
+table .btn-sm .fab, 
+table .btn-sm .fal {
+  font-size: 0.75rem !important;
+}
+
+/* Action button containers */
+.d-flex.gap-1,
+.d-flex.gap-2,
+.d-flex.flex-wrap.gap-1,
+.d-flex.flex-column.gap-1 {
+  align-items: center !important;
+}
+
+/* Table action column width optimization */
+table td:last-child,
+table th:last-child {
+  width: 1% !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+
+/* Button group improvements */
+.btn-group .btn-sm {
+  border-radius: 0.25rem !important;
+  margin-right: 2px !important;
+}
+
+.btn-group .btn-sm:not(:last-child) {
+  margin-right: 4px !important;
+}
+
+/* Specific button color improvements for dark theme */
+.btn-outline-info:hover {
+  background-color: #0dcaf0 !important;
+  border-color: #0dcaf0 !important;
+  color: #000 !important;
+}
+
+.btn-outline-warning:hover {
+  background-color: #ffc107 !important;
+  border-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+/* Button icons spacing */
+.btn .fas.me-1,
+.btn .far.me-1,
+.btn .fab.me-1,
+.btn .fal.me-1 {
+  margin-right: 0.375rem !important;
+}
+
+/* Table row hover effect for better UX */
+table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Loading state for buttons */
+.btn:disabled {
+  opacity: 0.65 !important;
+  cursor: not-allowed !important;
+}
+
+/* Tooltip improvements for dark theme */
+.tooltip .tooltip-inner {
+  background-color: #495057 !important;
+  color: #e9ecef !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.25rem !important;
+}
+
+.tooltip .tooltip-arrow::before {
+  border-top-color: #495057 !important;
+  border-bottom-color: #495057 !important;
+  border-left-color: #495057 !important;
+  border-right-color: #495057 !important;
+}
+
+/* =========================
+   COMPACT UI SCALING (87.5%)
+   ========================= */
+
+/* Base font size reduction */
+html {
+  font-size: 0.875rem !important; /* 14px instead of 16px (87.5%) */
+}
+
+/* Typography scaling */
+h1, .h1 { font-size: 2.1875rem !important; }
+h2, .h2 { font-size: 1.75rem !important; }
+h3, .h3 { font-size: 1.3125rem !important; }
+h4, .h4 { font-size: 1.125rem !important; }
+h5, .h5 { font-size: 1rem !important; }
+h6, .h6 { font-size: 0.875rem !important; }
+
+/* Button scaling */
+.btn {
+  padding: 0.328125rem 0.65625rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.21875rem !important;
+}
+
+.btn-sm {
+  padding: 0.21875rem 0.4375rem !important;
+  font-size: 0.765625rem !important;
+  border-radius: 0.1640625rem !important;
+}
+
+.btn-lg {
+  padding: 0.4375rem 0.875rem !important;
+  font-size: 1.09375rem !important;
+  border-radius: 0.2734375rem !important;
+}
+
+/* Form elements scaling */
+.form-control {
+  padding: 0.328125rem 0.65625rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.21875rem !important;
+  min-height: calc(1.3125rem + calc(0.65625rem + 2px)) !important;
+}
+
+.form-control-sm {
+  padding: 0.21875rem 0.4375rem !important;
+  font-size: 0.765625rem !important;
+  border-radius: 0.1640625rem !important;
+  min-height: calc(1.1666rem + calc(0.4375rem + 2px)) !important;
+}
+
+.form-control-lg {
+  padding: 0.4375rem 0.875rem !important;
+  font-size: 1.09375rem !important;
+  border-radius: 0.2734375rem !important;
+  min-height: calc(1.458rem + calc(0.875rem + 2px)) !important;
+}
+
+.form-select {
+  padding: 0.328125rem 1.96875rem 0.328125rem 0.65625rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.21875rem !important;
+  min-height: calc(1.3125rem + calc(0.65625rem + 2px)) !important;
+}
+
+.form-label {
+  font-size: 0.875rem !important;
+  margin-bottom: 0.4375rem !important;
+}
+
+.form-text {
+  font-size: 0.765625rem !important;
+  margin-top: 0.21875rem !important;
+}
+
+/* Input groups scaling */
+.input-group-text {
+  padding: 0.328125rem 0.65625rem !important;
+  font-size: 0.875rem !important;
+}
+
+/* Spacing utilities scaling */
+.p-1 { padding: 0.1875rem !important; }
+.p-2 { padding: 0.375rem !important; }
+.p-3 { padding: 0.75rem !important; }
+.p-4 { padding: 1.125rem !important; }
+.p-5 { padding: 2.25rem !important; }
+
+.m-1 { margin: 0.1875rem !important; }
+.m-2 { margin: 0.375rem !important; }
+.m-3 { margin: 0.75rem !important; }
+.m-4 { margin: 1.125rem !important; }
+.m-5 { margin: 2.25rem !important; }
+
+/* Individual spacing utilities */
+.pt-1, .py-1 { padding-top: 0.1875rem !important; }
+.pt-2, .py-2 { padding-top: 0.375rem !important; }
+.pt-3, .py-3 { padding-top: 0.75rem !important; }
+.pt-4, .py-4 { padding-top: 1.125rem !important; }
+
+.pb-1, .py-1 { padding-bottom: 0.1875rem !important; }
+.pb-2, .py-2 { padding-bottom: 0.375rem !important; }
+.pb-3, .py-3 { padding-bottom: 0.75rem !important; }
+.pb-4, .py-4 { padding-bottom: 1.125rem !important; }
+
+.ps-1, .px-1 { padding-left: 0.1875rem !important; }
+.ps-2, .px-2 { padding-left: 0.375rem !important; }
+.ps-3, .px-3 { padding-left: 0.75rem !important; }
+.ps-4, .px-4 { padding-left: 1.125rem !important; }
+
+.pe-1, .px-1 { padding-right: 0.1875rem !important; }
+.pe-2, .px-2 { padding-right: 0.375rem !important; }
+.pe-3, .px-3 { padding-right: 0.75rem !important; }
+.pe-4, .px-4 { padding-right: 1.125rem !important; }
+
+.mt-1, .my-1 { margin-top: 0.1875rem !important; }
+.mt-2, .my-2 { margin-top: 0.375rem !important; }
+.mt-3, .my-3 { margin-top: 0.75rem !important; }
+.mt-4, .my-4 { margin-top: 1.125rem !important; }
+
+.mb-1, .my-1 { margin-bottom: 0.1875rem !important; }
+.mb-2, .my-2 { margin-bottom: 0.375rem !important; }
+.mb-3, .my-3 { margin-bottom: 0.75rem !important; }
+.mb-4, .my-4 { margin-bottom: 1.125rem !important; }
+
+.ms-1, .mx-1 { margin-left: 0.1875rem !important; }
+.ms-2, .mx-2 { margin-left: 0.375rem !important; }
+.ms-3, .mx-3 { margin-left: 0.75rem !important; }
+.ms-4, .mx-4 { margin-left: 1.125rem !important; }
+
+.me-1, .mx-1 { margin-right: 0.1875rem !important; }
+.me-2, .mx-2 { margin-right: 0.375rem !important; }
+.me-3, .mx-3 { margin-right: 0.75rem !important; }
+.me-4, .mx-4 { margin-right: 1.125rem !important; }
+
+/* Table scaling */
+.table {
+  font-size: 0.75rem !important;
+}
+
+.table th,
+.table td {
+  padding: 0.375rem !important;
+  vertical-align: middle;
+}
+
+.table thead th {
+  font-size: 0.6875rem !important;
+  font-weight: 600;
+}
+
+.table-sm th,
+.table-sm td {
+  padding: 0.1875rem !important;
+}
+
+/* Modal scaling */
+.modal-header {
+  padding: 0.75rem !important;
+}
+
+.modal-body {
+  padding: 0.75rem !important;
+  font-size: 0.75rem;
+}
+
+.modal-footer {
+  padding: 0.5625rem 0.75rem !important;
+}
+
+.modal-title {
+  font-size: 1rem !important;
+}
+
+.modal-sm {
+  max-width: 225px !important;
+}
+
+.modal-lg {
+  max-width: 600px !important;
+}
+
+.modal-xl {
+  max-width: 825px !important;
+}
+
+/* Navigation scaling */
+.nav-tabs .nav-link {
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.75rem !important;
+}
+
+.nav-pills .nav-link {
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.75rem !important;
+}
+
+.navbar-brand {
+  font-size: 0.9375rem !important;
+  padding-top: 0.234375rem !important;
+  padding-bottom: 0.234375rem !important;
+}
+
+.navbar-nav .nav-link {
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.75rem !important;
+}
+
+/* Card scaling */
+.card-header {
+  padding: 0.75rem !important;
+  font-size: 0.8125rem !important;
+}
+
+.card-body {
+  padding: 0.75rem !important;
+}
+
+.card-footer {
+  padding: 0.5625rem 0.75rem !important;
+}
+
+.card-title {
+  font-size: 1rem !important;
+  margin-bottom: 0.375rem !important;
+}
+
+.card-subtitle {
+  font-size: 0.75rem !important;
+  margin-bottom: 0.375rem !important;
+}
+
+/* Badge scaling */
+.badge {
+  font-size: 0.625rem !important;
+  padding: 0.1875rem 0.375rem !important;
+}
+
+/* Alert scaling */
+.alert {
+  padding: 0.5625rem 0.75rem !important;
+  font-size: 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+/* Dropdown scaling */
+.dropdown-menu {
+  font-size: 0.75rem !important;
+}
+
+.dropdown-item {
+  padding: 0.1875rem 0.75rem !important;
+}
+
+.dropdown-header {
+  font-size: 0.65625rem !important;
+  padding: 0.375rem 0.75rem !important;
+}
+
+/* Pagination scaling */
+.pagination {
+  margin-bottom: 0.75rem !important;
+}
+
+.page-link {
+  padding: 0.28125rem 0.5625rem !important;
+  font-size: 0.75rem !important;
+}
+
+.pagination-sm .page-link {
+  padding: 0.1875rem 0.375rem !important;
+  font-size: 0.65625rem !important;
+}
+
+.pagination-lg .page-link {
+  padding: 0.5625rem 0.9375rem !important;
+  font-size: 0.9375rem !important;
+}
+
+/* Breadcrumb scaling */
+.breadcrumb {
+  padding: 0.5625rem 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+  font-size: 0.75rem !important;
+}
+
+/* Progress bar scaling */
+.progress {
+  height: 0.75rem !important;
+  font-size: 0.625rem !important;
+}
+
+/* List group scaling */
+.list-group-item {
+  padding: 0.5625rem 0.75rem !important;
+  font-size: 0.75rem !important;
+}
+
+/* Icon scaling */
+.fa, .fas, .far, .fal, .fab {
+  font-size: 0.75em !important;
+}
+
+.fa-2x { font-size: 1.5em !important; }
+.fa-3x { font-size: 2.25em !important; }
+.fa-lg { font-size: 0.9375em !important; }
+.fa-sm { font-size: 0.65625em !important; }
+.fa-xs { font-size: 0.5625em !important; }
+
+/* Tooltip scaling */
+.tooltip {
+  font-size: 0.6875rem !important;
+}
+
+.tooltip .tooltip-inner {
+  padding: 0.1875rem 0.375rem !important;
+  font-size: 0.6875rem !important;
+}
+
+/* Popover scaling */
+.popover {
+  font-size: 0.75rem !important;
+}
+
+.popover-header {
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.8125rem !important;
+}
+
+.popover-body {
+  padding: 0.5625rem 0.75rem !important;
+}
+
+/* Spinner scaling */
+.spinner-border,
+.spinner-grow {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+}
+
+.spinner-border-sm,
+.spinner-grow-sm {
+  width: 0.75rem !important;
+  height: 0.75rem !important;
+}
+
+/* Grid system scaling */
+.container-fluid {
+  padding-right: 0.75rem !important;
+  padding-left: 0.75rem !important;
+}
+
+.row {
+  margin-right: -0.375rem !important;
+  margin-left: -0.375rem !important;
+}
+
+.col,
+[class*="col-"] {
+  padding-right: 0.375rem !important;
+  padding-left: 0.375rem !important;
+}
+
+/* Gutters scaling */
+.g-1,
+.gx-1 { --bs-gutter-x: 0.1875rem !important; }
+.g-1,
+.gy-1 { --bs-gutter-y: 0.1875rem !important; }
+
+.g-2,
+.gx-2 { --bs-gutter-x: 0.375rem !important; }
+.g-2,
+.gy-2 { --bs-gutter-y: 0.375rem !important; }
+
+.g-3,
+.gx-3 { --bs-gutter-x: 0.75rem !important; }
+.g-3,
+.gy-3 { --bs-gutter-y: 0.75rem !important; }
+
+.g-4,
+.gx-4 { --bs-gutter-x: 1.125rem !important; }
+.g-4,
+.gy-4 { --bs-gutter-y: 1.125rem !important; }
+
+/* Offcanvas scaling */
+.offcanvas-header {
+  padding: 0.75rem !important;
+}
+
+.offcanvas-body {
+  padding: 0.75rem !important;
+  font-size: 0.75rem !important;
+}
+
+.offcanvas-title {
+  font-size: 1rem !important;
+}
+
+/* Toast scaling */
+.toast-header {
+  padding: 0.375rem 0.5625rem !important;
+  font-size: 0.75rem !important;
+}
+
+.toast-body {
+  padding: 0.5625rem !important;
+  font-size: 0.75rem !important;
 }

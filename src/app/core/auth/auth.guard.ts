@@ -7,7 +7,7 @@ export class AuthGuard {
   canActivate: CanActivateFn = () => {
     const token = localStorage.getItem('sessionToken');
     if (!token) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth/login']);
       return false;
     }
     return true;
