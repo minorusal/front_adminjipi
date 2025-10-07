@@ -414,6 +414,14 @@ export class JobDetailsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Leer el ambiente del query parameter
+    this.route.queryParams.subscribe(queryParams => {
+      if (queryParams['env']) {
+        this.selectedEnvironment = queryParams['env'] as 'qa' | 'prod';
+        console.log('🔧 [JOB-DETAILS] Ambiente desde URL:', this.selectedEnvironment);
+      }
+    });
+
     this.route.params.subscribe(params => {
       this.jobId = params['jobId'];
       this.filters.jobId = this.jobId;

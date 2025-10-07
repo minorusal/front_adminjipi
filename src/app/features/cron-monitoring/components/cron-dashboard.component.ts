@@ -369,7 +369,9 @@ export class CronDashboardComponent implements OnInit, OnDestroy {
   }
 
   viewJobDetails(jobId: string): void {
-    this.router.navigate(['/cron-monitoring/job', jobId]);
+    this.router.navigate(['/cron-monitoring/job', jobId], {
+      queryParams: { env: this.selectedEnvironment }
+    });
   }
 
   executeJobManually(job: JobMonitoring): void {
