@@ -312,7 +312,17 @@ export class CronDashboardComponent implements OnInit, OnDestroy {
   private subscribeToFacade(): void {
     this.facade.isLoading$.subscribe(loading => this.isLoading = loading);
     this.facade.error$.subscribe(error => this.error = error);
-    this.facade.jobs$.subscribe(jobs => this.jobs = jobs);
+    this.facade.jobs$.subscribe(jobs => {
+      console.log('📋 [DASHBOARD] Jobs recibidos:', jobs);
+      jobs.forEach(job => {
+        console.log(`📋 [DASHBOARD] Job ${job.job_id}:`, {
+          last_execution: job.last_execution,
+          next_execution: job.next_execution,
+          success_rate: job.success_rate
+        });
+      });
+      this.jobs = jobs;
+    });
   }
 
   loadJobs(): void {

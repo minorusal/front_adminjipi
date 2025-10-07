@@ -57,21 +57,13 @@ export interface JobExecutionStats {
   failed_executions: number;
   manual_executions: number;
   automatic_executions: number;
-  success_rate: number;
-  failure_rate: number;
+  success_rate: number | string;  // Puede venir como número o string
+  failure_rate: number | string;
   avg_duration_ms: number;
   max_duration_ms: number;
   min_duration_ms: number;
   avg_memory_mb: number;
-  last_execution: {
-    id: number;
-    job_id: string;
-    execution_type: string;
-    status: string;
-    start_time: string;
-    end_time: string;
-    duration_ms: number;
-  } | null;
+  last_execution: string | null;  // ISO timestamp string, ej: "2025-10-06T23:00:00.000Z"
 }
 
 // Respuesta real de GET /api/cron/jobs

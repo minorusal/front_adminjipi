@@ -125,14 +125,15 @@ export class CronMonitoringFacade {
         )
       }).pipe(
         map(({ job, stats, logs }) => {
-          // Determinar última ejecución: priorizar ultima_ejecucion_real
+          // Determinar última ejecución: priorizar ultima_ejecucion_real, sino usar stats.last_execution
           let lastExecution: string | undefined;
           if (stats.error === false && stats.ultima_ejecucion_real) {
             lastExecution = stats.ultima_ejecucion_real;
             console.log(`✅ [FACADE] Job ${job.job_id}: usando ultima_ejecucion_real =`, stats.ultima_ejecucion_real);
           } else if (stats.error === false && stats.stats?.last_execution) {
-            lastExecution = stats.stats.last_execution.start_time;
-            console.log(`⚠️ [FACADE] Job ${job.job_id}: usando stats.last_execution.start_time =`, stats.stats.last_execution.start_time);
+            // stats.last_execution es un string ISO timestamp directo
+            lastExecution = stats.stats.last_execution as any;
+            console.log(`⚠️ [FACADE] Job ${job.job_id}: usando stats.last_execution =`, stats.stats.last_execution);
           } else {
             lastExecution = undefined;
             console.log(`❌ [FACADE] Job ${job.job_id}: sin última ejecución`);

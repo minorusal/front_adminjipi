@@ -96,12 +96,12 @@ import { environment as environmentProd } from '../../../../environments/environ
                     Tasa de Éxito
                   </div>
                   <div class="h5 mb-0 font-weight-bold text-gray-800">
-                    {{ stats.success_rate.toFixed(1) }}%
+                    {{ formatSuccessRate(stats.success_rate) }}%
                   </div>
                   <div class="progress mt-2" style="height: 4px;">
                     <div
                       class="progress-bar bg-success"
-                      [style.width.%]="stats.success_rate">
+                      [style.width.%]="getSuccessRateValue(stats.success_rate)">
                     </div>
                   </div>
                 </div>
@@ -143,13 +143,13 @@ import { environment as environmentProd } from '../../../../environments/environ
                   </div>
                   <div class="small mb-0 font-weight-bold text-gray-800">
                     <span *ngIf="stats && stats.last_execution">
-                      {{ cronService.getRelativeTime(stats.last_execution.start_time) }}
+                      {{ cronService.getRelativeTime(stats.last_execution) }}
                     </span>
                     <span *ngIf="!stats || !stats.last_execution" class="text-muted">Sin ejecuciones</span>
                   </div>
                   <div *ngIf="stats && stats.last_execution" class="mt-1">
                     <small class="text-muted">
-                      {{ formatDate(stats.last_execution.start_time) }}
+                      {{ formatDate(stats.last_execution) }}
                     </small>
                   </div>
                 </div>
@@ -594,5 +594,19 @@ export class JobDetailsComponent implements OnInit, OnDestroy {
       minute: '2-digit',
       second: '2-digit'
     });
+  }
+
+  formatSuccessRate(rate: number | string): string {
+    if (typeof rate === 'string') {
+      return rate;
+    }
+    return rate.toFixed(1);
+  }
+
+  getSuccessRateValue(rate: number | string): number {
+    if (typeof rate === 'string') {
+      return parseFloat(rate);
+    }
+    return rate;
   }
 }

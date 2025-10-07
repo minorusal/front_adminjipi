@@ -222,7 +222,16 @@ export class CronMonitoringService {
    * Calcula el tiempo relativo desde una fecha
    */
   getRelativeTime(dateString: string): string {
+    if (!dateString) return 'N/A';
+
     const date = new Date(dateString);
+
+    // Validar que la fecha es válida
+    if (isNaN(date.getTime())) {
+      console.error('❌ [SERVICE] getRelativeTime: fecha inválida:', dateString);
+      return 'N/A';
+    }
+
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
 
