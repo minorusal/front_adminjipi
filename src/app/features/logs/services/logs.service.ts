@@ -5,6 +5,8 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import {
   LogFilesResponse,
+  LogFilesApiResponse,
+  LogFile,
   LogSearchResponse,
   LogSearchParams,
   LogTailOptions,
@@ -39,7 +41,54 @@ export class LogsService {
       .set('limit', limit.toString());
 
     const apiUrl = baseUrl ? `${baseUrl}/api/certification/logs` : this.defaultBaseUrl;
-    return this.http.get<LogFilesResponse>(`${apiUrl}/files`, { params });
+
+    console.log('📂 [LOGS SERVICE] Fetching log files from:', `${apiUrl}/files`);
+    console.log('📂 [LOGS SERVICE] Params:', params.toString());
+
+    return this.http.get<LogFilesApiResponse>(`${apiUrl}/files`, { params }).pipe(
+      map((apiResponse: LogFilesApiResponse) => {
+        console.log('📂 [LOGS SERVICE] API Response:', apiResponse);
+
+        // Transform API response to match the expected LogFilesResponse structure
+        const mappedFiles: LogFile[] = (apiResponse.results?.files || []).map(file => ({
+          filename: file.filename,
+          size: file.size,
+          lastModified: file.mtime,
+          path: `logs/${file.filename}`,
+          type: 'archived' as const,
+          date: file.date,
+          mtime: file.mtime,
+          readable: file.readable
+        }));
+
+        console.log('📂 [LOGS SERVICE] Mapped files:', mappedFiles);
+
+        const response: LogFilesResponse = {
+          error: apiResponse.error,
+          message: apiResponse.error ? 'Error fetching files' : 'Success',
+          ok: !apiResponse.error,
+          data: {
+            files: mappedFiles,
+            stats: {
+              totalFiles: apiResponse.results?.pagination?.total || 0,
+              totalSize: mappedFiles.reduce((sum, f) => sum + f.size, 0),
+              newestFile: mappedFiles[0]?.filename || '',
+              oldestFile: mappedFiles[mappedFiles.length - 1]?.filename || '',
+              currentLogSize: mappedFiles[0]?.size || 0
+            },
+            pagination: {
+              page: apiResponse.results?.pagination?.page || 1,
+              limit: apiResponse.results?.pagination?.limit || 20,
+              total: apiResponse.results?.pagination?.total || 0,
+              totalPages: apiResponse.results?.pagination?.total_pages || 0
+            }
+          }
+        };
+
+        console.log('📂 [LOGS SERVICE] Final response:', response);
+        return response;
+      })
+    );
   }
 
   /**

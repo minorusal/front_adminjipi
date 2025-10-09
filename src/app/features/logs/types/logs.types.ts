@@ -4,6 +4,9 @@ export interface LogFile {
   lastModified: string;
   path: string;
   type: 'current' | 'archived';
+  date?: string;
+  mtime?: string;
+  readable?: boolean;
 }
 
 export interface LogFileStats {
@@ -12,6 +15,26 @@ export interface LogFileStats {
   newestFile: string;
   oldestFile: string;
   currentLogSize: number;
+}
+
+// Estructura real del endpoint /api/certification/logs/files
+export interface LogFilesApiResponse {
+  error: boolean;
+  results: {
+    files: Array<{
+      date: string;
+      filename: string;
+      size: number;
+      mtime: string;
+      readable: boolean;
+    }>;
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      total_pages: number;
+    };
+  };
 }
 
 export interface LogFilesResponse {

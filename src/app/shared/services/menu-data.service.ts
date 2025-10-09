@@ -161,58 +161,115 @@ export class MenuDataService {
         children: [
           {
             id: '5-1',
-            label: 'BlocBloc',
-            icon: 'fas fa-cube',
-            route: '/monitoring/blocbloc',
-            parentId: '5'
+            label: 'APIs Externas',
+            icon: 'fas fa-plug',
+            parentId: '5',
+            expanded: false,
+            children: [
+              {
+                id: '5-1-1',
+                label: 'BlocBloc',
+                icon: 'fas fa-cube',
+                route: '/monitoring/blocbloc',
+                parentId: '5-1'
+              },
+              {
+                id: '5-1-2',
+                label: 'SAT (Konesh)',
+                icon: 'fas fa-receipt',
+                route: '/monitoring/konesh',
+                parentId: '5-1'
+              },
+              {
+                id: '5-1-3',
+                label: 'Reportes de Crédito',
+                icon: 'fas fa-file-invoice-dollar',
+                route: '/monitoring/credit-reports',
+                parentId: '5-1'
+              },
+              {
+                id: '5-1-4',
+                label: 'Mailjet',
+                icon: 'fas fa-envelope',
+                route: '/monitoring/mailjet',
+                parentId: '5-1'
+              }
+            ]
           },
           {
             id: '5-2',
-            label: 'SAT (Konesh)',
-            icon: 'fas fa-receipt',
-            route: '/monitoring/konesh',
-            parentId: '5'
+            label: 'Tareas Programadas',
+            icon: 'fas fa-clock',
+            parentId: '5',
+            expanded: false,
+            children: [
+              {
+                id: '5-2-1',
+                label: 'Cron Jobs',
+                icon: 'fas fa-clock',
+                route: '/cron-monitoring',
+                parentId: '5-2'
+              },
+              {
+                id: '5-2-2',
+                label: 'Diagnóstico Cron',
+                icon: 'fas fa-bug',
+                route: '/cron-monitoring/diagnostics',
+                parentId: '5-2'
+              }
+            ]
           },
           {
             id: '5-3',
-            label: 'Reportes de Crédito',
-            icon: 'fas fa-file-invoice-dollar',
-            route: '/monitoring/credit-reports',
-            parentId: '5'
+            label: 'Usuarios y Registro',
+            icon: 'fas fa-users',
+            parentId: '5',
+            expanded: false,
+            children: [
+              {
+                id: '5-3-1',
+                label: 'Usuarios No Confirmados',
+                icon: 'fas fa-user-clock',
+                route: '/unconfirmed-users-monitoring',
+                parentId: '5-3'
+              },
+              {
+                id: '5-3-2',
+                label: 'Intentos de Registro',
+                icon: 'fas fa-user-plus',
+                route: '/registration-attempts-monitoring',
+                parentId: '5-3'
+              }
+            ]
           },
           {
             id: '5-4',
-            label: 'Bitácora de Endpoints',
-            icon: 'fas fa-list-alt',
-            route: '/monitoring/bitacora',
-            parentId: '5'
+            label: 'Sistema y Logs',
+            icon: 'fas fa-server',
+            parentId: '5',
+            expanded: false,
+            children: [
+              {
+                id: '5-4-1',
+                label: 'Bitácora de Endpoints',
+                icon: 'fas fa-list-alt',
+                route: '/monitoring/bitacora',
+                parentId: '5-4'
+              },
+              {
+                id: '5-4-2',
+                label: 'Gestión de Logs',
+                icon: 'fas fa-file-alt',
+                route: '/monitoring/logs',
+                parentId: '5-4'
+              }
+            ]
           },
           {
             id: '5-5',
-            label: 'Gestión de Logs',
-            icon: 'fas fa-file-alt',
-            route: '/monitoring/logs',
-            parentId: '5'
-          },
-          {
-            id: '5-6',
-            label: 'Mailjet',
-            icon: 'fas fa-envelope',
-            route: '/monitoring/mailjet',
-            parentId: '5'
-          },
-          {
-            id: '5-7',
-            label: 'Cron Jobs',
-            icon: 'fas fa-clock',
-            route: '/cron-monitoring',
-            parentId: '5'
-          },
-          {
-            id: '5-8',
-            label: 'Diagnóstico Cron',
-            icon: 'fas fa-bug',
-            route: '/cron-monitoring/diagnostics',
+            label: 'Encuestas',
+            icon: 'fas fa-poll',
+            route: '/encuestas-monitoring',
             parentId: '5'
           }
         ]

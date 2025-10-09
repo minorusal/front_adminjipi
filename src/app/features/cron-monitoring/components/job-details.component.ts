@@ -589,7 +589,9 @@ export class JobDetailsComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/cron-monitoring']);
+    this.router.navigate(['/cron-monitoring'], {
+      queryParams: { env: this.selectedEnvironment }
+    });
   }
 
   formatDate(dateString: string): string {

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CronMonitoringFacade } from '../data-access/cron-monitoring.facade';
 import { CronMonitoringService } from '../services/cron-monitoring.service';
 import { JobMonitoring, ExecutionLog } from '../types/cron.types';
@@ -297,10 +297,19 @@ export class CronDashboardComponent implements OnInit, OnDestroy {
   constructor(
     public facade: CronMonitoringFacade,
     public cronService: CronMonitoringService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    // Leer el ambiente del query parameter
+    this.route.queryParams.subscribe(queryParams => {
+      if (queryParams['env']) {
+        this.selectedEnvironment = queryParams['env'] as 'qa' | 'prod';
+        console.log('🔧 [DASHBOARD] Ambiente desde URL:', this.selectedEnvironment);
+      }
+    });
+
     this.subscribeToFacade();
     this.loadJobs();
   }

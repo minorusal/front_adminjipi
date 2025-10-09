@@ -230,6 +230,54 @@ export const appRoutes: Routes = [
     ],
   },
   {
+    path: 'encuestas-monitoring',
+    loadComponent: () =>
+      import('./shared/components/main-layout.component').then(
+        (m) => m.MainLayoutComponent
+      ),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/encuestas-monitoring/components/encuestas-dashboard.component').then(
+            (m) => m.EncuestasDashboardComponent
+          ),
+      },
+    ],
+  },
+  {
+    path: 'unconfirmed-users-monitoring',
+    loadComponent: () =>
+      import('./shared/components/main-layout.component').then(
+        (m) => m.MainLayoutComponent
+      ),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/unconfirmed-users-monitoring/components/unconfirmed-users-dashboard.component').then(
+            (m) => m.UnconfirmedUsersDashboardComponent
+          ),
+      },
+    ],
+  },
+  {
+    path: 'registration-attempts-monitoring',
+    loadComponent: () =>
+      import('./shared/components/main-layout.component').then(
+        (m) => m.MainLayoutComponent
+      ),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/registration-attempts-monitoring/components/registration-attempts-dashboard.component').then(
+            (m) => m.RegistrationAttemptsDashboardComponent
+          ),
+      },
+    ],
+  },
+  {
     path: 'algoritmo',
     loadComponent: () =>
       import('./shared/components/main-layout.component').then(
