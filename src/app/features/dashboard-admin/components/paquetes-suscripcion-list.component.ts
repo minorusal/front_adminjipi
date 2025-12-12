@@ -35,6 +35,29 @@ import { environment as environmentProd } from '../../../../environments/environ
         <button type="button" class="btn-close" (click)="clearError()"></button>
       </div>
 
+      <!-- Indicador de Ambiente -->
+      <div class="alert mb-3" [class.alert-warning]="selectedEnvironment === 'qa'" [class.alert-danger]="selectedEnvironment === 'prod'" role="alert">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <i class="fas fa-server me-2"></i>
+            <strong>Ambiente Actual:</strong>
+            <span class="ms-2">
+              {{ selectedEnvironment === 'qa' ? 'QA (Desarrollo)' : 'PRODUCCIÓN' }}
+            </span>
+            <span class="ms-2 text-muted small">
+              • {{ selectedEnvironment === 'qa' ? qaApiUrl : prodApiUrl }}
+            </span>
+          </div>
+          <span class="badge" [class.bg-warning]="selectedEnvironment === 'qa'" [class.bg-danger]="selectedEnvironment === 'prod'" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+            {{ selectedEnvironment === 'qa' ? 'DESARROLLO' : 'PRODUCCIÓN' }}
+          </span>
+        </div>
+        <small *ngIf="selectedEnvironment === 'prod'" class="d-block mt-2">
+          <i class="fas fa-exclamation-triangle me-1"></i>
+          <strong>ATENCIÓN:</strong> Estás trabajando en el ambiente de PRODUCCIÓN. Los cambios afectarán a los usuarios reales.
+        </small>
+      </div>
+
       <!-- Filtros -->
       <div class="card shadow-sm mb-4">
         <div class="card-body">
