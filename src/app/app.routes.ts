@@ -340,8 +340,66 @@ export const appRoutes: Routes = [
       },
     ],
   },
-  { 
-    path: '', 
+  {
+    path: 'dashboard-admin',
+    loadComponent: () =>
+      import('./shared/components/main-layout.component').then(
+        (m) => m.MainLayoutComponent
+      ),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/dashboard-admin/components/dashboard-suscripciones.component').then(
+            (m) => m.DashboardSuscripcionesComponent
+          ),
+      },
+      {
+        path: 'alertas',
+        loadComponent: () =>
+          import('./features/dashboard-admin/components/alertas-dashboard.component').then(
+            (m) => m.AlertasDashboardComponent
+          ),
+      },
+      {
+        path: 'transacciones',
+        loadComponent: () =>
+          import('./features/dashboard-admin/components/transacciones-dashboard.component').then(
+            (m) => m.TransaccionesDashboardComponent
+          ),
+      },
+      {
+        path: 'cobros-recurrentes',
+        loadComponent: () =>
+          import('./features/dashboard-admin/components/cobros-recurrentes-dashboard.component').then(
+            (m) => m.CobrosRecurrentesDashboardComponent
+          ),
+      },
+      {
+        path: 'estadisticas',
+        loadComponent: () =>
+          import('./features/dashboard-admin/components/estadisticas-stripe-dashboard.component').then(
+            (m) => m.EstadisticasStripeDashboardComponent
+          ),
+      },
+      {
+        path: 'empresas',
+        loadComponent: () =>
+          import('./features/dashboard-admin/components/empresas-suscripciones-dashboard.component').then(
+            (m) => m.EmpresasSuscripcionesDashboardComponent
+          ),
+      },
+      {
+        path: 'paquetes',
+        loadComponent: () =>
+          import('./features/dashboard-admin/components/paquetes-management.component').then(
+            (m) => m.PaquetesManagementComponent
+          ),
+      },
+    ],
+  },
+  {
+    path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full'
   },

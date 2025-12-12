@@ -164,7 +164,7 @@ import { environment as environmentProd } from '../../../../environments/environ
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let job of jobs" class="cursor-pointer" (click)="viewJobDetails(job.job_id)">
+                    <tr *ngFor="let job of paginatedJobs" class="cursor-pointer" (click)="viewJobDetails(job.job_id)">
                       <td><code>{{ job.job_id }}</code></td>
                       <td>
                         <div>{{ job.nombre_job }}</div>
@@ -238,13 +238,34 @@ import { environment as environmentProd } from '../../../../environments/environ
                         </button>
                       </td>
                     </tr>
-                    <tr *ngIf="jobs.length === 0 && !isLoading">
+                    <tr *ngIf="paginatedJobs.length === 0 && !isLoading">
                       <td colspan="8" class="text-center text-muted py-4">
                         No hay jobs configurados
                       </td>
                     </tr>
                   </tbody>
                 </table>
+              </div>
+
+              <!-- Paginación -->
+              <div class="d-flex justify-content-between align-items-center mt-3" *ngIf="totalRecords > pageSize">
+                <div>
+                  Mostrando {{ (currentPage * pageSize) + 1 }} - {{ Math.min((currentPage + 1) * pageSize, totalRecords) }} de {{ totalRecords }}
+                </div>
+                <div class="btn-group">
+                  <button
+                    class="btn btn-sm btn-outline-primary"
+                    [disabled]="currentPage === 0"
+                    (click)="previousPage()">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-primary"
+                    [disabled]="(currentPage + 1) * pageSize >= totalRecords"
+                    (click)="nextPage()">
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -286,13 +307,21 @@ import { environment as environmentProd } from '../../../../environments/environ
 })
 export class CronDashboardComponent implements OnInit, OnDestroy {
   jobs: JobMonitoring[] = [];
+  paginatedJobs: JobMonitoring[] = [];
   isLoading = false;
   error: string | null = null;
   autoRefresh = false;
 
+  // Paginación
+  pageSize = 10;
+  currentPage = 0;
+  totalRecords = 0;
+
   selectedEnvironment: 'qa' | 'prod' = 'qa';
   qaApiUrl: string = environment.apiUrl;
   prodApiUrl: string = environmentProd.apiUrl;
+
+  Math = Math;
 
   constructor(
     public facade: CronMonitoringFacade,
@@ -331,7 +360,29 @@ export class CronDashboardComponent implements OnInit, OnDestroy {
         });
       });
       this.jobs = jobs;
+      this.totalRecords = jobs.length;
+      this.updatePaginatedJobs();
     });
+  }
+
+  updatePaginatedJobs(): void {
+    const startIndex = this.currentPage * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedJobs = this.jobs.slice(startIndex, endIndex);
+  }
+
+  nextPage(): void {
+    if ((this.currentPage + 1) * this.pageSize < this.totalRecords) {
+      this.currentPage++;
+      this.updatePaginatedJobs();
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.updatePaginatedJobs();
+    }
   }
 
   loadJobs(): void {

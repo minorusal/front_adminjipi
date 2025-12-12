@@ -126,6 +126,54 @@ export interface RegistrationAttemptsResponse {
 // Tipos de alerta para IP sospechosa (estructura real del API)
 export type RiskLevel = 'CRÍTICO' | 'ALTO' | 'MEDIO' | 'BAJO';
 
+// Desglose de puntuación de riesgo
+export interface DetallePuntuacion {
+  total: number;
+  breakdown: {
+    intentos_totales: {
+      valor: number;
+      peso: number;
+      puntos: number;
+    };
+    rfcs_diferentes: {
+      valor: number;
+      peso: number;
+      puntos: number;
+    };
+    emails_diferentes: {
+      valor: number;
+      peso: number;
+      puntos: number;
+    };
+    intentos_fallidos: {
+      valor: string | number;
+      peso: number;
+      puntos: number;
+    };
+    intentos_exitosos: {
+      valor: string | number;
+      peso: number;
+      puntos: number;
+    };
+  };
+  explicacion: {
+    como_se_calcula: string;
+    factores: {
+      intentos_totales: string;
+      rfcs_diferentes: string;
+      emails_diferentes: string;
+      intentos_fallidos: string;
+      intentos_exitosos: string;
+    };
+    rangos_interpretacion: {
+      '0-50': string;
+      '51-150': string;
+      '151-300': string;
+      '301+': string;
+    };
+  };
+}
+
 // Alerta individual de IP (estructura real del API)
 export interface IPAlert {
   ip_address: string;
@@ -141,6 +189,7 @@ export interface IPAlert {
   tipos_alerta: string[];
   recomendaciones: string[];
   puntuacion_riesgo: number;
+  detalle_puntuacion?: DetallePuntuacion;
   intentos_por_hora: number;
   horas_actividad: number;
   tipos_fallo_array: string[];

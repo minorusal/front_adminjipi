@@ -1,9 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { MenuItem } from '../types/menu.types';
 import { MenuDataService } from '../services/menu-data.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sidebar-menu',
@@ -351,11 +353,12 @@ import { AuthService } from '../../core/auth/auth.service';
   `],
   changeDetection: ChangeDetectionStrategy.Default,
 })
-export class SidebarMenuComponent implements OnInit {
+export class SidebarMenuComponent implements OnInit, OnDestroy {
   @Input() isCollapsed = false;
   @Output() sidebarToggle = new EventEmitter<boolean>();
-  
+
   menuItems: MenuItem[] = [];
+  private routerSubscription?: Subscription;
 
   constructor(
     private menuDataService: MenuDataService,
@@ -366,6 +369,22 @@ export class SidebarMenuComponent implements OnInit {
   ngOnInit() {
     console.log('SidebarMenuComponent initialized - Logout button should be visible');
     this.menuItems = this.menuDataService.getMenuItems();
+
+    // Expandir items basados en la ruta actual al inicializar
+    this.expandMenuBasedOnCurrentRoute();
+
+    // Suscribirse a cambios de navegación
+    this.routerSubscription = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.expandMenuBasedOnCurrentRoute();
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
   }
 
   toggleSidebar() {
@@ -406,6 +425,48 @@ export class SidebarMenuComponent implements OnInit {
   isActiveRoute(route?: string): boolean {
     if (!route) return false;
     return this.router.url === route;
+  }
+
+  private expandMenuBasedOnCurrentRoute() {
+    const currentUrl = this.router.url;
+
+    // Primero, colapsar todos los items
+    this.collapseAllItems(this.menuItems);
+
+    // Luego, encontrar y expandir los padres de la ruta actual
+    this.findAndExpandParents(this.menuItems, currentUrl);
+  }
+
+  private collapseAllItems(items: MenuItem[]) {
+    items.forEach(item => {
+      item.expanded = false;
+      if (item.children) {
+        this.collapseAllItems(item.children);
+      }
+    });
+  }
+
+  private findAndExpandParents(items: MenuItem[], currentUrl: string): boolean {
+    for (const item of items) {
+      // Verificar si este item coincide con la ruta actual
+      // Usamos una lógica más precisa: la URL debe ser exactamente la ruta o comenzar con la ruta seguida de /
+      if (item.route) {
+        const routeMatches = currentUrl === item.route ||
+                           currentUrl.startsWith(item.route + '/');
+        if (routeMatches) {
+          return true;
+        }
+      }
+
+      if (item.children) {
+        const childMatches = this.findAndExpandParents(item.children, currentUrl);
+        if (childMatches) {
+          item.expanded = true;
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   handleLogout() {

@@ -271,6 +271,64 @@ export class MenuDataService {
             icon: 'fas fa-poll',
             route: '/encuestas-monitoring',
             parentId: '5'
+          },
+          {
+            id: '5-6',
+            label: 'Suscripciones',
+            icon: 'fas fa-credit-card',
+            parentId: '5',
+            expanded: false,
+            children: [
+              {
+                id: '5-6-1',
+                label: 'Dashboard',
+                icon: 'fas fa-tachometer-alt',
+                route: '/dashboard-admin',
+                parentId: '5-6'
+              },
+              {
+                id: '5-6-2',
+                label: 'Alertas',
+                icon: 'fas fa-exclamation-triangle',
+                route: '/dashboard-admin/alertas',
+                parentId: '5-6'
+              },
+              {
+                id: '5-6-3',
+                label: 'Transacciones',
+                icon: 'fas fa-exchange-alt',
+                route: '/dashboard-admin/transacciones',
+                parentId: '5-6'
+              },
+              {
+                id: '5-6-4',
+                label: 'Cobros Recurrentes',
+                icon: 'fas fa-sync-alt',
+                route: '/dashboard-admin/cobros-recurrentes',
+                parentId: '5-6'
+              },
+              {
+                id: '5-6-5',
+                label: 'Estadísticas',
+                icon: 'fas fa-chart-pie',
+                route: '/dashboard-admin/estadisticas',
+                parentId: '5-6'
+              },
+              {
+                id: '5-6-6',
+                label: 'Empresas',
+                icon: 'fas fa-building',
+                route: '/dashboard-admin/empresas',
+                parentId: '5-6'
+              },
+              {
+                id: '5-6-7',
+                label: 'Gestión de Paquetes',
+                icon: 'fas fa-box-open',
+                route: '/dashboard-admin/paquetes',
+                parentId: '5-6'
+              }
+            ]
           }
         ]
       },
